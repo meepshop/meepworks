@@ -1,0 +1,16 @@
+{
+	"name":"meepworks-menu",
+	"main":"menu.js",
+	"scripts":["menu.js"],
+	"styles":["menu.css"],
+	"local":
+	[
+		"react",
+		"meepworks-core",
+		"meepworks-tip"
+	],
+	"dependencies":{
+		"esundahl/fading-entrances":"*",
+		"esundahl/fading-exits":"*"
+	}
+}

@@ -1,0 +1,24 @@
+{
+	"name":"meepworks",
+	"description":"meepshop front-end framework based on Component, Reactjs and KOA js",
+	"version":"0.0.1",
+	"author":"Jack Tzu-Chieh Huang",
+	"scripts":{
+		"start":"sudo npm install && gulp"
+	},
+	"dependencies":{
+		"component":"0.x.x",
+		"express":"*",
+		"es5-shim":"*",
+		"component-builder": "0.x.x",
+		"component-resolver": "0.x.x"
+	},
+	"devDependencies":{
+		"gulp":"*",
+		"gulp-rename":"*",
+		"gulp-uglify":"*",
+		"gulp-component":"*",
+		"gulp-watch":"*"
+	}
+
+}

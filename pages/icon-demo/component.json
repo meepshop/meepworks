@@ -1,0 +1,13 @@
+{
+	"name":"icon-demo",
+	"main":"icon-demo.js",
+	"scripts":["icon-demo.js"],
+	"styles":["icon-demo.css"],
+	"local":[
+		"react",
+		"meepworks-core",
+		"meepworks-app",
+		"meepworks-icon",
+		"meepworks-button"
+	]
+}

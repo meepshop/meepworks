@@ -1,0 +1,13 @@
+{
+	"name":"meepworks-button",
+	"main":"button.js",
+	"scripts":["button.js"],
+	"styles":["button.css"],
+	"local":[
+		"react",
+		"meepworks-core",
+		"meepworks-tip",
+		"meepworks-menu"
+	]
+
+}

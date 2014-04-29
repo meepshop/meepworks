@@ -1,0 +1,10 @@
+{
+	"name":"meepworks-loader",
+	"description":"remote require module",
+	"main":"loader.js",
+	"scripts":["loader.js"],
+	"dependencies":{
+		"visionmedia/superagent":"*",
+		"then/promise":"*"
+	}
+}

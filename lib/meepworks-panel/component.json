@@ -1,0 +1,12 @@
+{
+	"name":"meepworks-panel",
+	"main":"panel.js",
+	"scripts":["panel.js"],
+	"styles":["panel.css"],
+	"local":[
+		"react",
+		"meepworks-core",
+		"meepworks-button",
+		"meepworks-icon"
+	]
+}

@@ -1,0 +1,97 @@
+/** 
+ * Magic layout with isotope
+ * Beautifull layout inspired by google+
+ * Support with 2-4 elements coloumn
+ *
+ * if your viewport > 1280 this is support with 2-4 elements coloumn
+ * but if your viewport less then or equel 1280 this is only support with 2 element column
+ * 
+ * usage: 
+ *   add data-cols="3" or data-cols="4" to magic layout element 
+ *   <div class="magic-layout" data-cols="4">...</div>
+ */
+ .magic-layout{
+ 	position: relative;
+ 	margin-bottom: 20px;
+ }
+ .magic-layout:after{
+ 	display: block;
+ 	content: '';
+ 	clear: both;
+ }
+ /* percentage-based widths for fluid/responsive layout */
+ .magic-layout > .magic-element {
+ 	margin: 10px 1%;
+ 	width: 46.5%;		/* default is 2 coloumns */
+ }
+ .magic-layout > .magic-element.width-2x,
+ .magic-layout > .magic-element.width-3x,
+ .magic-layout > .magic-element.width-4x,
+ .magic-layout > .magic-element.width-full{
+ 	width: 96.5%;		/* width full */
+ }
+
+ .magic-layout.ml-col-3 > .magic-element {
+ 	width: 30.5%;		/* 3 coloumns */
+ }
+ .magic-layout.ml-col-3 > .magic-element.width-2x{
+ 	width: 63.53%;		/* width 2:3 */
+ }
+ .magic-layout.ml-col-3 > .magic-element.width-3x,
+ .magic-layout.ml-col-3 > .magic-element.width-4x,
+ .magic-layout.ml-col-3 > .magic-element.width-full{
+ 	width: 97.25%;		/* width full */
+ }
+
+ .magic-layout.ml-col-4 > .magic-element {
+ 	width: 22%;			/* 4 coloumns */
+ }
+ .magic-layout.ml-col-4 > .magic-element.width-2x{
+ 	width: 47%;		/* width 2:4 */
+ }
+ .magic-layout.ml-col-4 > .magic-element.width-3x{
+ 	width: 71.75%;		/* width 3:4 */
+ }
+ .magic-layout.ml-col-4 > .magic-element.width-4x,
+ .magic-layout.ml-col-4 > .magic-element.width-full{
+ 	width: 97%;		/* width full */
+ }
+
+ /* isotope transition */
+ .isotope,
+ .isotope .isotope-item {
+ 	/* change duration value to whatever you like */
+ 	-webkit-transition-duration: 0.3s;
+ 	-moz-transition-duration: 0.3s;
+ 	-ms-transition-duration: 0.3s;
+ 	-o-transition-duration: 0.3s;
+ 	transition-duration: 0.3s;
+ }
+
+ .isotope {
+ 	-webkit-transition-property: height, width;
+ 	-moz-transition-property: height, width;
+ 	-ms-transition-property: height, width;
+ 	-o-transition-property: height, width;
+ 	transition-property: height, width;
+ }
+
+ .isotope .isotope-item {
+ 	-webkit-transition-property: -webkit-transform, opacity;
+ 	-moz-transition-property:    -moz-transform, opacity;
+ 	-ms-transition-property:     -ms-transform, opacity;
+ 	-o-transition-property:      -o-transform, opacity;
+ 	transition-property:         transform, opacity;
+ }
+
+ /**** disabling Isotope CSS3 transitions ****/
+ .isotope.no-transition,
+ .isotope.no-transition .isotope-item,
+ .isotope .isotope-item.no-transition {
+ 	-webkit-transition-duration: 0s;
+ 	-moz-transition-duration: 0s;
+ 	-ms-transition-duration: 0s;
+ 	-o-transition-duration: 0s;
+ 	transition-duration: 0s;
+ }
+ /* End Magic layout */

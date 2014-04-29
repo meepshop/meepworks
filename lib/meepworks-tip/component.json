@@ -1,0 +1,10 @@
+{
+	"name":"meepworks-tip",
+	"main":"tip.js",
+	"scripts": ["tip.js"],
+	"styles": ["tip.css"],
+	"local":[
+		"react",
+		"meepworks-core"
+	]
+}

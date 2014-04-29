@@ -1,0 +1,13 @@
+{
+	"name":"meepworks-pagination",
+	"version":"0.0.1",
+	"main": "pagination.js",
+	"scripts":["pagination.js"],
+	"styles":["pagination.css"],
+	"local":[
+		"react",
+		"meepworks-core",
+		"meepworks-input",
+		"meepworks-menu"
+	]
+}

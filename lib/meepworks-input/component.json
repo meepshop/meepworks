@@ -1,0 +1,11 @@
+{
+	"name":"meepworks-input",
+	"main":"input.js",
+	"scripts":["input.js"],
+	"styles":["input.css"],
+	"local":[
+		"react",
+		"meepworks-core",
+		"meepworks-button"
+	]
+}

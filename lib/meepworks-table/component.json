@@ -1,0 +1,11 @@
+{
+	"name":"meepworks-table",
+	"main":"table.js",
+	"scripts":["table.js"],
+	"styles":["table.css"],
+	"local":[
+		"react",
+		"meepworks-core",
+		"meepworks-tip"
+	]
+}

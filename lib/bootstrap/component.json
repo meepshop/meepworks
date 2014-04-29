@@ -1,0 +1,5 @@
+{
+	"name": "bootstrap",
+	"description": "core bootstrap css",
+	"styles":["bootstrap.css"]
+}

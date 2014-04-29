@@ -1,0 +1,4 @@
+{
+	"name":"es5-shim",
+	"scripts":["es5-shim.js"]
+}

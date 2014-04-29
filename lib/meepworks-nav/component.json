@@ -1,0 +1,11 @@
+{
+	"name":"meepworks-nav",
+	"main":"nav.js",
+	"scripts":["nav.js"],
+	"styles":["nav.css"],
+	"local":[
+		"meepworks-core",
+		"meepworks-icon",
+		"react"
+	]
+}

@@ -1,0 +1,21 @@
+{
+	"name": "meepworks-icon",
+	"description":"packages glyphicons from bootstrap and ionicons",
+	"main":"icon.js",
+	"scripts": ["icon.js"],
+	"styles":["icon.css"],
+	"fonts":[
+		"/fonts/glyphicons-halflings-regular.eot",
+		"/fonts/glyphicons-halflings-regular.ttf",
+		"/fonts/glyphicons-halflings-regular.svg",
+		"/fonts/glyphicons-halflings-regular.woff"
+	],
+	"local":[
+		"react",
+		"meepworks-core"
+	],
+	"dependencies":{
+		"driftyco/ionicons":"*"
+	}
+
+}

@@ -1,0 +1,19 @@
+{
+	"name":"meepworks",
+	"author":"Jack Tzu-Chieh Huang",
+	"paths":["lib", "pages"],
+	"local":[
+		"meepworks-core",
+		"meepworks-menu",
+		"meepworks-nav",
+		"meepworks-wrapper",
+		"meepworks-router",
+		"meepworks-module",
+		"button-demo",
+		"icon-demo",
+		"progress",
+		"listview-demo",
+		"react",
+		"syrena-admin"
+	]
+}

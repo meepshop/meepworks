@@ -1,0 +1,12 @@
+{
+	"name":"meepworks-form",
+	"main":"form.js",
+	"scripts":["form.js"],
+	"styles":["form.css"],
+	"local":[
+		"react",
+		"meepworks-core",
+		"meepworks-input",
+		"meepworks-tip"
+	]
+}

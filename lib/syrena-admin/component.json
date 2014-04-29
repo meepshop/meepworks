@@ -1,0 +1,9 @@
+{
+	"name":"syrena-admin",
+	"scripts":["index.js"],
+	"styles": [
+		"theme.css",
+		"typography.css",
+		"components.css"
+	]
+}

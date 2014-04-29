@@ -1,0 +1,13 @@
+{
+	"name":"progress",
+	"main":"progress.js",
+	"scripts":["progress.js"],
+	"local":[
+		"react",
+		"meepworks-core",
+		"meepworks-input",
+		"meepworks-form",
+		"meepworks-panel",
+		"meepworks-app"
+	]
+}

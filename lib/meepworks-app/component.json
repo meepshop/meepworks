@@ -1,0 +1,11 @@
+{
+	"name": "meepworks-app",
+	"description":"generic content app container",
+	"main":"app.js",
+	"scripts":["app.js"],
+	"styles":["app.css"],
+	"local": [
+		"react",
+		"meepworks-core"
+	]
+}

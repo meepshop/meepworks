@@ -1,0 +1,86 @@
+/* jquery-tags-input */
+div.tagsinput {
+	border: 1px solid #e5e5e5;
+	background: #ffffff; 
+	padding: 2px 5px; 
+	/*width: 300px; */
+	height: auto; 
+	overflow-y: auto;
+
+	-webkit-transition: border-color .3s ease;
+	-moz-transition: border-color .3s ease;
+	-ms-transition: border-color .3s ease;
+	-o-transition: border-color .3s ease;
+	transition: border-color .3s ease;
+
+	-moz-border-radius: 2px; 
+	-webkit-border-radius: 2px;
+	border-radius: 2px; 
+}
+div.tagsinput.focus {
+	border-color: #3498db;		/* peterriver */
+}
+div.tagsinput span.tag { 
+	border: 1px solid #e5e5e5; 
+	display: block; 
+	float: left; 
+	padding: 0px 5px 2px; 
+	text-decoration: none; 
+	background: #ecf0f1; 		/* cloud */
+	color: #34495e; 			/* wetashpalt */
+	margin-right: 5px; 
+	margin-top: 2px;
+	margin-bottom: 2px;
+	font-family: "Roboto", helvetica; 
+	font-size: 13px;
+
+	-moz-border-radius: 2px; 
+	-webkit-border-radius: 2px;
+	border-radius: 2px; 
+}
+div.tagsinput span.tag a { 
+	font-weight: bold; 
+	color: #34495e; 			/* wetashpalt */
+	text-decoration:none; 
+	font-size: 11px; 
+} 
+div.tagsinput input { 
+	width:80px; 
+	margin:0px; 
+	font-family: "Roboto", helvetica; 
+	font-size: 13px; 
+	border:1px solid transparent; 
+	padding: 0px 5px 2px 0; 
+	background: transparent; 
+	color: #34495e; 			/* wetashpalt */
+	outline: 0px;  
+	margin-right: 5px;
+	margin-top: 2px;
+	margin-bottom: 2px;
+}
+div.tagsinput div { 
+	display:block; 
+	float: left; 
+} 
+.tags_clear { 
+	clear: both; 
+	width: 100%; 
+	height: 0px; 
+}
+.not_valid {
+	background: #e74c3c !important; 	/* alizarin */
+	color: #90111A !important;
+}
+/* end jquery-tags-input */
+
+.tag .btn {
+	font-size: 11px;
+	font-weight: bold;
+	vertical-align: baseline;
+	padding: 0px 0px 0px 2px;
+	color: rgba(0, 0, 0, 0.6);
+	border: 0;
+}
+.tag .btn:hover {
+	color: rgba(0, 0, 0, 1);
+}

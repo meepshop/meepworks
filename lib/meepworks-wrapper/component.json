@@ -1,0 +1,12 @@
+{
+	"name":"meepworks-wrapper",
+	"description":"define styles and controls for the wrapper element",
+	"main": "wrapper.js",
+	"scripts":["wrapper.js"],
+	"styles":["wrapper.css"],
+	"local":[
+		"meepworks-core",
+		"meepworks-button",
+		"react"
+	]
+}

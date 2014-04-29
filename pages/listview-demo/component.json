@@ -1,0 +1,13 @@
+{
+	"name":"listview-demo",
+	"main":"listview-demo.js",
+	"scripts":["listview-demo.js"],
+	"local":[
+		"meepworks-core",
+		"meepworks-app",
+		"meepworks-listview",
+		"meepworks-pagination",
+		"meepworks-table",
+		"meepworks-panel"
+	]	
+}

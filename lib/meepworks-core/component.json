@@ -1,0 +1,12 @@
+{
+	"name": "meepworks-core",
+	"description": "meepworks framework core component",
+	"version": "0.0.1",
+	"main":"core.js",
+	"scripts":["core.js"],
+	"local":[
+		"bootstrap",
+		"react", 
+		"es5-shim"
+	]
+}
