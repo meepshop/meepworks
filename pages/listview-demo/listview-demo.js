@@ -170,8 +170,15 @@ var listviewDemo = module.exports = core.createClass({
 						'Listview is a component for display a table of data:',
                         listview.extended({
                             ref: 'listview',
-                            selectable: true,
                             queryFn: this.queryFn,
+                            rowBodyFn: function (data)
+                            {
+                                return meepPanel({
+                                    title: 'Row Body Demo',
+                                    canExpand: true,
+                                    body: JSON.stringify(data)
+                                })
+                            },
                             columns: [
                                 {
                                     fieldname: 'name',
