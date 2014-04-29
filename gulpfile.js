@@ -4,7 +4,7 @@ var rename = require('gulp-rename');
 var cp = require('child_process');
 
 var paths = {
-	components: ['components/**/*', 'lib/**/*', 'component.json', 'app/*'],
+    components: ['lib/**/*', 'component.json', 'app/*'], //'components/**/*',
     pages: 'pages/**/*',
 	build: 'build/*.*'
 };
