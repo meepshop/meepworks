@@ -373,7 +373,8 @@
   padding-top: 15px;
   padding-bottom: 15px;
   padding-left: 15px;
-  padding-right: 265px;
+  padding-right: 15px;
+  margin-right: 250px;
   margin-bottom: 40px;
   overflow: auto;
   overflow-x: hidden;
