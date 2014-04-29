@@ -298,11 +298,11 @@
   -webkit-box-shadow: none;
   box-shadow: none;
 
-   -webkit-transform: translate3d(0,0,0) !important;
-  -moz-transform: translate3d(0,0,0) !important;
-  -ms-transform: translate3d(0,0,0) !important;
-  -o-transform: translate3d(0,0,0) !important;
-  transform: translate3d(0,0,0) !important;
+   -webkit-transform: none !important;
+  -moz-transform: none !important;
+  -ms-transform: none !important;
+  -o-transform: none !important;
+  transform: none !important;
 }
 [data-toggle="panel-collapse"]{
   cursor: pointer;
