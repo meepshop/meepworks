@@ -178,10 +178,10 @@
 	.content-main.content-main-md{
 		right: -1px;
 		padding-right: 0px;
-		-ms-transform: translateX(-250px);
+		/*-ms-transform: translateX(-250px);
 		-webkit-transform: translateX(-250px);
 		-moz-transform: translateX(-250px);
-		transform: translateX(-250px);
+		transform: translateX(-250px);*/
 	}
 	.content-lg .content-main.content-main-md{
 		padding-right: 0px;
@@ -190,8 +190,8 @@
 		position: absolute;
 		padding-bottom: 56px;
 		height: 100%;
-		width: 250px;
-		right: 0;
+		width: 100%;
+		right:0;
 		overflow: auto;
 
 		-ms-transform: translateX(100%);
@@ -199,13 +199,13 @@
 		-moz-transform: translateX(100%);
 		transform: translateX(100%);
 
-		-webkit-transition: all 0.3s ease;
-		-moz-transition: all 0.3s ease;
-		-ms-transition: all 0.3s ease;
-		-o-transition: all 0.3s ease;
-		transition: all 0.3s ease;
+		-webkit-transition: -webkit-transform 0.3s ease;
+		-moz-transition: -moz-transform 0.3s ease;
+		-ms-transition: -ms-transform 0.3s ease;
+		-o-transition: -o-transform 0.3s ease;
+		transition: transform 0.3s ease;
 
-		z-index: 4;
+		z-index: 6;
 	}
 	.content-aside.open{
 		-ms-transform: translateX(0);

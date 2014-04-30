@@ -298,11 +298,11 @@
   -webkit-box-shadow: none;
   box-shadow: none;
 
-   -webkit-transform: none  !important;
-  -moz-transform: none  !important;
-  -ms-transform: none  !important;
-  -o-transform: none  !important;
-  transform: none  !important;
+   -webkit-transform: none !important;
+  -moz-transform: none !important;
+  -ms-transform: none !important;
+  -o-transform: none !important;
+  transform: none !important;
 }
 [data-toggle="panel-collapse"]{
   cursor: pointer;
@@ -332,7 +332,7 @@
   width: auto;
   border: none;
   border-radius: 0;
-  overflow: auto;
+    /*overflow: auto;*/ /* desktop chrome cuts off the content of panel when set tot auto*/
   padding-right: 250px;
 
  
@@ -373,18 +373,18 @@
   padding-top: 15px;
   padding-bottom: 15px;
   padding-left: 15px;
-  padding-right: 265px;
+  padding-right: 15px;
+  margin-right: 250px;
   margin-bottom: 40px;
   overflow: auto;
-  overflow-x: hidden;
   z-index: 1;
 }
 .panel.expand.ie > .panel-body {
     position: fixed;
-    padding-right: 15px;    /* Adjust IE's fixed positioning */
+    margin-right: 0;    /* Adjust IE's fixed positioning */
 }
 .content-lg .panel.expand > .panel-body {
-  padding-right: 15px;
+  margin-right: 0;
 }
 .panel.expand > .panel-heading + .panel-body{
   margin-top: 60px;
