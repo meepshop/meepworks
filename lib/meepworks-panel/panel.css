@@ -385,7 +385,7 @@
     padding-right: 15px;    /* Adjust IE's fixed positioning */
 }
 .content-lg .panel.expand > .panel-body {
-  padding-right: 15px;
+    margin-right: 0;
 }
 .panel.expand > .panel-heading + .panel-body{
   margin-top: 60px;
