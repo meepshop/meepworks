@@ -298,11 +298,11 @@
   -webkit-box-shadow: none;
   box-shadow: none;
 
-   -webkit-transform: none !important;
-  -moz-transform: none !important;
-  -ms-transform: none !important;
-  -o-transform: none !important;
-  transform: none !important;
+   -webkit-transform: none  !important;
+  -moz-transform: none  !important;
+  -ms-transform: none  !important;
+  -o-transform: none  !important;
+  transform: none  !important;
 }
 [data-toggle="panel-collapse"]{
   cursor: pointer;
@@ -373,8 +373,7 @@
   padding-top: 15px;
   padding-bottom: 15px;
   padding-left: 15px;
-  padding-right: 15px;
-  margin-right: 250px;
+  padding-right: 265px;
   margin-bottom: 40px;
   overflow: auto;
   overflow-x: hidden;
@@ -385,7 +384,7 @@
     padding-right: 15px;    /* Adjust IE's fixed positioning */
 }
 .content-lg .panel.expand > .panel-body {
-    margin-right: 0;
+  padding-right: 15px;
 }
 .panel.expand > .panel-heading + .panel-body{
   margin-top: 60px;

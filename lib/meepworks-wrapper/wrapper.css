@@ -116,10 +116,6 @@
 }
 
 .content-main.content-main-md{
-	/*-ms-transform: translateX(-250px);
-	-webkit-transform: translateX(-250px);
-	-moz-transform: translateX(-250px);
-	transform: translateX(-250px);*/
 	padding-right: 550px;
 	right: -1px;
 }
@@ -149,7 +145,7 @@
  	z-index: 4;
  }
  .content-lg .content-aside{
- 	/*right: 0px;*/
+ 	right: 0px;
  }
  .content-aside.open{
  	-ms-transform: translateX(0);

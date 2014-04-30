@@ -55,14 +55,14 @@ window.onload=function ()
     }, document.getElementById('viewport'));
 
 
-    // app.setProps({
-    //     module: moduleHolder({
-    //     title: 'Test Module',
-    //     module: react.DOM.div({
-    //         children: 'module content'
-    //     })
-    // })
-    // });
+     app.setProps({
+         module: moduleHolder({
+         title: 'Test Module',
+         module: react.DOM.div({
+             children: 'module content'
+         })
+     })
+     });
 
 //perhaps there's a more elegant way to do this.
 router('?button-demo', function ()
