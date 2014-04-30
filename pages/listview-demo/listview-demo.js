@@ -107,6 +107,10 @@ var db = genDb(55);
 
 
 var listviewDemo = module.exports = core.createClass({
+    getInitialState: function ()
+    {
+        return {};
+    },
     queryFn: function (params, cb)
     {
         console.log(params);
@@ -157,6 +161,23 @@ var listviewDemo = module.exports = core.createClass({
         }, Math.random()*70 + 120);
         
         
+    },
+    test: function ()
+    {
+        //console.log(this.refs.listview.getDisplayed());
+        this.refs.listview.setDisplayed(['name']);
+
+    },
+    componentWillMount: function ()
+    {
+        this.state.timeout = setTimeout(this.test, 5000);
+    },
+    componentWillUnmount: function ()
+    {
+        if(this.state.timeout)
+        {
+            clearTimeout(this.state.timeout);
+        }
     },
     render: function ()
     {

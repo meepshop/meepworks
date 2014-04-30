@@ -9,6 +9,7 @@
     overflow:hidden;
     filter: alpha(opacity=0);
     visibility:hidden;
+    white-space:nowrap;
 }
 
 .tooltip.hover-fade{
