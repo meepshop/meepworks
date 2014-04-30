@@ -8,9 +8,5 @@
 		"react",
 		"meepworks-core",
 		"meepworks-tip"
-	],
-	"dependencies":{
-		"esundahl/fading-entrances":"*",
-		"esundahl/fading-exits":"*"
-	}
+	]
 }
