@@ -53,6 +53,12 @@ module.exports = core.createClass({
                         title: 'Test',
                         body: [
                             uploader()
+                            //uploader.fileUpload({
+                            //    file: {
+                            //        name: 'testname',
+                            //        size: 1260583
+                            //    }
+                            //})
                         ]
                     }),
                     panel({

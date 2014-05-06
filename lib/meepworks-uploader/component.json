@@ -6,6 +6,8 @@
 	"local":[
 		"react",
 		"meepworks-core",
-		"meepworks-progress"
+		"meepworks-progress",
+		"meepworks-button",
+		"meepworks-icon"
 	]
 }
