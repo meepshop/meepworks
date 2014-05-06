@@ -1,0 +1,10 @@
+{
+	"name": "meepworks-progress",
+	"main": "progress.js",
+	"scripts": ["progress.js"],
+	"styles": ["progress.css"],
+	"local": [
+		"react",
+		"meepworks-core"
+	]
+}

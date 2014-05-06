@@ -13,6 +13,7 @@ window.onload=function ()
     var iconDemo = require('icon-demo');
     var progress = require('progress');
     var listViewDemo = require('listview-demo');
+    var uploaderDemo = require('uploader-demo');
     require('syrena-admin').start();
 
 
@@ -38,6 +39,10 @@ window.onload=function ()
             {
                 label: 'Listview Demo',
                 link: '?listview-demo'
+            },
+            {
+                label: 'Uploader Demo',
+                link: '?uploader-demo'
             }
             ]
         }
@@ -100,6 +105,15 @@ router('?listview-demo', function ()
             key: 'listview-demo'
         }),
         title: 'Listview Demo'
+    });
+});
+router('?uploader-demo', function ()
+{
+    app.setProps({
+        content: uploaderDemo({
+            key: 'uploader-demo'
+        }),
+        title: 'Uploader Demo'
     });
 });
 router.init({});

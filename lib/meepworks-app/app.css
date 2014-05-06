@@ -1,7 +1,9 @@
 .content-app{
  	position: relative;
  	height: 100%;
- 	overflow: auto;
+ 	/*overflow: auto;*/
+     overflow-x:hidden;
+     -webkit-overflow-scrolling:touch;
  }
  .content-app.fixed-header{
  	overflow: hidden;

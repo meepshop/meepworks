@@ -1,0 +1,13 @@
+{
+	"name":"uploader-demo",
+	"main":"uploader-demo.js",
+	"scripts":["uploader-demo.js"],
+	"local":[
+		"react",
+		"meepworks-core",
+		"meepworks-app",
+		"meepworks-panel",
+		"meepworks-progress",
+		"meepworks-uploader"
+	]
+}
