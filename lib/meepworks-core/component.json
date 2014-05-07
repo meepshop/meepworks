@@ -8,5 +8,8 @@
 		"bootstrap",
 		"react", 
 		"es5-shim"
-	]
+	],
+	"dependencies":{
+		"component/emitter":"*"
+	}
 }
