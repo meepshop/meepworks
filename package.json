@@ -1,0 +1,19 @@
+{
+  "name": "meepworks",
+  "version": "0.0.1",
+  "description": "ReactJS based UI library",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/meepshop/meepworks"
+  },
+  "author": "Jack Tzu-Chieh Huang <u9520107@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/meepshop/meepworks/issues"
+  },
+  "homepage": "https://github.com/meepshop/meepworks"
+}
