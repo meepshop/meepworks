@@ -1,8 +1,0 @@
-{
-	"name":"meepworks-router",
-	"main":"router.js",
-	"scripts":["router.js"],
-	"dependencies":{
-		"visionmedia/page.js":"*"
-	}
-}
