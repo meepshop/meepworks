@@ -19,7 +19,9 @@
   "devDependencies": {
     "co-exec": "^1.1.0",
     "co-fs": "^1.2.0",
+    "es6-module-loader": "^0.9.4",
     "gulp": "^3.8.9",
+    "gulp-rename": "^1.2.0",
     "gulp-watch": "^1.1.0",
     "jspm": "^0.8.1",
     "koa": "^0.13.0",
@@ -27,24 +29,27 @@
     "koa-router": "^3.5.0",
     "koa-spdy": "^0.1.0",
     "koa-static": "^1.4.7",
+    "react-tools": "^0.12.0",
     "spdy": "^1.29.1",
+    "through2": "^0.6.3",
     "traceur": "0.0.72"
   },
   "jspm": {
     "name": "meepworks",
     "main": "index.js",
-    "configFile": "config/jspm.js",
+    "configFile": "config/config.js",
     "dependencies": {
-      "react": "^0.11.2",
+      "react": "npm:react@^0.12.0",
       "github:visionmedia/co": "github:tj/co@^3.1.0",
       "github:tj/superagent": "github:visionmedia/superagent@^0.20.0",
-      "github:facebook/immutable-js": "^2.6.1"
+      "npm:immutable": "^2.6.2",
+      "npm:react": "^0.12.0"
     }
   },
   "dependencies": {
     "co": "^3.1.0",
     "immutable": "^2.6.1",
-    "react": "^0.11.2",
+    "react": "^0.12.0",
     "superagent": "^0.20.0"
   }
 }

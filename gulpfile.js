@@ -4,14 +4,16 @@ var cp = require('child_process');
 var path = require('path');
 var fs = require('fs');
 
-gulp.task('load-tasks', function () {
+console.log(process.argv);
+
+if(process.argv.length > 2) {
   fs.readdirSync('gulp-tasks').forEach(function(task) {
     if(/^[A-za-z].*\.js$/i.test(task)) {
       require(path.resolve(__dirname, 'gulp-tasks', task));
     }
   });
-});
-gulp.task('init', ['load-tasks'], function () {
+}
+gulp.task('init', function () {
   gulp.run('test-server');
 });
 
@@ -25,9 +27,11 @@ gulp.task('default', function () {
       stdio: 'inherit'
     });
   }
-  watch(['gulpfile.js', 'gulp-tasks/**.js'], reload).on('error', function (err) {
+  watch(['gulpfile.js', 'gulp-tasks/**.js', 'bin/tools.js'], reload).on('error', function (err) {
     console.log(err);
     this.emit('end');
   });
   reload();
 });
+
+
