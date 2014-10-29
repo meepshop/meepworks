@@ -35,6 +35,9 @@ app.get(/.*/, function *(next) {
       React.DOM.script({
       src: 'jspm_packages/system.js'
     }),
+			React.DOM.script({
+			src: 'config/config.js'
+			}),
     //React.DOM.script({
     //  src: 'build/test-apps/' + app + '/app-out.js'
     //}),

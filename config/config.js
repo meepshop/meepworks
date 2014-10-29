@@ -8,11 +8,11 @@ System.config({
 
 System.config({
   "map": {
+    "react": "npm:react@^0.12.0",
     "npm:react": "npm:react@^0.12.0",
     "npm:immutable": "npm:immutable@^2.6.2",
     "github:visionmedia/co": "github:tj/co@^3.1.0",
-    "github:tj/superagent": "github:visionmedia/superagent@^0.20.0",
-    "react": "npm:react@^0.12.0",
+    "superagent": "github:visionmedia/superagent@^0.20.0",
     "npm:react@0.12.0": {
       "envify": "npm:envify@3"
     },
@@ -73,7 +73,6 @@ System.config({
     "npm:through": "2.3.6",
     "npm:jstransform": "6.3.2",
     "github:tj/co": "3.1.0",
-    "github:visionmedia/superagent": "0.20.0",
     "npm:source-map": "0.1.31",
     "npm:base62": "0.1.1",
     "npm:amdefine": "0.0.8",
@@ -86,7 +85,8 @@ System.config({
     "npm:ieee754": "1.1.4",
     "npm:sha.js": "2.2.6",
     "npm:json": "9.0.2",
-    "github:systemjs/plugin-json": "0.1.0"
+    "github:systemjs/plugin-json": "0.1.0",
+    "github:visionmedia/superagent": "0.20.0"
   }
 });
 
