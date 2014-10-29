@@ -15,5 +15,36 @@
   "bugs": {
     "url": "https://github.com/meepshop/meepworks/issues"
   },
-  "homepage": "https://github.com/meepshop/meepworks"
+  "homepage": "https://github.com/meepshop/meepworks",
+  "devDependencies": {
+    "co-exec": "^1.1.0",
+    "co-fs": "^1.2.0",
+    "gulp": "^3.8.9",
+    "gulp-watch": "^1.1.0",
+    "jspm": "^0.8.1",
+    "koa": "^0.13.0",
+    "koa-mount": "^1.3.0",
+    "koa-router": "^3.5.0",
+    "koa-spdy": "^0.1.0",
+    "koa-static": "^1.4.7",
+    "spdy": "^1.29.1",
+    "traceur": "0.0.72"
+  },
+  "jspm": {
+    "name": "meepworks",
+    "main": "index.js",
+    "configFile": "config/jspm.js",
+    "dependencies": {
+      "react": "^0.11.2",
+      "github:visionmedia/co": "github:tj/co@^3.1.0",
+      "github:tj/superagent": "github:visionmedia/superagent@^0.20.0",
+      "github:facebook/immutable-js": "^2.6.1"
+    }
+  },
+  "dependencies": {
+    "co": "^3.1.0",
+    "immutable": "^2.6.1",
+    "react": "^0.11.2",
+    "superagent": "^0.20.0"
+  }
 }
