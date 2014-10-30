@@ -37,13 +37,12 @@
   "jspm": {
     "name": "meepworks",
     "main": "index.js",
-    "configFile": "config/config.js",
+    "configFile": "config/jspm.js",
     "dependencies": {
       "react": "npm:react@^0.12.0",
-      "github:visionmedia/co": "github:tj/co@^3.1.0",
-      "npm:immutable": "^2.6.2",
-      "npm:react": "^0.12.0",
-      "superagent": "github:visionmedia/superagent@^0.20.0"
+      "immutable": "github:facebook/immutable-js@^3.0.1",
+      "co": "github:tj/co@^3.1.0",
+      "superagent": "github:u9520107/superagent@0.20.0-jspm"
     }
   },
   "dependencies": {

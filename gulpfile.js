@@ -14,7 +14,7 @@ if(process.argv.length > 2) {
   });
 }
 gulp.task('init', function () {
-  gulp.run('test-server');
+  gulp.start('test-server');
 });
 
 gulp.task('default', function () {

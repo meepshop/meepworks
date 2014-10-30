@@ -36,13 +36,9 @@ app.get(/.*/, function *(next) {
       src: 'jspm_packages/system.js'
     }),
 			React.DOM.script({
-			src: 'config/config.js'
+			src: 'config/jspm.js'
 			}),
-    //React.DOM.script({
-    //  src: 'build/test-apps/' + app + '/app-out.js'
-    //}),
       React.DOM.script({
-        //src: 'build/test-apps/' + app + '/app.js'
         dangerouslySetInnerHTML: {
           __html: "System.import('build/test-apps/" + app + "/app');"
         }

@@ -1,2 +1,2 @@
 import React from 'react';
-import Superagent from 'github:visionmedia/superagent';
+import Superagent from 'superagent';
