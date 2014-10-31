@@ -6,7 +6,7 @@ import path from 'path';
 import React from 'react';
 import fs from 'fs';
 
-import HtmlPage from '../views/html-page/html-page.js'; 
+import HtmlPage from '../../dist-node/views/html-page/html-page.js'; 
 
 
 var app = new koa();
@@ -17,10 +17,10 @@ app.use(function *(next) {
 });
 app.use(mount('/jspm_packages', serve(path.resolve(__dirname, '../../jspm_packages'))));
 app.use(mount('/config', serve(path.resolve(__dirname, '../../config'))));
-app.use(mount('/build', serve(path.resolve(__dirname, '../../build'))));
+app.use(mount('/dist', serve(path.resolve(__dirname, '../../dist'))));
+app.use(mount('/test-build/apps', serve(path.resolve(__dirname, '../apps'))));
 
 app.use(router(app));
-
 
 app.get(/.*/, function *(next) {
   var app = this.req.url.substr(1) || 'index';
@@ -40,7 +40,7 @@ app.get(/.*/, function *(next) {
 			}),
       React.DOM.script({
         dangerouslySetInnerHTML: {
-          __html: "System.import('build/test-apps/" + app + "/app');"
+          __html: "System.import('test-build/apps/" + app + "/app');"
         }
       })
 

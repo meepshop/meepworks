@@ -33,3 +33,8 @@ jspm_packages
 
 # MacOS
 .DS_Store
+
+# builds
+dist
+dist-node
+test-build

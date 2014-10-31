@@ -12,6 +12,7 @@ System.config({
     "immutable": "github:facebook/immutable-js@^3.0.1",
     "co": "github:tj/co@^3.1.0",
     "superagent": "github:u9520107/superagent@0.20.0-jspm",
+    "npm:normalize.css": "npm:normalize.css@^3.0.2",
     "npm:react@0.12.0": {
       "envify": "npm:envify@3"
     },
@@ -58,7 +59,8 @@ System.config({
     "github:u9520107/superagent@0.20.0-jspm": {
       "emitter": "github:component/emitter@^1.1.3",
       "reduce": "github:component/reduce@^1.0.1"
-    }
+    },
+    "npm:normalize.css@3.0.2": {}
   }
 });
 
@@ -90,7 +92,8 @@ System.config({
     "github:tj/co": "3.1.0",
     "github:u9520107/superagent": "0.20.0-jspm",
     "github:component/reduce": "1.0.1",
-    "github:component/emitter": "1.1.3"
+    "github:component/emitter": "1.1.3",
+    "npm:normalize.css": "3.0.2"
   }
 });
 

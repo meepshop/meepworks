@@ -4,9 +4,10 @@ var cp = require('child_process');
 var path = require('path');
 var fs = require('fs');
 
-console.log(process.argv);
-
-if(process.argv.length > 2) {
+/**
+ * Only load gulp-tasks with --harmony flag on
+ */
+if(process.execArgv.indexOf('--harmony')>-1) {
   fs.readdirSync('gulp-tasks').forEach(function(task) {
     if(/^[A-za-z].*\.js$/i.test(task)) {
       require(path.resolve(__dirname, 'gulp-tasks', task));
@@ -14,18 +15,32 @@ if(process.argv.length > 2) {
   });
 }
 gulp.task('init', function () {
-  gulp.start('test-server');
+  gulp.start('test-server-start');
+  gulp.start('source-watch');
+  gulp.start('test-server-watch');
 });
 
+gulp.task('clean', function () {
+  spawnTask('dist-clean');
+});
+gulp.task('build', function () {
+  spawnTask('dist-build');
+});
+
+gulp.task('watch', function () {
+  spawnTask('source-watch');
+});
+
+/**
+ *  default task monitors gulpfile.js, gulp-tasks, and bin/tools.js and reload on file change
+ */
 gulp.task('default', function () {
   var p;
   function reload () {
     if(p) {
       p.kill('SIGHUP');
     }
-    p = cp.spawn('node', ['--harmony', 'node_modules/gulp/bin/gulp.js', 'init'], {
-      stdio: 'inherit'
-    });
+    p = spawnTask('init');
   }
   watch(['gulpfile.js', 'gulp-tasks/**.js', 'bin/tools.js'], reload).on('error', function (err) {
     console.log(err);
@@ -33,5 +48,16 @@ gulp.task('default', function () {
   });
   reload();
 });
+
+/**
+ *  @function
+ *    @param task {string} - name of the task to run
+ *  spawns child node process with harmony flag on to run tasks
+ */
+function spawnTask(task) {
+  return cp.spawn('node', ['--harmony', 'node_modules/gulp/bin/gulp.js', task], {
+      stdio: 'inherit'
+    });
+}
 
 

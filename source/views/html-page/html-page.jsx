@@ -15,14 +15,15 @@ var HtmlPage = React.createClass({
     /* jshint ignore:start */
     return <html>
       <head>
+
         <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" charSet="UTF-8" />
-      {this.props.metaData}
+        {this.props.metaData}
         <title>{this.props.title}</title>
         {this.props.styles}
         {this.props.scripts}
       </head>
       <body>
-      {this.props.body}
+        {this.props.body}
       </body>
     </html>;
     /* jshint ignore:end */
