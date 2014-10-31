@@ -13,6 +13,7 @@ System.config({
     "co": "github:tj/co@^3.1.0",
     "superagent": "github:u9520107/superagent@0.20.0-jspm",
     "npm:normalize.css": "npm:normalize.css@^3.0.2",
+    "css": "github:systemjs/plugin-css@^0.1.0",
     "npm:react@0.12.0": {
       "envify": "npm:envify@3"
     },
@@ -93,7 +94,8 @@ System.config({
     "github:u9520107/superagent": "0.20.0-jspm",
     "github:component/reduce": "1.0.1",
     "github:component/emitter": "1.1.3",
-    "npm:normalize.css": "3.0.2"
+    "npm:normalize.css": "3.0.2",
+    "github:systemjs/plugin-css": "0.1.0"
   }
 });
 

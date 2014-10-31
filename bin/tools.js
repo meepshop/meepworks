@@ -7,6 +7,9 @@ var exec = require('co-exec');
 var rename = require('gulp-rename');
 var path = require('path');
 var gulp = require('gulp');
+var esprima = require('esprima');
+var plumber = require('gulp-plumber');
+var fs = require('fs');
 
 
 
@@ -22,7 +25,26 @@ function nodify(options) {
     } else if (file.isStream()) {
       throw new Error('nodify should not be receiving streams');
     } else if (file.isBuffer() && file.path.match(/js$/i)) {
-      file.contents = new Buffer(traceur.compile(file.contents.toString('utf8'), options));
+
+      var source = file.contents.toString(enc);
+      var output = [];
+      var ast = esprima.tokenize(source, {
+        range: true       
+      });
+      var lastIdx = 0;
+      ast.forEach(function (token, idx){
+        if(token.value === 'import' &&
+                  ast[idx + 1].value.indexOf('.css!')> -1) {
+        output.push(source.substring(lastIdx, token.range[0]));
+        lastIdx = ast[idx + 1].range[1] + 1;
+        }
+      
+      });
+      if(lastIdx < source.length) {
+        output.push(source.substring(lastIdx));
+      }
+
+      file.contents = new Buffer(traceur.compile(output.join(''), options));
       this.push(file);
       next();
     } else {
@@ -41,22 +63,14 @@ function jsxTransform(options) {
     if (file.isNull()) {
       return next();
     } else if (file.path.match(/jsx$/i)) {
-      if (file.isStream()) {
-        var data = '';
-        file.contents.on('data', function(chunk) {
-          console.log(chunk);
-          data += chunk.toString('utf8');
-        });
-        file.contents.on('end', function() {
-          file.contents = reactTools.transform(data, options);
-          this.push(file);
-          next();
-
-        });
-      } else if (file.isBuffer()) {
+      if (file.isBuffer()) {
+       try { 
         file.contents = new Buffer(reactTools.transform(file.contents.toString('utf8'), options));
         this.push(file);
         next();
+       } catch(err) {
+        next(err);
+       }
       }
     } else {
       this.push(file);
@@ -65,9 +79,8 @@ function jsxTransform(options) {
   });
 }
 
-function * buildFile(filepath, options) {
+function buildFile(filepath, options) {
   return new Promise(function(resolve, reject) {
-
     try {
       var srcPath = filepath;
       var relativePath = path.relative(options.sourceDir, filepath);
@@ -77,18 +90,15 @@ function * buildFile(filepath, options) {
 
       if (options.glob) {
         srcPath = filepath + '/**';
-        //srcNodePath = options.distPath + '/**';
       }
-      //else {
-      //  var relativePath = path.relative(options.sourceDir, filepath);
-      //  destPath = path.dirname(path.resolve(destPath, relativePath));
-      //  srcNodePath = path.resolve(options.distPath, relativePath);
-      //  destNodePath = path.dirname(path.resolve(destNodePath, relativePath));
-      //}
-      var pipeline = gulp.src(srcPath);
-      pipeline.on('error', reject);
+
+      var pipeline = gulp.src(srcPath).pipe(plumber({
+        errorHandler: function (err) {
+          reject(err);
+        }
+      }));      
       pipeline.pipe(jsxTransform())
-        .pipe(rename(function(filepath) {
+      .pipe(rename(function(filepath) {
           if (filepath.extname === '.jsx') {
             filepath.extname = '.js';
           }
@@ -98,23 +108,31 @@ function * buildFile(filepath, options) {
           destPath = path.dirname(path.resolve(destPath, relativePath));
         }
         pipeline.pipe(gulp.dest(destPath))
-          .on('end', function() {
+        .on('end', function() {
             if(destNodePath) {
               var srcNodePath;
               if(options.glob){
                 srcNodePath = options.destPath + '/**';
               } else {
+                if(relativePath.match(/\.jsx$/i)) {
+                  relativePath = relativePath.replace(/\.jsx$/i, '.js');
+                }
                 srcNodePath = path.resolve(options.destPath, relativePath);
                 destNodePath = path.dirname(path.resolve(destNodePath, relativePath));
               }
               gulp.src(srcNodePath)
-                .on('error', reject)
+                .pipe(plumber({
+                  errorHandler: function (err) {
+                    reject(err);
+                  }
+                }))
                 .pipe(nodify())
                 .pipe(gulp.dest(destNodePath))
                 .on('end', resolve);
             } 
           });
-      } else if(destNodePath) {
+      }
+      else if(destNodePath) {
         if(!options.glob) {
           destNodePath = path.dirname(path.resolve(destNodePath, relativePath));
         }
@@ -124,22 +142,6 @@ function * buildFile(filepath, options) {
       } else {
         reject();
       }
-
-      // .pipe(gulp.dest(destPath))
-      //  .on('end', function() {
-      //    gulp.src(srcNodePath)
-      //      .pipe(nodify())
-      //      .pipe(gulp.dest(destNodePath))
-      //      .on('end', function() {
-      //        resolve();
-      //      })
-      //      .on('error', function(err) {
-      //        reject(err);
-      //      });
-      //  })
-      //  .on('error', function(err) {
-      //    reject(err);
-      //  });
     } catch (err) {
       reject(err);
     }

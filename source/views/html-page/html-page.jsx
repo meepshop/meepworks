@@ -7,27 +7,31 @@ var HtmlPage = React.createClass({
       metaData: [],
       scripts: [],
       style: [],
-      body: null
+      body: null,
+      setInnerHTML: ''
     };
   },
   render: function () {
   
     /* jshint ignore:start */
+
+    var body = (this.props.setInnerHTML ? <body dangerouslySetInnerHTML={{
+      __html: this.props.setInnerHTML
+    }}></body> : <body>{this.props.body}</body>);
+
+
     return <html>
       <head>
-
         <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" charSet="UTF-8" />
         {this.props.metaData}
         <title>{this.props.title}</title>
         {this.props.styles}
         {this.props.scripts}
       </head>
-      <body>
-        {this.props.body}
-      </body>
+        {body}
     </html>;
     /* jshint ignore:end */
   }
 });
 
-module.exports = HtmlPage;
+export default HtmlPage;

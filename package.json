@@ -20,8 +20,10 @@
     "co-exec": "^1.1.0",
     "co-fs": "^1.2.0",
     "es6-module-loader": "^0.9.4",
+    "esprima": "^1.2.2",
     "gulp": "^3.8.9",
     "gulp-changed": "^1.0.0",
+    "gulp-plumber": "^0.6.6",
     "gulp-rename": "^1.2.0",
     "gulp-watch": "^1.1.0",
     "jspm": "^0.8.1",
@@ -45,7 +47,8 @@
       "immutable": "github:facebook/immutable-js@^3.0.1",
       "co": "github:tj/co@^3.1.0",
       "superagent": "github:u9520107/superagent@0.20.0-jspm",
-      "npm:normalize.css": "^3.0.2"
+      "npm:normalize.css": "^3.0.2",
+      "css": "^0.1.0"
     }
   },
   "dependencies": {

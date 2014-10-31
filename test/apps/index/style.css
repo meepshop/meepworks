@@ -1,0 +1,8 @@
+body {
+  background-color: yellow;
+  color: blue;
+}
+
+body > div > div {
+  text-align: center;
+}

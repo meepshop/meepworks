@@ -11,46 +11,47 @@ var tools = require('../bin/tools.js');
 
 var server_process;
 
-var testServerSource = 'test/server';
-var testAppsSource = 'test/apps';
-var testServerSourceAbs = path.resolve('test/server');
-var testAppsSourceAbs= path.resolve('test/apps');
+var testSource = 'test';
+var testSourceAbs = path.resolve('test');
 
-var testAppBuildPath = path.resolve(__dirname, '../build/test-apps');
+var testBuildPath = 'test-build';
+var testNodeBuildPath = 'test-node-build';
 
 
-gulp.task('test-server-build', function (cb) {
-  gulp.src('test/server/*')
-    .pipe(tools.nodify())
-    .pipe(gulp.dest('test-build/server'))
-    .on('end', cb);
-});
 
-gulp.task('test-apps-build', function (cb) {
-  gulp.src('test/apps/**')
-    .pipe(tools.jsxTransform())
-    .pipe(rename(function (filename){
-      if(filename.extname.toLowerCase()==='.jsx') {
-        filename.extname = '.js';
-      }
-    }))
-    .pipe(gulp.dest('test-build/apps'))
-    .on('end', cb);
-});
-
-gulp.task('test-server-start', ['dist-build', 'test-server-build', 'test-apps-build'], function () {
-  spawnServer();
-});
-
-gulp.task('test-server-clean', function (cb) {
-  co(function *(){
-    yield tools.cleanPath('test-build');
+gulp.task('test-server-build', ['test-server-clean'], function(cb) {
+  co(function * () {
+    yield tools.buildFile(testSource, {
+      glob: true,
+      destPath: 'test-build',
+      destNodePath: 'test-node-build',
+      sourceDir: testSourceAbs
+    });
     cb();
   })();
 });
 
 
-gulp.task('test-server-restart', function (){
+gulp.task('test-server-init', ['dist-build', 'test-server-build'], function() {
+  gulp.start('test-server-start');
+});
+
+gulp.task('test-server-clean', function(cb) {
+  co(function * () {
+    yield tools.cleanPath(testBuildPath);
+    yield tools.cleanPath(testNodeBuildPath);
+    cb();
+  })();
+});
+gulp.task('test-server-start', function() {
+  spawnServer();
+});
+
+gulp.task('test-server-stop', function() {
+  killServer();
+});
+
+gulp.task('test-server-restart', function() {
   killServer();
   spawnServer();
 });
@@ -63,119 +64,58 @@ gulp.task('test-server-watch', function() {
     .on('change', function(change) {
       co(function * () {
         var relativePath;
-        if (change.path.indexOf(testServerSourceAbs) > -1) {
+        if (change.path.indexOf(testSourceAbs + '/') > -1) {
           if (change.type === 'rename') {
             console.log(change.old + ' was renamed to ' + change.path);
           } else {
             console.log(change.path + ' was ' + change.type);
           }
-          relativePath = path.relative(testServerSourceAbs, change.path);
+          killServer();
+          relativePath = path.relative(testSourceAbs, change.path);
           switch (change.type) {
             case 'deleted':
-              yield tools.cleanPath(path.resolve('test-build/server', relativePath));
+              yield tools.cleanPath(path.resolve(testBuildPath, relativePath));
+              yield tools.cleanPath(path.resolve(testNodeBuildPath, relativePath));
               break;
               default:
-                yield tools.buildFile(change.path, {
+                try {
+              yield tools.buildFile(change.path, {
                 glob: (yield cofs.stat(change.path)).isDirectory(),
-                destNodePath: 'test-build/server',
-                sourceDir: testServerSourceAbs
+                destPath: testBuildPath,
+                destNodePath: testNodeBuildPath,
+                sourceDir: testSourceAbs
               });
-            gulp.start('test-server-restart');
-            break;
-              
-          }
+              } catch(err) {
+                return console.log(err);
+              }
+              spawnServer();
+              break;
 
-        } else if (change.path.indexOf(testAppsSourceAbs) > -1) {
-          if (change.type === 'rename') {
-            console.log(change.old + ' was renamed to ' + change.path);
-          } else {
-            console.log(change.path + ' was ' + change.type);
-          }
-          relativePath = path.relative(testAppsSourceAbs, change.path);
-          switch (change.type) {
-            case 'deleted':
-              yield tools.cleanPath(path.resolve('test-build/apps', relativePath));
-              break;
-              default:
-                yield tools.buildFile(change.path, {
-                glob: (yield cofs.stat(change.path)).isDirectory(),
-                destNodePath: 'test-build/Apps',
-                sourceDir: testAppsSourceAbs
-              });
-            break;
-              
           }
         }
       })();
     });
 });
 
-//
-//gulp.task('test-server-init', ['views-build-node', 'test-server-build', 'test-server-app-build'], function () {
-//  spawnServer();
-//});
-//gulp.task('test-server-reload', ['views-build-node'], function () {
-//  killServer();
-//  spawnServer();
-//});
-//
-//
-//gulp.task('test-server-build',  function () {
-//  gulp.src(path.resolve(__dirname, '../source/test-server/*.js'))
-//    .pipe(tools.nodify())
-//    .pipe(gulp.dest(path.resolve(__dirname, '../build-node/test-server')));
-//});
-//
-//gulp.task('test-server-app-clean', function (cb) {
-//  co(function *() {
-//    if(yield cofs.exists(testAppBuildPath)) {
-//      yield exec('rm -R ' + testAppBuildPath);
-//    } 
-//    cb();
-//  })();
-//});
-//
-//gulp.task('test-server-app-build', ['test-server-app-clean'], function (cb) {
-//  gulp.src(path.resolve(__dirname, '../source/test-apps/**/*.jsx'))
-//    .pipe(tools.jsxTransform())
-//    .pipe(rename(function (filePath) {
-//      filePath.extname = '.js';
-//    }))
-//    .pipe(gulp.dest(testAppBuildPath))
-//    .on('end', cb);
-//});
-//
-//
-//
-//
-//gulp.task('test-server', function () {
-//  gulp.start('test-server-init');
-//  watch([
-//    path.resolve(__dirname, '../source/test-server/*.js') 
-//  ], function () {
-//    gulp.start('test-server-restart');
-//  }).on('error', handleError);
-//  watch([path.resolve(__dirname, '../source/views/html-page/html-page.jsx')], function () {
-//    gulp.start('test-server-reload'); 
-//  }).on('error', handleError);
-//});
-
-
 
 process.on('exit', killServer);
 
-process.on('SIGHUP', function () {
+process.on('SIGHUP', function() {
   killServer();
   process.exit();
 });
+
 function killServer() {
-  if(server_process) {
+  if (server_process) {
+    console.log('stopping server');
     server_process.kill();
+    server_process = null;
   }
 }
 
 function spawnServer() {
-  server_process = cp.spawn('node', ['--harmony', path.resolve(__dirname, '../test-build/server/app.js')], {
+  console.log('starting server');
+  server_process = cp.spawn('node', ['--harmony', path.resolve(__dirname, '../test-node-build/server/app.js')], {
     stdio: 'inherit'
   });
 }
