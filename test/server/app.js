@@ -5,6 +5,7 @@ import router from 'koa-router';
 import path from 'path';
 import React from 'react';
 import fs from 'fs';
+import favicon from 'koa-favicon';
 
 import HtmlPage from '../../dist-node/views/html-page/html-page.js'; 
 
@@ -19,6 +20,7 @@ app.use(mount('/jspm_packages', serve(path.resolve(__dirname, '../../jspm_packag
 app.use(mount('/config', serve(path.resolve(__dirname, '../../config'))));
 app.use(mount('/dist', serve(path.resolve(__dirname, '../../dist'))));
 app.use(mount('/test-build/apps', serve(path.resolve(__dirname, '../apps'))));
+app.use(favicon());
 
 app.use(router(app));
 
