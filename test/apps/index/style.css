@@ -5,4 +5,10 @@ body {
 
 body > div > div {
   text-align: center;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  height: 80px;
+  background-color: gray;
 }

@@ -12,14 +12,7 @@ var App = React.createClass({
     return <div id="app" style={{
         marginTop: 80
     }}>
-      <div style={{
-        position: 'fixed',
-        width: '100%',
-        top: 0,
-        left: 0,
-        height: 80,
-        backgroundColor: 'gray'
-      }}>Header Bar</div>
+      <div >Header Bar</div>
       This is the content of an App
     </div>;
     /*jshint ignore:end */
@@ -34,3 +27,5 @@ App.init = function () {
 };
 
 export default App;
+
+
