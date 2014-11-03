@@ -17,7 +17,8 @@ coverage
 .grunt
 
 # Compiled binary addons (http://nodejs.org/api/addons.html)
-build/Release
+build
+build-node
 
 # Dependency directory
 # Deployed apps should consider commenting this line out:
@@ -36,7 +37,3 @@ config/jspm.js
 .DS_Store
 
 # builds
-dist
-dist-node
-test-build
-test-node-build

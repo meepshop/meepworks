@@ -10,17 +10,11 @@ var watch = require('gulp-watch');
 var fs = require('fs');
 
 var sourcePath = 'source';
-var sourcePathAbs = path.resolve(__dirname, '../source');
-
-var distPath = 'dist';
-var distNodePath = 'dist-node';
-var distEs5Path = 'dist-es5';
+var destPath = 'build';
 
 gulp.task('dist-clean', function(cb) {
   co(function * () {
-    yield tools.cleanPath(distPath);
-    yield tools.cleanPath(distNodePath);
-    //yield tools.cleanPath(distEs5Path);
+    yield tools.cleanPath(destPath);
     cb();
   })();
 
@@ -29,11 +23,10 @@ gulp.task('dist-clean', function(cb) {
 
 gulp.task('dist-build', ['dist-clean'], function(cb) {
   co(function * () {
-    yield tools.buildFile(sourcePathAbs, {
+    yield tools.buildFile(sourcePath, {
       glob: true,
-      destPath: distPath,
-      destNodePath: distNodePath,
-      sourceDir: sourcePathAbs
+      destPath: destPath,
+      sourcePath: sourcePath
     });
     cb();
   })();
@@ -46,28 +39,24 @@ gulp.task('source-watch', function() {
     })
     .on('change', function(change) {
       co(function * () {
-        if (change.path.indexOf(sourcePathAbs) > -1) {
+        if (change.path.indexOf(path.resolve(sourcePath)) > -1) {
           if (change.type === 'rename') {
             console.log(change.old + ' was renamed to ' + change.path);
           } else {
             console.log(change.path + ' was ' + change.type);
           }
           gulp.start('test-server-stop');
-          var relativePath = path.relative(sourcePathAbs, change.path);
-          var distPathAbs = path.resolve(distPath, relativePath);
-          var distNodePathAbs = path.resolve(distNodePath, relativePath);
+          var relativePath = path.relative(sourcePath, change.path);
           switch (change.type) {
             case 'deleted':
-              yield tools.cleanPath(distPathAbs);
-              yield tools.cleanPath(distNodePathAbs);
+              yield tools.cleanPath(destPath, relativePath);
               break;
             default:
               try {
                 yield tools.buildFile(change.path, {
                   glob: (yield cofs.stat(change.path)).isDirectory(),
-                  destPath: distPath,
-                  destNodePath: distNodePath,
-                  sourceDir: sourcePathAbs
+                  destPath: destPath,
+                  sourcePath: sourcePath
                 });
               } catch (err) {
                 return console.log(err);

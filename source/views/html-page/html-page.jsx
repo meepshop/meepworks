@@ -13,7 +13,6 @@ var HtmlPage = React.createClass({
   },
   render: function () {
   
-    /* jshint ignore:start */
 
     var body = (this.props.setInnerHTML ? <body dangerouslySetInnerHTML={{
       __html: this.props.setInnerHTML
@@ -30,7 +29,6 @@ var HtmlPage = React.createClass({
       </head>
         {body}
     </html>;
-    /* jshint ignore:end */
   }
 });
 

@@ -17,7 +17,6 @@ if(process.execArgv.indexOf('--harmony')>-1) {
 gulp.task('init', function () {
   gulp.start('test-server-init');
   gulp.start('source-watch');
-  gulp.start('test-server-watch');
 });
 
 gulp.task('clean', function () {
