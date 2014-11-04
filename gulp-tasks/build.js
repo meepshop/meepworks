@@ -23,11 +23,15 @@ gulp.task('dist-clean', function(cb) {
 
 gulp.task('dist-build', ['dist-clean'], function(cb) {
   co(function * () {
+    try {
     yield tools.buildFile(sourcePath, {
       glob: true,
       destPath: destPath,
       sourcePath: sourcePath
     });
+    } catch(err) {
+      console.log(err);
+    }
     cb();
   })();
 });

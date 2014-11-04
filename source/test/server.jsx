@@ -14,7 +14,7 @@ import AppRouter from '../server/app-router';
 import HtmlPage from '../views/html-page/html-page';
 import IndexPage from './app/pages/index/index';
 import TestPage from './app/pages/test/test';
-
+import Immutable from 'immutable';
 var app = new koa();
 
 app.use(function*(next) {
@@ -47,7 +47,7 @@ var doctype = '<!DOCTYPE html>';
         ".catch(function(err){console.log(err);})"
       ].join('')
     }}></script>
-  ]} setInnerHTML={React.renderToString(<IndexPage/>)} />);
+  ]}  />);
 
 });
 

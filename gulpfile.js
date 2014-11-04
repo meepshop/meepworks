@@ -15,8 +15,14 @@ if(process.execArgv.indexOf('--harmony')>-1) {
   });
 }
 gulp.task('init', function () {
-  gulp.start('test-server-init');
-  gulp.start('source-watch');
+  gulp.start('source-watch', function (err) {
+    console.log('test');
+  });
+  gulp.start('test-server-init', function (err) {
+    if(err) {
+      console.log('test2');
+    }
+  });
 });
 
 gulp.task('clean', function () {
