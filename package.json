@@ -1,8 +1,7 @@
 {
   "name": "meepworks",
   "version": "0.0.1",
-  "description": "ReactJS based UI library",
-  "main": "index.js",
+  "description": "Isomorphic Framework based on ReactJS & Flux",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -17,46 +16,7 @@
   },
   "homepage": "https://github.com/meepshop/meepworks",
   "devDependencies": {
-    "co-exec": "^1.1.0",
-    "co-fs": "^1.2.0",
-    "es6-module-loader": "^0.9.4",
-    "esprima": "^1.2.2",
-    "gulp": "^3.8.9",
-    "gulp-changed": "^1.0.0",
-    "gulp-plumber": "^0.6.6",
-    "gulp-rename": "^1.2.0",
-    "gulp-watch": "^1.1.0",
-    "jspm": "^0.8.1",
-    "koa": "^0.13.0",
-    "koa-favicon": "^1.2.0",
-    "koa-mount": "^1.3.0",
-    "koa-router": "^3.5.0",
-    "koa-spdy": "^0.1.0",
-    "koa-static": "^1.4.7",
-    "react-tools": "^0.12.0",
-    "spdy": "^1.29.1",
-    "through2": "^0.6.3",
-    "traceur": "0.0.72"
-  },
-  "jspm": {
-    "name": "meepworks",
-    "main": "index.js",
-    "configFile": "config/jspm.js",
-    "dependencies": {
-      "react": "npm:react@^0.12.0",
-      "immutable": "github:facebook/immutable-js@^3.0.1",
-      "co": "github:tj/co@^3.1.0",
-      "superagent": "github:u9520107/superagent@0.20.0-jspm",
-      "npm:normalize.css": "^3.0.2",
-      "css": "^0.1.0",
-      "page": "github:visionmedia/page.js@^1.3.7"
-    }
   },
   "dependencies": {
-    "co": "^3.1.0",
-    "immutable": "^2.6.1",
-    "page": "^1.3.7",
-    "react": "^0.12.0",
-    "superagent": "^0.20.0"
   }
 }
