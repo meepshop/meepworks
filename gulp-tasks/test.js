@@ -7,7 +7,7 @@ import through from 'through2';
 import To5Instrumenter from 'greasebox/dist/to5-instrumenter';
 
 gulp.task('test', (cb) => {
-  gulp.src(['source/*.js'])
+  gulp.src(['source/**/*.js'])
     .pipe(istanbul({
       includeUntested: true,
       instrumenter: To5Instrumenter
@@ -16,9 +16,17 @@ gulp.task('test', (cb) => {
     .on('error', cb)
     .on('finish', () => {
       gulp.src(['test/*.js'])
-      .pipe(mocha())
+      .pipe(mocha({
+        globals: ['meepworkDebug']
+      }))
+      .on('error', cb)
       .pipe(istanbul.writeReports())
       .on('error', cb)
       .on('end', cb);
     });
+});
+
+gulp.task('watch-test', () => {
+  gulp.watch(['source/*.js', 'test/*.js'], ['test'])
+  .on('error', console.log);
 });

@@ -26,18 +26,31 @@
   },
   "dependencies": {
     "co": "^4.3.1",
+    "component-emitter": "^1.1.3",
+    "debug": "^2.1.1",
+    "flux": "^2.0.1",
     "greasebox": "^0.6.1",
+    "immutable": "^3.6.2",
+    "page": "^1.6.0",
     "react": "^0.12.2"
   },
   "jspm": {
     "directories": {
       "lib": "lib"
     },
+    "main": false,
     "configFile": "jspm_packages/config.js",
     "dependencies": {
       "6to5": "npm:6to5@^3.5.3",
       "co": "npm:co@^4.3.1",
-      "greasebox": "npm:greasebox@^0.6.1"
+      "component-emitter": "npm:component-emitter@^1.1.3",
+      "debug": "npm:debug@^2.1.1",
+      "flux": "npm:flux@^2.0.1",
+      "greasebox": "npm:greasebox@^0.6.1",
+      "immutable": "npm:immutable@^3.6.2",
+      "page": "npm:page@^1.6.0",
+      "react": "^0.12.2",
+      "url": "^0.1.0"
     }
   }
 }
