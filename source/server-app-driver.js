@@ -9,8 +9,8 @@ import Viewport from './components/viewport';
 import builder from 'systemjs-builder';
 import path from 'path';
 import url from 'url';
-import foreach from 'greasebox/dist/co-foreach';
-import map from 'greasebox/dist/co-map';
+import foreach from 'greasebox/co-foreach';
+import map from 'greasebox/co-map';
 import Tmpl from './tmpl';
 
 import appLoader from './app-loader';

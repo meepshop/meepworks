@@ -11,7 +11,7 @@ import {INIT_STORE} from './store-base';
 
 import url from 'url';
 
-import foreach from 'greasebox/dist/co-foreach';
+import foreach from 'greasebox/co-foreach';
 import Tmpl from './tmpl';
 
 debug.enable('app-driver');
