@@ -1,6 +1,5 @@
 import debug from 'debug';
 
-//debug.enable('tmpl-log');
 const log = debug('tmpl-log');
 /**
  * @exports default

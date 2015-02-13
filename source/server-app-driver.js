@@ -25,9 +25,7 @@ import SetRoutes from './actions/set-routes';
 
 
 import debug from 'debug';
-debug.enable('app-driver');
 var log = debug('app-driver');
-debug.enable('bind-url');
 var bindLog = debug('bind-url');
 
 const OK = Symbol();
@@ -110,25 +108,26 @@ export default class AppDriver {
           ];
         }
         //generate html container
-        ctx.body = DOCTYPE;
-        ctx.body += React.renderToStaticMarkup(
-          <HtmlPage
-            scripts={[
-              transpilerRuntime,
-              <script key="sys" src={ `/${config.jspm.path}/system.js` }></script>,
-              <script key="config" src={ `/${config.jspm.config}` }></script>,
-              cssPreloads,
-              yield appLoader(config, '#viewport', data)
-            ]}
-            body={<Viewport
-              innerHTML={appString}
-            />}
-          />);
+        let htmlOut = React.renderToStaticMarkup(<HtmlPage
+          scripts={[
+            transpilerRuntime,
+            <script key="sys" src={ `/${config.jspm.path}/system.js` }></script>,
+            <script key="config" src={ `/${config.jspm.config}` }></script>,
+            cssPreloads,
+            yield appLoader(config, '#viewport', data)
+          ]}
+          body={<Viewport
+            innerHTML={appString}
+          />}
+        />);
 
-          stores.forEach((s) => {
-            s[DEMOTE]();
-          });
-          dispatcher[DEMOTE]();
+        ctx.body = DOCTYPE + htmlOut;
+        ctx.status = 200;
+        ctx.type = 'text/html';
+        stores.forEach((s) => {
+          s[DEMOTE]();
+        });
+        dispatcher[DEMOTE]();
       }
 
     });
@@ -322,26 +321,26 @@ export default class AppDriver {
 
   }
   *traceCss(src, jspm) {
-  var css;
-  if(!_CssCache[src]) {
-    //trace app for all module imports
-    yield builder.loadConfig(this.config.jspm.config);
+    var css;
+    if(!_CssCache[src]) {
+      //trace app for all module imports
+      yield builder.loadConfig(this.config.jspm.config);
 
 
-    var trace = yield builder.trace(src);
+      var trace = yield builder.trace(src);
 
-    _CssCache[src] = Object.keys(trace.tree).filter((item) => {
-      //filter imports to only css entries
-      return /\.css/i.test(trace.tree[item].address);
-    }).map((item)=> {
-      //normalize server-side address to client side relative address
-      return '/' + path.relative(path.dirname(this.config.jspm.path), trace.tree[item].address.replace(/file:/i, '')).replace(/\\\\/g, '/');
-    });
-    builder.reset();
+      _CssCache[src] = Object.keys(trace.tree).filter((item) => {
+        //filter imports to only css entries
+        return /\.css/i.test(trace.tree[item].address);
+      }).map((item)=> {
+        //normalize server-side address to client side relative address
+        return '/' + path.relative(path.dirname(this.config.jspm.path), trace.tree[item].address.replace(/file:/i, '')).replace(/\\\\/g, '/');
+      });
+      builder.reset();
 
+    }
+    return _CssCache[src];
   }
-  return _CssCache[src];
-}
 }
 
 

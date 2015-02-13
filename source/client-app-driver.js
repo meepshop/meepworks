@@ -14,11 +14,8 @@ import url from 'url';
 import foreach from 'greasebox/co-foreach';
 import Tmpl from './tmpl';
 
-debug.enable('app-driver');
 const log = debug('app-driver');
-debug.enable('route-log');
 const routeLog = debug('route-log');
-debug.enable('bind-log');
 const bindLog = debug('bind-log');
 
 const INIT = Symbol();
