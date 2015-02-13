@@ -17,7 +17,7 @@ let DataScript = React.createClass({
 let LoaderScript = React.createClass({
   render () {
     let dataId = this.props.dataId ? `, '${this.props.dataId}'` : '';
-    let selfContained = config.transiler === 'traceur' ? '' :
+    let selfContained = (this.props.config && this.props.config.transiler === 'traceur') ? '' :
       `System.to5Options = {
     optional: ['selfContained']
   };`;
