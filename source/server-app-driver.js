@@ -83,9 +83,7 @@ export default class AppDriver {
 
         //render app to string
         let RootComponent = RouterStore.getInstance(ctx).getRootComponent();
-        log('root component: ', RootComponent);
         let appString = React.renderToString(<RootComponent />);
-        log('root component: ', RootComponent);
 
         //dehydrate stores
         let data = stores.map((s) =>  {
@@ -108,13 +106,13 @@ export default class AppDriver {
         } else {
           if(config.transpiler === 'traceur') {
             transpilerRuntime = [
-              <script key="traceur-runtime" src="/jspm_packages/traceur-runtime.js"></script>
+              <script key="traceur-runtime" src={ `/${config.jspm.path}/traceur-runtime.js` }></script>
             ];
           } else {
             //assume 6to5
             transpilerRuntime = [
-              <script key="6to5-runtime" src="/jspm_packages/6to5-runtime.js"></script>,
-              <script key="6to5-polyfill" src="/jspm_packages/6to5-polyfill.js"></script>
+              <script key="6to5-runtime" src={ `/${config.jspm.path}/6to5-runtime.js` }></script>,
+              <script key="6to5-polyfill" src={ `/${config.jspm.path}/6to5-polyfill.js` }></script>
             ];
           }
         }
@@ -124,8 +122,8 @@ export default class AppDriver {
           <HtmlPage
             scripts={[
               transpilerRuntime,
-              <script key="sys" src="/jspm_packages/system.js"></script>,
-              <script key="config" src="/jspm_packages/config.js"></script>,
+              <script key="sys" src={ `/${config.jspm.path}/system.js` }></script>,
+              <script key="config" src={ `/${config.jspm.config}` }></script>,
               cssPreloads,
               yield appLoader(config, '#viewport', data)
             ]}
