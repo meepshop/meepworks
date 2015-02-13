@@ -32,7 +32,7 @@ var bindLog = debug('bind-url');
 
 const OK = Symbol();
 const CSS_PRELOAD = Symbol();
-const _CssCache = {};
+let _CssCache = {};
 const DOCTYPE = '<!DOCTYPE html>';
 
 /**
