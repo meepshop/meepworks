@@ -100,11 +100,30 @@ export default class AppDriver {
           }
         }
 
+        let transpilerRuntime;
+        if(Array.isArray( config.transpilerRuntimes )) {
+          transpilerRuntime = config.transpilerRuntimes.map((runtime, idx) => {
+            return <script key={`runtime-${idx}`} src={runtime}></script>;
+          });
+        } else {
+          if(config.transpiler === 'traceur') {
+            transpilerRuntime = [
+              <script key="traceur-runtime" src="/jspm_packages/traceur-runtime.js"></script>
+            ];
+          } else {
+            //assume 6to5
+            transpilerRuntime = [
+              <script key="6to5-runtime" src="/jspm_packages/6to5-runtime.js"></script>,
+              <script key="6to5-polyfill" src="/jspm_packages/6to5-polyfill.js"></script>
+            ];
+          }
+        }
         //generate html container
         ctx.body = DOCTYPE;
         ctx.body += React.renderToStaticMarkup(
           <HtmlPage
             scripts={[
+              transpilerRuntime,
               <script key="sys" src="/jspm_packages/system.js"></script>,
               <script key="config" src="/jspm_packages/config.js"></script>,
               cssPreloads,
