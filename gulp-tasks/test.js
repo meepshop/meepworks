@@ -25,8 +25,3 @@ gulp.task('test', (cb) => {
       .on('end', cb);
     });
 });
-
-gulp.task('watch', ['test'], () => {
-  gulp.watch(['source/*.js', 'test/*.js'], ['test'])
-  .on('error', console.log);
-});
