@@ -12,9 +12,7 @@ gulp.task('build', (cb) => {
       .on('error', reject)
       .pipe(gb.loadMap())
       .on('error', reject)
-      .pipe(gb.to5Transform({
-        optional: ['selfContained']
-      }))
+      .pipe(gb.to5Transform())
       .on('error', reject)
       .pipe(gb.writeMap())
       .on('error', reject)
