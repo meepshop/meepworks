@@ -105,8 +105,6 @@ export default class AppDriver {
         ctx.body += React.renderToStaticMarkup(
           <HtmlPage
             scripts={[
-              <script key="6to5-runtime" src="/jspm_packages/6to5-runtime.js"></script>,
-              <script key="6to5-polyfill" src="/jspm_packages/6to5-polyfill.js"></script>,
               <script key="sys" src="/jspm_packages/system.js"></script>,
               <script key="config" src="/jspm_packages/config.js"></script>,
               cssPreloads,
