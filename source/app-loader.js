@@ -17,14 +17,9 @@ let DataScript = React.createClass({
 let LoaderScript = React.createClass({
   render () {
     let dataId = this.props.dataId ? `, '${this.props.dataId}'` : '';
-    let selfContained = (this.props.config && this.props.config.transiler === 'traceur') ? '' :
-      `System.to5Options = {
-    optional: ['selfContained']
-  };`;
     return <script dangerouslySetInnerHTML={{
       __html: `
       System.baseURL = '/';
-      ${selfContained}
       System.import('meepworks/client-app-driver') // has to be modified to proper path afterwards
       .then(function (m) {
         new m.default('${this.props.config.distPath.external}/${this.props.config.appPath}', '${this.props.target}'${dataId});

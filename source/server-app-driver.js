@@ -103,7 +103,12 @@ export default class AppDriver {
           transpilerRuntime = [
             <script key="traceur-runtime" src={ `/${config.jspm.path}/traceur-runtime.js` }></script>
           ];
-        }        //generate html container
+        } else {
+          transpilerRuntime = [
+            <script key="traceur-runtime" src={ `/${config.jspm.path}/6to5-polyfill.js` }></script>
+          ];
+        }
+        //generate html container
         ctx.body = DOCTYPE;
         ctx.body += React.renderToStaticMarkup(
           <HtmlPage
