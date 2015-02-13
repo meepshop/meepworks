@@ -98,6 +98,7 @@ export default class AppDriver {
           }
         }
 
+        let transpilerRuntime;
         if(config.transpiler === 'traceur') {
           transpilerRuntime = [
             <script key="traceur-runtime" src={ `/${config.jspm.path}/traceur-runtime.js` }></script>
