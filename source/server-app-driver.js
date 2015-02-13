@@ -105,8 +105,8 @@ export default class AppDriver {
           ];
         } else {
           transpilerRuntime = [
-            <script key="traceur-runtime" src={ `/${config.jspm.path}/6to5-runtime.js` }></script>,
-            <script key="traceur-runtime" src={ `/${config.jspm.path}/6to5-polyfill.js` }></script>
+            <script key="6to5-runtime" src={ `/${config.jspm.path}/6to5-runtime.js` }></script>,
+            <script key="6to5-polyfill" src={ `/${config.jspm.path}/6to5-polyfill.js` }></script>
           ];
         }
         //generate html container
