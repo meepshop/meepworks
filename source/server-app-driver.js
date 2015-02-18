@@ -18,7 +18,7 @@ import {PROMOTE, DEMOTE} from './instance';
 import Navigate from './actions/navigate';
 import {SET_KEY} from './action-base';
 import Dispatcher from './dispatcher';
-import {INIT_STORE} from './store-base';
+import { INIT_STORE, INIT } from './store-base';
 import RouterStore from './stores/router-store';
 import RouteTable from './stores/route-table';
 import SetRoutes from './actions/set-routes';
@@ -58,15 +58,17 @@ export default class AppDriver {
     driver.koa.use(function * (next) {
       var ctx = this;
       //create request specific dispatcher and stores
-      let dispatcher = Dispatcher.getInstance(ctx);
-      let stores = [];
+      //let dispatcher = Dispatcher.getInstance(ctx);
+      //let stores = [];
+      ctx.dispatcher = Dispatcher.getInstance(ctx);
+      ctx.stores = new Set();
 
-      for(let s of traceStores(App)) {
-        let tmp = s.getInstance(ctx);
-        tmp[INIT_STORE]();
-        dispatcher.register(tmp);
-        stores.push(tmp);
-      }
+      //for(let s of traceStores(App)) {
+      //  let tmp = s.getInstance(ctx);
+      //  tmp[INIT_STORE]();
+      //  dispatcher.register(tmp);
+      //  stores.push(tmp);
+      //}
 
 
       //yields routing logic
