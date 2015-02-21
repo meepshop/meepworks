@@ -25,6 +25,9 @@ import SetRoutes from './actions/set-routes';
 
 
 import debug from 'debug';
+debug.enable('app-driver');
+debug.enable('bind-url');
+
 var log = debug('app-driver');
 var bindLog = debug('bind-url');
 
@@ -58,17 +61,17 @@ export default class AppDriver {
     driver.koa.use(function * (next) {
       var ctx = this;
       //create request specific dispatcher and stores
-      //let dispatcher = Dispatcher.getInstance(ctx);
-      //let stores = [];
-      ctx.dispatcher = Dispatcher.getInstance(ctx);
-      ctx.stores = new Set();
+      let dispatcher = Dispatcher.getInstance(ctx);
+      let stores = [];
+      //ctx.dispatcher = Dispatcher.getInstance(ctx);
+      //ctx.stores = new Set();
 
-      //for(let s of traceStores(App)) {
-      //  let tmp = s.getInstance(ctx);
-      //  tmp[INIT_STORE]();
-      //  dispatcher.register(tmp);
-      //  stores.push(tmp);
-      //}
+      for(let s of traceStores(App)) {
+        let tmp = s.getInstance(ctx);
+        tmp[INIT_STORE]();
+        dispatcher.register(tmp);
+        stores.push(tmp);
+      }
 
 
       //yields routing logic
@@ -204,6 +207,7 @@ export default class AppDriver {
             }
           });
           compList.push(App.component);
+        log('@@@', compList);
 
           //set routing information
           yield new SetRoutes({
