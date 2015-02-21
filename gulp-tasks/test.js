@@ -4,13 +4,13 @@ import istanbul from 'gulp-istanbul';
 import mocha from 'gulp-mocha';
 import through from 'through2';
 
-import To5Instrumenter from 'greasebox/to5-instrumenter';
+import BabelInstrumenter from 'greasebox/babel-instrumenter';
 
 gulp.task('test', (cb) => {
   gulp.src(['source/**/*.js'])
     .pipe(istanbul({
       includeUntested: true,
-      instrumenter: To5Instrumenter
+      instrumenter: BabelInstrumenter
     }))
     .pipe(istanbul.hookRequire())
     .on('error', cb)

@@ -12,7 +12,7 @@ gulp.task('build', (cb) => {
       .on('error', reject)
       .pipe(gb.loadMap())
       .on('error', reject)
-      .pipe(gb.to5Transform({
+      .pipe(gb.babelTransform({
         blacklist: ['regenerator']
       }))
       .on('error', reject)

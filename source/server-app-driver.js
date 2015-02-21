@@ -107,10 +107,6 @@ export default class AppDriver {
             <script key="traceur-runtime" src={ `/${config.jspm.path}/traceur-runtime.js` }></script>
           ];
         } else {
-          transpilerRuntime = [
-            <script key="6to5-runtime" src={ `/${config.jspm.path}/6to5-runtime.js` }></script>,
-            <script key="6to5-polyfill" src={ `/${config.jspm.path}/6to5-polyfill.js` }></script>
-          ];
         }
         //generate html container
         let htmlOut = React.renderToStaticMarkup(<HtmlPage
@@ -207,7 +203,6 @@ export default class AppDriver {
             }
           });
           compList.push(App.component);
-        log('@@@', compList);
 
           //set routing information
           yield new SetRoutes({
@@ -334,6 +329,7 @@ export default class AppDriver {
 
 
       var trace = yield builder.trace(src);
+      log('###########');
 
       _CssCache[src] = Object.keys(trace.tree).filter((item) => {
         //filter imports to only css entries
