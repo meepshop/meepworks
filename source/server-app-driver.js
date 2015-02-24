@@ -61,27 +61,34 @@ export default class AppDriver {
     driver.koa.use(function * (next) {
       var ctx = this;
       //create request specific dispatcher and stores
-      let dispatcher = Dispatcher.getInstance(ctx);
-      let stores = [];
-      //ctx.dispatcher = Dispatcher.getInstance(ctx);
-      //ctx.stores = new Set();
+      //let dispatcher = Dispatcher.getInstance(ctx);
+      //let stores = [];
 
-      for(let s of traceStores(App)) {
-        let tmp = s.getInstance(ctx);
-        tmp[INIT_STORE]();
-        dispatcher.register(tmp);
-        stores.push(tmp);
-      }
+      //create instance specific dispatcher and store set
+      ctx.dispatcher = Dispatcher.getInstance(ctx);
+      ctx.stores = new Set([RouterStore, RouteTable]);
 
+      //init router store
+      let rStore = RouterStore.getInstance(ctx);
+      rStore[INIT_STORE]();
+      ctx.dispatcher.register(rStore);
+
+      //init route table store
+      let rTable = RouteTable.getInstance(ctx);
+      rTable[INIT_STORE]();
+      ctx.dispatcher.register(rTable);
 
       //yields routing logic
       yield next;
 
       if(ctx[OK]) {
         //promote dispatcher and stores
-        dispatcher[PROMOTE]();
-        stores.forEach((s)=> {
-          s[PROMOTE]();
+        ctx.dispatcher[PROMOTE]();
+        let stores = [];
+        ctx.stores.forEach((s) => {
+          let tmp = s.getInstance(ctx);
+          tmp[PROMOTE]();
+          stores.push(tmp);
         });
 
         //render app to string
@@ -107,6 +114,9 @@ export default class AppDriver {
             <script key="traceur-runtime" src={ `/${config.jspm.path}/traceur-runtime.js` }></script>
           ];
         } else {
+          transpilerRuntime = [
+            <script key="babel-runtime" src={`/${config.jspm.path}/babel-polyfill.js`}></script>
+          ];
         }
         //generate html container
         let htmlOut = React.renderToStaticMarkup(<HtmlPage
@@ -128,7 +138,7 @@ export default class AppDriver {
         stores.forEach((s) => {
           s[DEMOTE]();
         });
-        dispatcher[DEMOTE]();
+        ctx.dispatcher[DEMOTE]();
       }
 
     });
@@ -201,8 +211,30 @@ export default class AppDriver {
             if(p.component) {
               compList.push(p.component);
             }
+            //init stores
+            if(Array.isArray(p.stores)) {
+              p.stores.forEach((s) => {
+                ctx.stores.add(s);
+                let tmp = s.getInstance(ctx);
+                if(!tmp[INIT]) {
+                  tmp[INIT_STORE]();
+                  ctx.dispatcher.register(tmp);
+                }
+              });
+            }
           });
           compList.push(App.component);
+          if(Array.isArray(App.stores)) {
+              App.stores.forEach((s) => {
+                ctx.stores.add(s);
+                let tmp = s.getInstance(ctx);
+                if(!tmp[INIT]) {
+                  tmp[INIT_STORE]();
+                  ctx.dispatcher.register(tmp);
+                }
+              });
+
+          }
 
           //set routing information
           yield new SetRoutes({
@@ -269,6 +301,17 @@ export default class AppDriver {
           parents.forEach((p) => {
             if(p.component) {
               compList.push(p.component);
+            }
+            //init stores
+            if(Array.isArray(p.stores)) {
+              p.stores.forEach((s) => {
+                ctx.stores.add(s);
+                let tmp = s.getInstance(ctx);
+                if(!tmp[INIT]) {
+                  tmp[INIT_STORE]();
+                  ctx.dispatcher.register(tmp);
+                }
+              });
             }
           });
 

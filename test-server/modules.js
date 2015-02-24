@@ -1,13 +1,38 @@
 import React from 'react';
-import ActionBase from '../dist/action-base';
-import StoreBase from '../dist/store-base';
+import ActionBase from '../source/action-base';
+import StoreBase from '../source/store-base';
 
 
 
 const Modules = React.createClass({
+  getInitialState() {
+    return {
+      now: TimeStore.getInstance().now
+    };
+  },
+  componentDidMount() {
+    TimeStore.getInstance().on('change', this.handleTimeChange);
+      requestAnimationFrame(this.triggerUpdateTime);
+  },
+  componentWillUnmount() {
+    TimeStore.getInstance().off('change', this.handleTimeChange);
+  },
+  triggerUpdateTime() {
+    if(this.isMounted()) {
+      new UpdateTime().exec();
+      requestAnimationFrame(this.triggerUpdateTime);
+    }
+  },
+  handleTimeChange(){
+    let t = TimeStore.getInstance().now;
+    if(t!== this.state.now) {
+      this.setState({
+        now: t
+      });
+    }
+  },
   render () {
-    console.log(TimeStore.getInstance().now);
-    return <div>{ TimeStore.getInstance().now }</div>;
+    return <div>{ 'now: ' + this.state.now }</div>;
   }
 });
 

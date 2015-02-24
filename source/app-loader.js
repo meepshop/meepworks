@@ -17,12 +17,14 @@ let DataScript = React.createClass({
 let LoaderScript = React.createClass({
   render () {
     let dataId = this.props.dataId ? `, '${this.props.dataId}'` : '';
+    let p = this.props.config.localtest ? 'source' : 'meepworks';
     return <script dangerouslySetInnerHTML={{
       __html: `
       System.baseURL = '/';
-      System.import('meepworks/client-app-driver') // has to be modified to proper path afterwards
+      System.import('${p}/client-app-driver') // has to be modified to proper path afterwards
       .then(function (m) {
-        new m('${this.props.config.distPath.external}/${this.props.config.appPath}', '${this.props.target}'${dataId});
+        console.log(m);
+        new m.default('${this.props.config.distPath.external}/${this.props.config.appPath}', '${this.props.target}'${dataId});
       })
       .catch(function (err) {
         console.log(err);

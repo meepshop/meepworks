@@ -7,18 +7,18 @@ import RouterStore from './stores/router-store';
 import RouteTable from './stores/route-table';
 import Navigate from './actions/navigate';
 import SetComponents from './actions/set-components';
-import {INIT_STORE} from './store-base';
+import { INIT_STORE, INIT } from './store-base';
 
 import url from 'url';
 
 import foreach from 'greasebox/co-foreach';
 import Tmpl from './tmpl';
-
+debug.enable('app-driver');
 const log = debug('app-driver');
 const routeLog = debug('route-log');
 const bindLog = debug('bind-log');
 
-const INIT = Symbol();
+const INIT_APP = Symbol();
 
 
 
@@ -29,32 +29,28 @@ export default class ClientAppDriver {
     driver.appPath = src;
     log(src);
 
-    let dispatcher = Dispatcher.getInstance();
+    driver.dispatcher = Dispatcher.getInstance();
 
     //find data
-    let data;
-    if(dataId) {
-      let dataScript = document.querySelector(`script[id="${dataId}"]`);
-      data = JSON.parse(dataScript.innerText);
-      log(data);
-    }
+    let dataScript = document.querySelector(`script[id="${dataId}"]`);
+    driver.data = JSON.parse(dataScript.innerText);
+    log(driver.data);
+
     co(function * () {
-      var App = (yield System.import(src));
+      var App = (yield System.import(src)).default;
       driver.app = App;
       log(App);
 
 
-      //rehydrate stores
-      var stores = [];
-      for(let s of traceStores(App)) {
-        let tmp = s.getInstance();
-        tmp[INIT_STORE]();
-        dispatcher.register(tmp);
-        stores.push(tmp);
-      }
-      stores.forEach((s, i) => {
-        s.rehydrate(data[i]);
-      });
+      let rStore = RouterStore.getInstance();
+      rStore[INIT_STORE]();
+      driver.dispatcher.register(rStore);
+      rStore.rehydrate(driver.data.shift());
+
+      let rTable = RouteTable.getInstance();
+      rTable[INIT_STORE]();
+      driver.dispatcher.register(rTable);
+      rTable.rehydrate(driver.data.shift());
 
       //compose client routing logic and repopulate RouterStores's components list
       driver.srcRoot = RouteTable.getInstance().getSrcRoot();
@@ -72,9 +68,9 @@ export default class ClientAppDriver {
     }).catch(log);
   }
   init() {
-    this[INIT] = true;
+    this[INIT_APP] = true;
     let RootComponent = RouterStore.getInstance().getRootComponent();
-    React.render(<RootComponent />, document.querySelector(this.target));
+    React.render(React.createElement(RootComponent), document.querySelector(this.target));
   }
   bindRoutes(route, urlPath, parents = []) {
     bindLog('route: ', route, urlPath, parents);
@@ -84,17 +80,15 @@ export default class ClientAppDriver {
         bindLog(`binding ${urlPath}`, route.app);
         page(urlPath, co.wrap(function * (ctx) {
 
-          if(driver[INIT] && ctx.path === RouterStore.getInstance().getUrl()) {
+          if(driver[INIT_APP] && ctx.path === RouterStore.getInstance().getUrl()) {
             return;
           }
           routeLog('routed to: ', urlPath, route, parents);
-
 
           let compList = [];
           //check parents
           routeLog('check p: ', parents);
           yield foreach(parents, function * (p) {
-
             if(typeof p.app === 'string') {
               if(`${driver.srcRoot}/${p.app}`===driver.appPath) {
                 p.app = driver.app;
@@ -107,6 +101,18 @@ export default class ClientAppDriver {
             }
             if(p.app.component) {
               compList.push(p.app.component);
+            }
+            if(Array.isArray(p.app.stores)) {
+              p.app.stores.forEach((s) => {
+                let tmp = s.getInstance();
+                if(!tmp[INIT]) {
+                  tmp[INIT_STORE]();
+                  driver.dispatcher.register(tmp);
+                  if(!driver[INIT]) {
+                    tmp.rehydrate(driver.data.shift());
+                  }
+                }
+              });
             }
           });
           //check self
@@ -123,11 +129,28 @@ export default class ClientAppDriver {
           if(route.app.component) {
             compList.push(route.app.component);
           }
+          if(Array.isArray(route.app.stores)) {
+            route.app.stores.forEach((s) => {
+              let tmp  = s.getInstance();
+              if(!tmp[INIT]) {
+                tmp[INIT_STORE]();
+                driver.dispatcher.register(tmp);
+                if(!driver[INIT]) {
+                  tmp.rehydrate(driver.data.shift());
+                }
+              }
+            });
+          }
+
+
           //module loaded
 
           //run navigate
 
-          if(driver[INIT]) {
+          if(driver[INIT_APP]) {
+            //init stores if they are not initialized yet
+
+
             //trigger navigate action
             yield new Navigate({
               params: ctx.params,
@@ -137,11 +160,10 @@ export default class ClientAppDriver {
               components: compList
             }).exec();
           }
-
           //run actions
           yield foreach(parents, function * (p) {
-            if(!p.app[INIT]) {
-              if(driver[INIT]) {
+            if(!p.app[INIT_APP]) {
+              if(driver[INIT_APP]) {
                 if(Array.isArray(p.app.initialActions)) {
                   yield foreach(p.app.initialActions, (initialAction) => {
                     return new initialAction.action(initialAction.payload).exec();
@@ -149,10 +171,10 @@ export default class ClientAppDriver {
 
                 }
               }
-              p.app[INIT] = true;
+              p.app[INIT_APP] = true;
             }
-            log('driver[INIT]', driver[INIT]);
-            if(driver[INIT]) {
+            log('driver[INIT_APP]', driver[INIT_APP]);
+            if(driver[INIT_APP]) {
               if(Array.isArray(p.app.routeActions)) {
                 yield foreach(p.app.routeActions, (routeAction) => {
                   return new routeAction.action(routeAction.payload).exec();
@@ -161,8 +183,8 @@ export default class ClientAppDriver {
             }
 
           });
-          if(!route.app[INIT]) {
-            if(driver[INIT]) {
+          if(!route.app[INIT_APP]) {
+            if(driver[INIT_APP]) {
               if(Array.isArray(route.app.initialActions)) {
                 yield foreach(route.app.initialActions, (initialAction) => {
                   return new initialAction.action(initialAction.payload).exec();
@@ -170,10 +192,10 @@ export default class ClientAppDriver {
 
               }
             }
-            route.app[INIT] = true;
+            route.app[INIT_APP] = true;
             //run routeActions
           }
-          if(driver[INIT]) {
+          if(driver[INIT_APP]) {
             if(Array.isArray(route.app.routeActions)) {
               yield foreach(route.app.routeActions, (routeAction) => {
                 return new routeAction.action(routeAction.payload).exec();
@@ -182,7 +204,7 @@ export default class ClientAppDriver {
             }
           }
 
-          if (!driver[INIT]) {
+          if (!driver[INIT_APP]) {
             yield new SetComponents(compList).exec();
             driver.init();
           }
@@ -199,7 +221,7 @@ export default class ClientAppDriver {
         bindLog(`binding ${urlPath}`, route);
 
         page(urlPath, co.wrap(function * (ctx) {
-          if(driver[INIT] && ctx.path === RouterStore.getInstance().getUrl()) {
+          if(driver[INIT_APP] && ctx.path === RouterStore.getInstance().getUrl()) {
             return;
           }
 
@@ -220,11 +242,23 @@ export default class ClientAppDriver {
             if(p.app.component) {
               compList.push(p.app.component);
             }
+            if(Array.isArray(p.app.stores)) {
+              p.app.stores.forEach((s) => {
+                let tmp = s.getInstance();
+                if(!tmp[INIT]) {
+                  tmp[INIT_STORE]();
+                  driver.dispatcher.register(tmp);
+                  if(!driver[INIT]) {
+                    tmp.rehydrate(driver.data.shift());
+                  }
+                }
+              });
+            }
 
           });
 
           //navigate
-          if(driver[INIT]) {
+          if(driver[INIT_APP]) {
             //trigger navigate action
             yield new Navigate({
               params: ctx.params,
@@ -237,8 +271,8 @@ export default class ClientAppDriver {
 
           //run actions
           yield foreach(parents, function * (p) {
-            if(!p.app[INIT]) {
-              if(driver[INIT]) {
+            if(!p.app[INIT_APP]) {
+              if(driver[INIT_APP]) {
                 if(Array.isArray(p.app.initialActions)) {
                   yield foreach(p.app.initialActions, (initialAction) => {
                     return new initialAction.action(initialAction.payload).exec();
@@ -246,9 +280,9 @@ export default class ClientAppDriver {
 
                 }
               }
-              p.app[INIT] = true;
+              p.app[INIT_APP] = true;
             }
-            if(driver[INIT]) {
+            if(driver[INIT_APP]) {
               if(Array.isArray(p.app.routeActions)) {
                 yield foreach(p.app.routeActions, (routeAction) => {
                   return new routeAction.action(routeAction.payload).exec();
@@ -258,7 +292,7 @@ export default class ClientAppDriver {
 
           });
 
-          if(!driver[INIT]) {
+          if(!driver[INIT_APP]) {
             yield new SetComponents(compList).exec();
             driver.init();
           }

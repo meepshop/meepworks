@@ -1,11 +1,18 @@
 import React from 'react';
-import RouterStore from '../dist/stores/router-store';
-
+import RouterStore from '../source/stores/router-store';
 const App = React.createClass({
+  componentDidMount () {
+    RouterStore.getInstance().on('change', this.handleRouteChange);
+  },
+  componentWillUnmount () {
+    RouterStore.getInstance().off('change', this.handleRouteChange);
+  },
+  handleRouteChange() {
+    this.forceUpdate();
+  },
   render() {
     let Content = RouterStore.getInstance().getChildComponent(App);
 
-    console.log('###', Content);
     if(!Content) {
       Content = Home;
     }

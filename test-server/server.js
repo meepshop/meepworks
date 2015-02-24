@@ -3,7 +3,7 @@ import mount from 'koa-mount';
 import serve from 'koa-static';
 import favicon from 'koa-favicon';
 import path from 'path';
-import AppDriver from '../dist/server-app-driver';
+import AppDriver from '../source/server-app-driver';
 import TestApp from './app';
 import debug from 'debug';
 
@@ -12,9 +12,9 @@ debug.enable('bind-url');
 
 server.use(favicon());
 server.use(mount('/jspm_packages', serve(path.resolve(__dirname, '../jspm_packages/'))));
-server.use(mount('/dist', serve(path.resolve(__dirname, '../source'))));
+server.use(mount('/source', serve(path.resolve(__dirname, '../source'))));
 server.use(mount('/meepworks', serve(path.resolve(__dirname, '../source'))));
-server.use(mount('/test-server', serve(path.resolve(__dirname, '../server-client'))));
+server.use(mount('/test-server', serve(path.resolve(__dirname, '../test-server-build'))));
 
 server.use(mount('/', new AppDriver(TestApp, {
   appPath: 'app',
@@ -24,9 +24,10 @@ server.use(mount('/', new AppDriver(TestApp, {
   },
   distPath: {
     external: 'test-server',
-    internal: 'server-client'
+    internal: 'test-server-build'
   },
-  fileRoot: __dirname
+  fileRoot: __dirname,
+  localtest: true
 })));
 
 server.listen('15551');
