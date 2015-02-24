@@ -6,7 +6,7 @@ import HtmlPage from './components/html-page';
 import Viewport from './components/viewport';
 
 
-import builder from 'systemjs-builder';
+import Builder from 'systemjs-builder';
 import path from 'path';
 import url from 'url';
 import foreach from 'greasebox/co-foreach';
@@ -368,6 +368,7 @@ export default class AppDriver {
     var css;
     if(!_CssCache[src]) {
       //trace app for all module imports
+      let builder = new Builder();
       yield builder.loadConfig(this.config.jspm.config);
 
 
