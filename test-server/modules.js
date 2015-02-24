@@ -1,6 +1,6 @@
 import React from 'react';
-import ActionBase from '../source/action-base';
-import StoreBase from '../source/store-base';
+import ActionBase from '../dist/action-base';
+import StoreBase from '../dist/store-base';
 
 
 

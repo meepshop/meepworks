@@ -16,6 +16,7 @@ gulp.task('publish', ['build'], (cb) => {
       let info = JSON.parse(yield exec('npm view --json meepworks'));
       info.versions.sort(sortSemver);
       latest = info.versions.pop();
+      log(`latest version on npm: ${latest}`);
     } catch(err) {}
 
     let manifest = JSON.parse(yield cofs.readFile(path.resolve(__dirname, '../package.json')));
@@ -30,8 +31,8 @@ gulp.task('publish', ['build'], (cb) => {
       log(`Trying to publish version: ${chalk.green( manifest.version )}, but latest npm version is ${chalk.green( latest )}.`);
     }
 
-  }).catch(cb)
-    .then(cb);
+  }).then(cb)
+    .catch(cb);
 });
 
 function sortSemver(a, b) {

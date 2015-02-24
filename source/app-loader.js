@@ -22,7 +22,7 @@ let LoaderScript = React.createClass({
       System.baseURL = '/';
       System.import('meepworks/client-app-driver') // has to be modified to proper path afterwards
       .then(function (m) {
-        new m.default('${this.props.config.distPath.external}/${this.props.config.appPath}', '${this.props.target}'${dataId});
+        new m('${this.props.config.distPath.external}/${this.props.config.appPath}', '${this.props.target}'${dataId});
       })
       .catch(function (err) {
         console.log(err);

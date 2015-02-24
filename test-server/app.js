@@ -1,6 +1,5 @@
 import React from 'react';
-import RouterStore from '../source/stores/router-store';
-//import {TimeStore} from './modules';
+import RouterStore from '../dist/stores/router-store';
 
 const App = React.createClass({
   render() {
@@ -26,9 +25,6 @@ const Home = React.createClass({
 });
 export default {
   component: App,
-  //stores: [
-  //  TimeStore
-  //],
   routes: {
     '/': {
       name: 'Home',

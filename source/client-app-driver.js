@@ -39,7 +39,7 @@ export default class ClientAppDriver {
       log(data);
     }
     co(function * () {
-      var App = (yield System.import(src)).default;
+      var App = (yield System.import(src));
       driver.app = App;
       log(App);
 
