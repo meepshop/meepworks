@@ -25,8 +25,6 @@ import SetRoutes from './actions/set-routes';
 
 
 import debug from 'debug';
-debug.enable('app-driver');
-debug.enable('bind-url');
 
 var log = debug('app-driver');
 var bindLog = debug('bind-url');
@@ -373,7 +371,6 @@ export default class AppDriver {
 
 
       var trace = yield builder.trace(src);
-      log('###########');
 
       _CssCache[src] = Object.keys(trace.tree).filter((item) => {
         //filter imports to only css entries

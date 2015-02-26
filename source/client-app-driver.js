@@ -13,7 +13,6 @@ import url from 'url';
 
 import foreach from 'greasebox/co-foreach';
 import Tmpl from './tmpl';
-debug.enable('app-driver');
 const log = debug('app-driver');
 const routeLog = debug('route-log');
 const bindLog = debug('bind-log');
