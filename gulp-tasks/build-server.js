@@ -3,7 +3,7 @@ import * as gb from 'greasebox';
 import path from 'path';
 import plumber from 'gulp-plumber';
 
-gulp.task('build-server', ['build-server-client', 'build-server-node'], () => {});
+gulp.task('build-server', ['build-server-node'], () => {});
 
 gulp.task('build-server-client', ['clean-server-client'], (cb) => {
   gulp.src('test-server/source/**/*.js')

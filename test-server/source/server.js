@@ -3,6 +3,12 @@ import mount from 'koa-mount';
 import serve from 'koa-static';
 import favicon from 'koa-favicon';
 import path from 'path';
+import requireFilter from '../../dist/require-filter';
+
+requireFilter.filter('.css!');
+
+import 'test.css!';
+
 import TestApp from './app/app';
 import debug from 'debug';
 
