@@ -1,6 +1,6 @@
 {
   "name": "meepworks",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "description": "Isomorphic Framework based on ReactJS & Flux",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -35,7 +35,7 @@
     "component-emitter": "^1.1.3",
     "debug": "^2.1.1",
     "flux": "^2.0.1",
-    "greasebox": "^0.8.4",
+    "greasebox": "^0.8.5",
     "immutable": "^3.6.2",
     "koa": "^0.18.0",
     "koa-router": "^4.0.1",
@@ -54,8 +54,9 @@
       "component-emitter": "npm:component-emitter@^1.1.3",
       "debug": "npm:debug@^2.1.1",
       "flux": "npm:flux@^2.0.1",
-      "greasebox": "github:u9520107/greasebox@^0.8.4",
+      "greasebox": "npm:greasebox@^0.8.5",
       "immutable": "npm:immutable@^3.6.2",
+      "jsx": "github:floatdrop/plugin-jsx@^0.1.1",
       "koa": "npm:koa@^0.18.0",
       "koa-router": "npm:koa-router@^4.0.1",
       "page": "npm:page@^1.6.0",

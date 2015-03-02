@@ -36,7 +36,7 @@ export default class ClientAppDriver {
     log(driver.data);
 
     co(function * () {
-      var App = (yield System.import(src)).default;
+      var App = (yield System.import(src));
       driver.app = App;
       log(App);
 
@@ -69,7 +69,7 @@ export default class ClientAppDriver {
   init() {
     this[INIT_APP] = true;
     let RootComponent = RouterStore.getInstance().getRootComponent();
-    React.render(React.createElement(RootComponent), document.querySelector(this.target));
+    React.render(<RootComponent />, document.querySelector(this.target));
   }
   bindRoutes(route, urlPath, parents = []) {
     bindLog('route: ', route, urlPath, parents);
@@ -94,7 +94,7 @@ export default class ClientAppDriver {
               } else {
                 let canonicalAppPath = url.resolve(driver.appPath, p.app);
                 routeLog(`fetching ${canonicalAppPath}`);
-                p.app = ( yield System.import(canonicalAppPath) ).default;
+                p.app = ( yield System.import(canonicalAppPath) );
                 routeLog(`successfully fetched: `, p.app);
               }
             }
@@ -121,7 +121,7 @@ export default class ClientAppDriver {
             } else {
               let canonicalAppPath = url.resolve(driver.appPath, route.app);
               routeLog(`fetching ${canonicalAppPath}`);
-              route.app = ( yield System.import(canonicalAppPath) ).default;
+              route.app = ( yield System.import(canonicalAppPath) );
               routeLog(`successfully fetched: `, route.app);
             }
           }
@@ -234,7 +234,7 @@ export default class ClientAppDriver {
               } else {
                 let canonicalAppPath = url.resolve(driver.appPath, p.app);
                 routeLog(`fetching ${canonicalAppPath}`);
-                p.app = ( yield System.import(canonicalAppPath) ).default;
+                p.app = ( yield System.import(canonicalAppPath) );
                 routeLog(`successfully fetched: `, p.app);
               }
             }

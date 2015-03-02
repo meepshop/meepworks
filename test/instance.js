@@ -118,7 +118,7 @@ describe('Instance', () => {
 
     it('should only work with keyed instances', () => {
       a = Instance.getInstance();
-      expect(a[PROMOTE]).to.not.exist();
+      expect(a[PROMOTE]).to.be.a('undefined');
     });
 
     it('should promote an keyed instance to global instance', () => {
@@ -141,7 +141,7 @@ describe('Instance', () => {
 
     it('should only work with keyed instances', () => {
       a = Instance.getInstance();
-      expect(a[DEMOTE]).to.not.exist();
+      expect(a[DEMOTE]).to.be.a('undefined');
     });
 
     it('should demote a promoted instance from being global', () => {

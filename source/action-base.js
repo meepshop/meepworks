@@ -37,8 +37,8 @@ export default class ActionBase {
    *  a promise that would in the end resolve an payload.
    */
   action() {
-    log(`Class ${this.constructor.name} has not implemented action.`);
-    return Promise.reject();
+    //allow actions to be used as events by defaulting to resolved promise
+    return Promise.resolve();
   }
   /**
    *  @function

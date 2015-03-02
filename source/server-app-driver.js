@@ -22,6 +22,7 @@ import { INIT_STORE, INIT } from './store-base';
 import RouterStore from './stores/router-store';
 import RouteTable from './stores/route-table';
 import SetRoutes from './actions/set-routes';
+import ExposeContext from './actions/expose-context';
 
 
 import debug from 'debug';
@@ -75,6 +76,8 @@ export default class AppDriver {
       let rTable = RouteTable.getInstance(ctx);
       rTable[INIT_STORE]();
       ctx.dispatcher.register(rTable);
+
+      new ExposeContext(ctx).exec(ctx);
 
       //yields routing logic
       yield next;

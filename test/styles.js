@@ -5,10 +5,10 @@ import StyleMap from '../source/styles';
 import { merge } from '../source/styles';
 
 describe('StyleMap', () => {
-  it('should be a constructor function', ()=> {
+  it('should be a constructor function', () => {
     expect(StyleMap).to.be.a('function');
     let s = new StyleMap({});
-    expect(s).to.exist();
+    expect(s).to.exist;
   });
 
   it('should accept css-in-js defs and wraps around it', () => {
@@ -20,7 +20,7 @@ describe('StyleMap', () => {
       }
     };
     let s = new StyleMap(def);
-    expect(s.header).to.exist();
+    expect(s.header).to.exist;
     expect(s.header.backgroundColor).to.equal(def.header.backgroundColor);
     expect(s.header.position).to.equal(def.header.position);
     expect(s.header.top).to.equal(def.header.top);
@@ -53,7 +53,7 @@ describe('StyleMap', () => {
       body: 'red'
     };
     let s = new StyleMap(def);
-    expect(s.body).to.not.exist();
+    expect(s.body).to.not.exist;
   });
 
 });
@@ -65,7 +65,7 @@ describe('merge', () => {
 
   it('should return objects', () => {
     let s = merge();
-    expect(s).to.exist();
+    expect(s).to.exist;
     expect(s).to.be.a('object');
   });
 

@@ -12,7 +12,7 @@ describe('tmpl', () => {
 
   it('should return a tmpl object', () => {
     let a = new Tmpl('test');
-    expect(a).to.exist();
+    expect(a).to.exist;
   });
 
   describe('tmpl object', () => {

@@ -1,5 +1,5 @@
 import React from 'react';
-import RouterStore from '../source/stores/router-store';
+import RouterStore from '../../../dist/stores/router-store';
 const App = React.createClass({
   componentDidMount () {
     RouterStore.getInstance().on('change', this.handleRouteChange);

@@ -1,5 +1,4 @@
 import ActionBase from '../action-base';
-import RouterStore from '../stores/router-store';
 
 export const NAVIGATE = Symbol();
 
