@@ -165,7 +165,11 @@ export default class ClientAppDriver {
               if(driver[INIT_APP]) {
                 if(Array.isArray(p.app.initialActions)) {
                   yield foreach(p.app.initialActions, (initialAction) => {
-                    return new initialAction.action(initialAction.payload).exec();
+                    let payload = initialAction.payload;
+                    if(typeof payload === 'function') {
+                      payload = payload();
+                    }
+                    return new initialAction.action(payload).exec();
                   });
 
                 }
@@ -176,7 +180,11 @@ export default class ClientAppDriver {
             if(driver[INIT_APP]) {
               if(Array.isArray(p.app.routeActions)) {
                 yield foreach(p.app.routeActions, (routeAction) => {
-                  return new routeAction.action(routeAction.payload).exec();
+                    let payload = routeAction.payload;
+                    if(typeof payload === 'function') {
+                      payload = payload();
+                    }
+                  return new routeAction.action(payload).exec();
                 });
               }
             }
@@ -186,7 +194,11 @@ export default class ClientAppDriver {
             if(driver[INIT_APP]) {
               if(Array.isArray(route.app.initialActions)) {
                 yield foreach(route.app.initialActions, (initialAction) => {
-                  return new initialAction.action(initialAction.payload).exec();
+                    let payload = initialAction.payload;
+                    if(typeof payload === 'function') {
+                      payload = payload();
+                    }
+                  return new initialAction.action(payload).exec();
                 });
 
               }
@@ -197,7 +209,11 @@ export default class ClientAppDriver {
           if(driver[INIT_APP]) {
             if(Array.isArray(route.app.routeActions)) {
               yield foreach(route.app.routeActions, (routeAction) => {
-                return new routeAction.action(routeAction.payload).exec();
+                    let payload = routeAction.payload;
+                    if(typeof payload === 'function') {
+                      payload = payload();
+                    }
+                return new routeAction.action(payload).exec();
               });
 
             }
@@ -274,7 +290,11 @@ export default class ClientAppDriver {
               if(driver[INIT_APP]) {
                 if(Array.isArray(p.app.initialActions)) {
                   yield foreach(p.app.initialActions, (initialAction) => {
-                    return new initialAction.action(initialAction.payload).exec();
+                    let payload = initialAction.payload;
+                    if(typeof payload === 'function') {
+                      payload = payload();
+                    }
+                    return new initialAction.action(payload).exec();
                   });
 
                 }
@@ -284,7 +304,11 @@ export default class ClientAppDriver {
             if(driver[INIT_APP]) {
               if(Array.isArray(p.app.routeActions)) {
                 yield foreach(p.app.routeActions, (routeAction) => {
-                  return new routeAction.action(routeAction.payload).exec();
+                  let payload = routeAction.payload;
+                  if(typeof payload === 'function') {
+                    payload = payload();
+                  }
+                  return new routeAction.action(payload).exec();
                 });
               }
             }

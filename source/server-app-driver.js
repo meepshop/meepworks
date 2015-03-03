@@ -259,7 +259,21 @@ export default class AppDriver {
           //exec ctx App's initial actions
           if(Array.isArray(App.initialActions)) {
             yield foreach(App.initialActions, (initialAction) => {
-              return new initialAction.action(initialAction.payload)[SET_KEY](ctx).exec();
+              let payload = initialAction.payload;
+              if(typeof payload === 'function') {
+                payload = payload();
+              }
+              return new initialAction.action(payload)[SET_KEY](ctx).exec();
+            });
+          }
+
+          if(Array.isArray(App.routeActions)) {
+            yield foreach(App.routeActions, function * (routeAction) {
+              let payload = routeAction.payload;
+              if(typeof payload === 'function') {
+                payload = payload();
+              }
+              yield new routeAction.action(payload)[SET_KEY](ctx).exec();
             });
           }
 
@@ -356,12 +370,20 @@ export default class AppDriver {
     yield foreach(parents, function * (Mod) {
       if(Array.isArray(Mod.initialActions)) {
         yield foreach(Mod.initialActions, function * (initialAction) {
-          yield new initialAction.action(initialAction.payload)[SET_KEY](ctx).exec();
+          let payload = initialAction.payload;
+          if(typeof payload === 'function') {
+            payload = payload();
+          }
+          yield new initialAction.action(payload)[SET_KEY](ctx).exec();
         });
       }
       if(Array.isArray(Mod.routeActions)) {
         yield foreach(Mod.routeActions, function * (routeAction) {
-          yield new routeAction.action(routeAction.payload)[SET_KEY](ctx).exec();
+          let payload = routeAction.payload;
+          if(typeof payload === 'function') {
+            payload = payload();
+          }
+          yield new routeAction.action(payload)[SET_KEY](ctx).exec();
         });
       }
     });
