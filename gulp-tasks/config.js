@@ -1,3 +1,4 @@
+
 export const paths = {
   server: 'test-server/node',
   client: 'test-server/client',

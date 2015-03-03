@@ -77,7 +77,6 @@ export default class AppDriver {
       rTable[INIT_STORE]();
       ctx.dispatcher.register(rTable);
 
-      new ExposeContext(ctx).exec(ctx);
 
       //yields routing logic
       yield next;
@@ -237,6 +236,8 @@ export default class AppDriver {
 
           }
 
+          yield new ExposeContext(ctx).exec(ctx);
+
           //set routing information
           yield new SetRoutes({
             srcRoot: driver.config.distPath.external,
@@ -316,6 +317,7 @@ export default class AppDriver {
             }
           });
 
+          yield new ExposeContext(ctx).exec(ctx);
           //set routing information
           yield new SetRoutes({
             srcRoot: driver.config.distPath.external,
