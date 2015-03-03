@@ -236,7 +236,7 @@ export default class AppDriver {
 
           }
 
-          yield new ExposeContext(ctx).exec(ctx);
+          yield new ExposeContext(ctx)[SET_KEY](ctx).exec();
 
           //set routing information
           yield new SetRoutes({
@@ -317,7 +317,7 @@ export default class AppDriver {
             }
           });
 
-          yield new ExposeContext(ctx).exec(ctx);
+          yield new ExposeContext(ctx)[SET_KEY](ctx).exec();
           //set routing information
           yield new SetRoutes({
             srcRoot: driver.config.distPath.external,
