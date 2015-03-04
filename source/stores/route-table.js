@@ -5,7 +5,7 @@ import {SET_ROUTES} from '../actions/set-routes';
 
 const log = debug('route-table');
 
-const KEY = Symbol();
+const DATA = Symbol();
 
 export default class RouteTable extends StoreBase {
   constructor() {
@@ -22,7 +22,7 @@ export default class RouteTable extends StoreBase {
   }
   handleSetRoutes(payload) {
     log('handleSetRoutes', payload);
-    this[KEY] = this[KEY].withMutations((map) => {
+    this[DATA] = this[DATA].withMutations((map) => {
       map
         .set('routes', Im.fromJS(payload.routes))
         .set('srcRoot', payload.srcRoot);
@@ -30,16 +30,16 @@ export default class RouteTable extends StoreBase {
   }
   rehydrate(state) {
     if(state) {
-      this[KEY] = Im.fromJS(state);
+      this[DATA] = Im.fromJS(state);
     }
   }
   dehydrate() {
-    return this[KEY].toJS();
+    return this[DATA].toJS();
   }
   getRoutes() {
-    return this[KEY].get('routes').toJS();
+    return this[DATA].get('routes').toJS();
   }
   getSrcRoot() {
-    return this[KEY].get('srcRoot');
+    return this[DATA].get('srcRoot');
   }
 }

@@ -12,7 +12,7 @@ const App = React.createClass({
     this.forceUpdate();
   },
   render() {
-    let Content = RouterStore.getInstance().getChildComponent(App);
+    let Content = RouterStore.getChildComponent(App);
 
     if(!Content) {
       Content = Home;

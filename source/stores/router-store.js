@@ -6,7 +6,7 @@ import { SET_COMPONENTS } from '../actions/set-components';
 
 const log = debug('router-store');
 
-const DATA_KEY = Symbol();
+const DATA = Symbol();
 
 export default class RouterStore extends StoreBase {
   constructor(initialState) {
@@ -32,7 +32,7 @@ export default class RouterStore extends StoreBase {
   }
   handleNavigate(route) {
     log('handleNavigate', route);
-    this[DATA_KEY] = this[DATA_KEY].withMutations((map) => {
+    this[DATA] = this[DATA].withMutations((map) => {
       map
         .set('title', route.title)
         .set('params', Immutable.fromJS(route.params))
@@ -46,44 +46,62 @@ export default class RouterStore extends StoreBase {
   }
   handleSetComponents(comps) {
     log('handleSetComponents', comps);
-    this[DATA_KEY] = this[DATA_KEY].set('components', Immutable.fromJS(comps));
+    this[DATA] = this[DATA].set('components', Immutable.fromJS(comps));
   }
 
   rehydrate(state) {
     if (state) {
       state.components = [];
-      this[DATA_KEY] = Immutable.fromJS(state);
+      this[DATA] = Immutable.fromJS(state);
     }
   }
   dehydrate() {
-    let res = this[DATA_KEY].toJS();
+    let res = this[DATA].toJS();
     delete res.components;
     return res;
   }
 
+  static getChildComponent(comp) {
+    return this.getInstance().getChildComponent(comp);
+  }
   getChildComponent(comp) {
     var res = null;
-    for (var i = 0, len = this[DATA_KEY].get('components').size - 1; i < len; i++) {
-      if (comp === this[DATA_KEY].getIn(['components', i])) {
-        res = this[DATA_KEY].getIn(['components', i + 1]);
+    for (var i = 0, len = this[DATA].get('components').size - 1; i < len; i++) {
+      if (comp === this[DATA].getIn(['components', i])) {
+        res = this[DATA].getIn(['components', i + 1]);
         break;
       }
     }
     return res;
   }
   getRootComponent() {
-    return this[DATA_KEY].getIn(['components', 0]);
+    return this[DATA].getIn(['components', 0]);
+  }
+  static getRootComponent() {
+    return this.getInstance().getRootComponent();
   }
   getTitle() {
-    return this[DATA_KEY].get('title');
+    return this[DATA].get('title');
+  }
+  static getTitle() {
+    return this.getInstance()[DATA].get('title');
   }
   getRoute() {
-    return this[DATA_KEY].get('route');
+    return this[DATA].get('route');
+  }
+  static getRoute() {
+    return this.getInstance()[DATA].get('route');
   }
   getUrl() {
-    return this[DATA_KEY].get('url');
+    return this[DATA].get('url');
+  }
+  static getUrl() {
+    return this.getInstance()[DATA].get('url');
+  }
+  getState() {
+    return this[DATA];
   }
   static getState() {
-    return this.getInstance()[DATA_KEY];
+    return this.getInstance()[DATA];
   }
 }

@@ -28,12 +28,12 @@ import ExposeContext from './actions/expose-context';
 import debug from 'debug';
 
 var log = debug('app-driver');
-var bindLog = debug('bind-url');
 
 const OK = Symbol();
 const CSS_PRELOAD = Symbol();
-let _CssCache = {};
 const DOCTYPE = '<!DOCTYPE html>';
+
+let _CssCache = {};
 
 /**
  * @exports default
@@ -56,13 +56,9 @@ export default class AppDriver {
       app: driver.config.appPath,
       title: App.title
     };
-    //triggers for all requests
+    //server logic entry point
     driver.koa.use(function * (next) {
       var ctx = this;
-      //create request specific dispatcher and stores
-      //let dispatcher = Dispatcher.getInstance(ctx);
-      //let stores = [];
-
       //create instance specific dispatcher and store set
       ctx.dispatcher = Dispatcher.getInstance(ctx);
       ctx.stores = new Set([RouterStore, RouteTable]);
@@ -81,6 +77,7 @@ export default class AppDriver {
       //yields routing logic
       yield next;
 
+      //application init is done, ready to render
       if(ctx[OK]) {
         //promote dispatcher and stores
         ctx.dispatcher[PROMOTE]();
@@ -101,6 +98,9 @@ export default class AppDriver {
         });
 
         //generate css preload list
+        //this scans for css imports and loads them in html's head tag
+        //which allows the server-side render result to be properly styled.
+        //If this is not done, some styles will only appear after client applicaiton loads.
         let cssPreloads = [];
         if(ctx[CSS_PRELOAD]) {
           for(let css of ctx[CSS_PRELOAD]) {
@@ -135,6 +135,8 @@ export default class AppDriver {
         ctx.body = DOCTYPE + htmlOut;
         ctx.status = 200;
         ctx.type = 'text/html';
+
+        //demote stores and dispatcher from global status
         stores.forEach((s) => {
           s[DEMOTE]();
         });
@@ -163,7 +165,7 @@ export default class AppDriver {
    *    Bind all the routing logic to the application driver.
    */
   bindRoutes(route, urlPath, filePath, files, table, parents = []) {
-    bindLog('route: ', route);
+    log('route: ', route);
     let driver = this;
 
     if(!table) {
@@ -201,7 +203,7 @@ export default class AppDriver {
       //if component is defined, and the urlPath is not delegated to child application
       if(App.component && !(App.routes&&App.routes[urlPath])) {
 
-        bindLog(urlPath);
+        log(urlPath);
 
         this.koa.get(urlPath, function * (next) {
           var ctx = this;
@@ -235,7 +237,9 @@ export default class AppDriver {
               });
 
           }
-
+          //expose the context
+          //this helps to allow middlewares to pass information into the stores
+          //for the root application
           yield new ExposeContext(ctx)[SET_KEY](ctx).exec();
 
           //set routing information
@@ -259,21 +263,13 @@ export default class AppDriver {
           //exec ctx App's initial actions
           if(Array.isArray(App.initialActions)) {
             yield foreach(App.initialActions, (initialAction) => {
-              let payload = initialAction.payload;
-              if(typeof payload === 'function') {
-                payload = payload();
-              }
-              return new initialAction.action(payload)[SET_KEY](ctx).exec();
+              return new initialAction.action(initialAction.payload)[SET_KEY](ctx).exec();
             });
           }
 
           if(Array.isArray(App.routeActions)) {
             yield foreach(App.routeActions, function * (routeAction) {
-              let payload = routeAction.payload;
-              if(typeof payload === 'function') {
-                payload = payload();
-              }
-              yield new routeAction.action(payload)[SET_KEY](ctx).exec();
+              yield new routeAction.action(routeAction.payload)[SET_KEY](ctx).exec();
             });
           }
 
@@ -299,16 +295,16 @@ export default class AppDriver {
       }
     } else {
       //if app is not defined, then use the current app
-      bindLog('check: ', route);
+      log('check: ', route);
       let App = parents[parents.length - 1];
-      bindLog(App);
+      log(App);
       if(App.component) {
         table.hasComponent = true;
       }
       //if component is defined
       if(App.component) {
 
-        bindLog(urlPath);
+        log(urlPath);
 
         this.koa.get(urlPath, function * (next) {
           var ctx = this;
@@ -370,20 +366,12 @@ export default class AppDriver {
     yield foreach(parents, function * (Mod) {
       if(Array.isArray(Mod.initialActions)) {
         yield foreach(Mod.initialActions, function * (initialAction) {
-          let payload = initialAction.payload;
-          if(typeof payload === 'function') {
-            payload = payload();
-          }
-          yield new initialAction.action(payload)[SET_KEY](ctx).exec();
+          yield new initialAction.action(initialAction.payload)[SET_KEY](ctx).exec();
         });
       }
       if(Array.isArray(Mod.routeActions)) {
         yield foreach(Mod.routeActions, function * (routeAction) {
-          let payload = routeAction.payload;
-          if(typeof payload === 'function') {
-            payload = payload();
-          }
-          yield new routeAction.action(payload)[SET_KEY](ctx).exec();
+          yield new routeAction.action(routeAction.payload)[SET_KEY](ctx).exec();
         });
       }
     });
@@ -413,14 +401,3 @@ export default class AppDriver {
   }
 }
 
-
-
-function traceStores(App) {
-  let res = new Set([RouterStore, RouteTable]);
-  if(Array.isArray(App.stores)) {
-    App.stores.forEach((s)=> {
-      res.add(s);
-    });
-  }
-  return res;
-}
