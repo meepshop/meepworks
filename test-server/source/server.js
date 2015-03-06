@@ -6,14 +6,13 @@ import path from 'path';
 import requireFilter from '../../dist/require-filter';
 
 requireFilter.filter('.css!');
+requireFilter.filter('.*!asset');
 
 import 'test.css!';
 
 import TestApp from './app/app';
 import debug from 'debug';
 
-debug.enable('bind-url');
-debug.enable ('req-log');
 
 let log = debug('req-log');
 
@@ -21,9 +20,15 @@ import AppDriver from '../../dist/server-app-driver';
 
 let server = koa();
 server.use(favicon());
-server.use(mount('/jspm_packages', serve(path.resolve(__dirname, '../../jspm_packages/'))));
-server.use(mount('/dist', serve(path.resolve(__dirname, '../../dist'))));
-server.use(mount('/test-server', serve(path.resolve(__dirname, '../../test-server'))));
+server.use(mount('/jspm_packages', serve(path.resolve(__dirname, '../../jspm_packages/'), {
+  maxage: 2*60*1000
+})));
+server.use(mount('/dist', serve(path.resolve(__dirname, '../../dist'), {
+  maxage: 2*60*1000
+})));
+server.use(mount('/test-server', serve(path.resolve(__dirname, '../../test-server'), {
+  maxage: 2*60*1000
+})));
 
 
 server.use(function * (next) {
@@ -43,7 +48,11 @@ server.use(mount('/', new AppDriver(TestApp, {
     internal: 'test-server/node'
   },
   fileRoot: __dirname,
-  localtest: true
+  localtest: true,
+  versions: {
+    js: '2015030601'
+  },
+  debug: []
 })));
 
 server.listen('15551', () => {

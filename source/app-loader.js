@@ -1,6 +1,7 @@
 import React from 'react';
 import uuid from './uuid';
 import debug from 'debug';
+import dedent from './dedent';
 
 
 /**
@@ -14,7 +15,6 @@ let DataScript = React.createClass({
   }
 });
 
-
 let LoaderScript = React.createClass({
   render () {
     let dataId = this.props.dataId ? `, '${this.props.dataId}'` : '';
@@ -24,20 +24,21 @@ let LoaderScript = React.createClass({
       debugString = `debug.enable('${this.props.config.debug.join(',')}');`;
     }
     return <script dangerouslySetInnerHTML={{
-      __html: `
-      System.baseURL = '/';
-      System.import('debug')
-      .then(function(debug) {
-          ${debugString}
-          return System.import('${p}/client-app-driver') // has to be modified to proper path afterwards
+      __html: dedent`
+      (function () {
+        System.baseURL = '/';
+        System.import('debug')
+        .then(function(debug) {
+            ${debugString}
+            return System.import('${p}/client-app-driver') // has to be modified to proper path afterwards
+          })
+        .then(function (m) {
+          new m('${this.props.config.distPath.external}/${this.props.config.appPath}', '${this.props.target}'${dataId});
         })
-      .then(function (m) {
-        new m('${this.props.config.distPath.external}/${this.props.config.appPath}', '${this.props.target}'${dataId});
-      })
-      .catch(function (err) {
-        console.log(err);
-      });
-      `
+        .catch(function (err) {
+          console.log(err);
+        });
+      })();`
     }}></script>;
   }
 });

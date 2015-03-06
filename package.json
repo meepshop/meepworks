@@ -45,7 +45,7 @@
   },
   "jspm": {
     "directories": {
-      "lib": "source"
+      "lib": "."
     },
     "configFile": "jspm_packages/config.js",
     "dependencies": {

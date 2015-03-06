@@ -107,24 +107,32 @@ export default class AppDriver {
             cssPreloads.push(<link rel="stylesheet" href={css} />);
           }
         }
+        let jsVer = config.versions && config.versions.js ? `?${config.versions.js}` : '';
 
         let transpilerRuntime;
         if(config.transpiler === 'traceur') {
           transpilerRuntime = [
-            <script key="traceur-runtime" src={ `/${config.jspm.path}/traceur-runtime.js` }></script>
+            <script key="traceur-runtime" src={ `/${config.jspm.path}/traceur-runtime.js${jsVer}` }></script>
           ];
         } else {
           transpilerRuntime = [
-            <script key="babel-runtime" src={`/${config.jspm.path}/babel-polyfill.js`}></script>
+            <script key="babel-runtime" src={`/${config.jspm.path}/babel-polyfill.js${jsVer}`}></script>
           ];
         }
+        let cacheBuster = <script key="cache-buster"
+          id="cache-buster"
+          src={`/${config.localtest ? 'dist' : 'meepworks'}/cache-buster.js${jsVer}`}
+          data-ver={jsVer}
+          data-jspm={config.jspm.path}
+          dataJspm></script>;
         //generate html container
         let htmlOut = React.renderToStaticMarkup(<HtmlPage
           scripts={[
             transpilerRuntime,
-            <script key="sys" src={ `/${config.jspm.path}/system.js` }></script>,
-            <script key="config" src={ `/${config.jspm.config}` }></script>,
-            cssPreloads,
+            <script key="sys" src={ `/${config.jspm.path}/system.js${jsVer}` }></script>,
+              <script key="config" src={ `/${config.jspm.config}${jsVer}` }></script>,
+              cacheBuster,
+              cssPreloads,
             yield appLoader(config, '#viewport', data)
           ]}
           body={<Viewport

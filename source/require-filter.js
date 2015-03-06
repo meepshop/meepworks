@@ -28,7 +28,8 @@ class RequireFilter {
 
   filter(f) {
     if(!this[FILTERS].has(f)) {
-      this[FILTERS].set(f, new RegExp(`${escapeRegExp(f)}$`, 'i'));
+
+      this[FILTERS].set(f, new RegExp(`${asterickToAny(escapeRegExp(f))}$`, 'i'));
     }
   }
   removeFilter(f) {
@@ -46,6 +47,9 @@ class RequireFilter {
     return this[ENABLED];
   }
 
+}
+function asterickToAny(str) {
+  return str.replace(/\\\*/g, '.*');
 }
 
 export default new RequireFilter();
