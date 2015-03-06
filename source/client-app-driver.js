@@ -175,13 +175,17 @@ export default class ClientAppDriver {
 
           if(driver[INIT_APP]) {
             //trigger navigate action, if not the first load
+            let title = Tmpl.format(route.title, ctx.params) || route.app.name || '';
             yield new Navigate({
               params: ctx.params,
-              title: Tmpl.format(route.title, ctx.params) || route.app.name || '',
+              title: title,
               route: urlPath,
               url: ctx.path,
               components: compList
             }).exec();
+            if(typeof document !== 'undefined') {
+              document.title = title;
+            }
           }
           //run actions
           yield foreach(parents, function * (p) {
@@ -289,13 +293,17 @@ export default class ClientAppDriver {
           //navigate
           if(driver[INIT_APP]) {
             //trigger navigate action
+            let title = Tmpl.format(route.title, ctx.params) || '';
             yield new Navigate({
               params: ctx.params,
-              title: Tmpl.format(route.title, ctx.params) || '',
+              title: title,
               route: urlPath,
               url: ctx.path,
               components: compList
             }).exec();
+            if(typeof document !== 'undefined') {
+              document.title = title;
+            }
           }
 
           //run actions

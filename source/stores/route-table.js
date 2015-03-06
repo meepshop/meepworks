@@ -11,7 +11,8 @@ export default class RouteTable extends StoreBase {
   constructor() {
     this.rehydrate({
         routes: {},
-        srcRoot: '/'
+        srcRoot: '/',
+        driver: null
     });
   }
   get handlers() {
