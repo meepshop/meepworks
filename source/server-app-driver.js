@@ -387,7 +387,6 @@ export default class AppDriver {
       let builder = new Builder();
       yield builder.loadConfig(this.config.jspm.config);
 
-
       var trace = yield builder.trace(src);
 
       _CssCache[src] = Object.keys(trace.tree).filter((item) => {
@@ -395,7 +394,12 @@ export default class AppDriver {
         return /\.css/i.test(trace.tree[item].address);
       }).map((item)=> {
         //normalize server-side address to client side relative address
-        return '/' + path.relative(path.dirname(this.config.jspm.path), trace.tree[item].address.replace(/file:/i, '')).replace(/\\\\/g, '/');
+        if(item.indexOf(this.config.jspm.path) > -1) {
+          return '/' + path.relative(path.dirname(this.config.jspm.path), trace.tree[item].address.replace(/file:/i, '')).replace(/\\\\/g, '/');
+        } else {
+          let ver = `?${ this.config.version }` || '';
+          return `/${item.split('!')[0]}${ver}`;
+        }
       });
       builder.reset();
 

@@ -31,7 +31,7 @@ server.use(mount('/jspm_packages', serve(path.resolve(__dirname, '../../jspm_pac
 server.use(mount('/dist', serve(path.resolve(__dirname, '../../dist'), {
   maxage: 2*60*1000
 })));
-server.use(mount('/test-server', serve(path.resolve(__dirname, '../../test-server'), {
+server.use(mount('/test-server/node', serve(path.resolve(__dirname, '../../test-server/node'), {
   maxage: 2*60*1000
 })));
 
