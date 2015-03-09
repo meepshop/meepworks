@@ -2,6 +2,7 @@ import React from 'react';
 import RouterStore from '../../../dist/stores/router-store';
 
 import test from './something.mp3!asset';
+import 'normalize.css/normalize.css!';
 import './test.css!';
 
 const App = React.createClass({

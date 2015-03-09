@@ -394,7 +394,7 @@ export default class AppDriver {
         return /\.css/i.test(trace.tree[item].address);
       }).map((item)=> {
         //normalize server-side address to client side relative address
-        if(item.indexOf(this.config.jspm.path) > -1) {
+        if(trace.tree[item].address.indexOf(this.config.jspm.path) > -1) {
           return '/' + path.relative(path.dirname(this.config.jspm.path), trace.tree[item].address.replace(/file:/i, '')).replace(/\\\\/g, '/');
         } else {
           let ver = `?${ this.config.version }` || '';

@@ -13,3 +13,6 @@ Change Log
 
 #v0.4.5
 1. server AppDriver would append versions to traced css if they are not from jspm_packages.
+
+#v0.4.6
+1. fix error where css files from jspm_packages would also be handled with app version
