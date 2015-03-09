@@ -33,6 +33,7 @@ const OK = Symbol();
 const CSS_PRELOAD = Symbol();
 const DOCTYPE = '<!DOCTYPE html>';
 
+
 let _CssCache = {};
 
 /**
@@ -107,7 +108,7 @@ export default class AppDriver {
             cssPreloads.push(<link rel="stylesheet" href={css} />);
           }
         }
-        let jsVer = config.versions && config.versions.js ? `?${config.versions.js}` : '';
+        let jsVer = config.version ? `?${config.version}` : '';
 
         let transpilerRuntime;
         if(config.transpiler === 'traceur') {
@@ -119,19 +120,13 @@ export default class AppDriver {
             <script key="babel-runtime" src={`/${config.jspm.path}/babel-polyfill.js${jsVer}`}></script>
           ];
         }
-        let cacheBuster = <script key="cache-buster"
-          id="cache-buster"
-          src={`/${config.localtest ? 'dist' : 'meepworks'}/cache-buster.js${jsVer}`}
-          data-ver={jsVer}
-          data-jspm={config.jspm.path}
-          dataJspm></script>;
+
         //generate html container
         let htmlOut = React.renderToStaticMarkup(<HtmlPage
           scripts={[
             transpilerRuntime,
             <script key="sys" src={ `/${config.jspm.path}/system.js${jsVer}` }></script>,
-              <script key="config" src={ `/${config.jspm.config}${jsVer}` }></script>,
-              cacheBuster,
+            <script key="config" src={ `/${config.jspm.config}${jsVer}` }></script>,
               cssPreloads,
             yield appLoader(config, '#viewport', data)
           ]}

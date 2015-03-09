@@ -27,6 +27,19 @@ let LoaderScript = React.createClass({
       __html: dedent`
       (function () {
         System.baseURL = '/';
+        System.meepworks = {
+          appVersion: '${this.props.config.version ? `?${this.props.config.version}` : ''}',
+          jspmPath: '${this.props.config.jspm.path}'
+        };
+
+        var fetch = System.fetch;
+        System.fetch = function (load) {
+          if(load.address.indexOf(System.meepworks.jspmPath) === -1) {
+            load.address += System.meepworks.appVersion;
+          }
+          return fetch.call(this, load);
+        };
+
         System.import('debug')
         .then(function(debug) {
             ${debugString}
@@ -42,7 +55,6 @@ let LoaderScript = React.createClass({
     }}></script>;
   }
 });
-
 
 export default function * appLoader(config, target, data) {
   let output = [];

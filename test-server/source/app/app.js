@@ -1,7 +1,7 @@
 import React from 'react';
 import RouterStore from '../../../dist/stores/router-store';
 
-import test from './something.mp3!asset';
+//import test from './something.mp3!asset';
 
 const App = React.createClass({
   componentDidMount () {

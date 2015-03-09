@@ -3,12 +3,17 @@ import mount from 'koa-mount';
 import serve from 'koa-static';
 import favicon from 'koa-favicon';
 import path from 'path';
-import requireFilter from '../../dist/require-filter';
 
+import RequireFilter from '../../dist/require-filter';
+
+const requireFilter = new RequireFilter({
+  fileRoot: path.resolve(__dirname, '..'),
+  urlRoot: '/test-server/',
+  version: '2015030601'
+});
 requireFilter.filter('.css!');
 requireFilter.filter('.*!asset');
 
-import 'test.css!';
 
 import TestApp from './app/app';
 import debug from 'debug';
@@ -49,9 +54,7 @@ server.use(mount('/', new AppDriver(TestApp, {
   },
   fileRoot: __dirname,
   localtest: true,
-  versions: {
-    js: '2015030601'
-  },
+  version: '2015030601',
   debug: []
 })));
 
