@@ -1,8 +1,8 @@
 import React from 'react';
 import RouterStore from '../stores/router-store';
 
-export default React.createClass({
-  getDefaultProps() {
+export default class HtmlPage extends React.Component {
+  static get defaultProps() {
     return {
       scripts: [],
       styles: [],
@@ -10,7 +10,7 @@ export default React.createClass({
       body: null,
       setHtml: false
     };
-  },
+  }
   render() {
     return <html>
       <head>
@@ -26,4 +26,4 @@ export default React.createClass({
       }
     </html>;
   }
-});
+}

@@ -80,28 +80,65 @@ export default class RouterStore extends StoreBase {
   static getRootComponent() {
     return this.getInstance().getRootComponent();
   }
+  static get rootComponent() {
+    return this.getInstance().rootComponent;
+  }
+  get rootComponent() {
+    return this[DATA].getIn(['components', 0]);
+  }
+
   getTitle() {
     return this[DATA].get('title');
   }
   static getTitle() {
     return this.getInstance()[DATA].get('title');
   }
+
+  static get title() {
+    return this.getInstance().title;
+  }
+  get title() {
+    return this[DATA].get('title');
+  }
+
   getRoute() {
     return this[DATA].get('route');
   }
   static getRoute() {
     return this.getInstance()[DATA].get('route');
   }
+  static get route() {
+    return this.getInstance().route;
+  }
+  get route() {
+    return this[DATA].route;
+  }
+
+
   getUrl() {
     return this[DATA].get('url');
   }
   static getUrl() {
     return this.getInstance()[DATA].get('url');
   }
+  static get url() {
+    return this.getInstance().url;
+  }
+  get url() {
+    return this[DATA].url;
+  }
+
+
   getState() {
     return this[DATA];
   }
   static getState() {
     return this.getInstance()[DATA];
+  }
+  static get state() {
+    return this.getInstance()[DATA];
+  }
+  get state() {
+    return this[DATA];
   }
 }

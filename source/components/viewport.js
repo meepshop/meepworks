@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default React.createClass({
+export default class Viewport extends React.Component {
   render() {
     if(this.props.innerHTML) {
       return <div
@@ -11,4 +11,4 @@ export default React.createClass({
     }
     return <div id="viewport"></div>;
   }
-});
+}
