@@ -1,6 +1,7 @@
 import React from 'react';
 import ActionBase from '../../../dist/action-base';
 import StoreBase from '../../../dist/store-base';
+import RouterStore from '../../../dist/stores/router-store';
 
 
 
@@ -32,7 +33,17 @@ const Modules = React.createClass({
     }
   },
   render () {
-    return <div>{ 'now: ' + this.state.now }</div>;
+    let Child = RouterStore.getInstance().getChildComponent(Modules);
+    let rootUrl = RouterStore.rootUrl;
+    let content;
+    if(Child) {
+      content = <Child />;
+    }
+    return <div>
+      Modules: <br />
+      <a href={ `${rootUrl}/modules/nest1` }>Nested App 1</a><br />
+      {content}
+    </div>;
   }
 });
 
@@ -72,5 +83,12 @@ class TimeStore extends StoreBase {
 }
 export default {
   component: Modules,
-  stores: [TimeStore]
+  stores: [TimeStore],
+  routes: {
+    '/modules/nest1': {
+      app: './nested/nest1',
+      title: 'Nest App 1',
+      name: 'nest1'
+    }
+  }
 };

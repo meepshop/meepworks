@@ -3,22 +3,21 @@ import Immutable from 'immutable';
 import debug from 'debug';
 import { NAVIGATE } from '../actions/navigate';
 import { SET_COMPONENTS } from '../actions/set-components';
-
+import SetApproot from '../actions/set-approot';
 const log = debug('router-store');
 
 const DATA = Symbol();
 
 export default class RouterStore extends StoreBase {
-  constructor(initialState) {
-    if (!initialState) {
-      initialState = {
+  constructor() {
+    let state = {
         title: '',
         params: null,
         route: '',
-        url: ''
+        url: '',
+        root: ''
       };
-    }
-    this.rehydrate(initialState);
+    this.rehydrate(state);
   }
 
   get handlers() {
@@ -28,10 +27,19 @@ export default class RouterStore extends StoreBase {
     }, {
       action: SET_COMPONENTS,
       handler: this.handleSetComponents
+    }, {
+      action: SetApproot.symbol,
+      handler: this.handleSetApproot
     }];
   }
+  handleSetApproot(root) {
+    if(root[root.length -1] === '/') {
+      root = root.substr(0, root.length - 1);
+    }
+    this[DATA] = this[DATA].set('root', root);
+    this.emit('change');
+  }
   handleNavigate(route) {
-    log('handleNavigate', route);
     this[DATA] = this[DATA].withMutations((map) => {
       map
         .set('title', route.title)
@@ -140,5 +148,12 @@ export default class RouterStore extends StoreBase {
   }
   get state() {
     return this[DATA];
+  }
+
+  static get rootUrl() {
+    return this.getInstance().rootUrl;
+  }
+  get rootUrl() {
+    return this[DATA].get('root');
   }
 }

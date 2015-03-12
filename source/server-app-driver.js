@@ -23,10 +23,10 @@ import RouterStore from './stores/router-store';
 import RouteTable from './stores/route-table';
 import SetRoutes from './actions/set-routes';
 import ExposeContext from './actions/expose-context';
+import SetApproot from './actions/set-approot';
 
 
 import debug from 'debug';
-
 var log = debug('app-driver');
 
 const OK = Symbol();
@@ -53,6 +53,7 @@ export default class AppDriver {
     driver.koa = new koa();
     driver.app = App;
     driver.config = config;
+    driver.rootUrl = config.rootUrl || '/';
     driver.routeTable = {
       app: driver.config.appPath,
       title: App.title
@@ -68,6 +69,7 @@ export default class AppDriver {
       let rStore = RouterStore.getInstance(ctx);
       rStore[INIT_STORE]();
       ctx.dispatcher.register(rStore);
+      new SetApproot(driver.rootUrl)[SET_KEY](ctx).exec();
 
       //init route table store
       let rTable = RouteTable.getInstance(ctx);

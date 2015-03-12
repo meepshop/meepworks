@@ -60,6 +60,7 @@ export default class ClientAppDriver {
       rStore[INIT_STORE]();
       driver.dispatcher.register(rStore);
       rStore.rehydrate(driver.data.shift());
+      driver.rootUrl = RouterStore.rootUrl;
 
       let rTable = RouteTable.getInstance();
       rTable[INIT_STORE]();
@@ -101,6 +102,7 @@ export default class ClientAppDriver {
       //if current application has component, and its sub route table does not have current path
       if(route.hasComponent && !(route.routes && route.routes[urlPath])) {
         log(`binding ${urlPath}`, route.app);
+        urlPath = driver.rootUrl + urlPath;
         page(urlPath, co.wrap(function * (ctx) {
           //if routed path is already the current path, do nothing
           if(driver[INIT_APP] && ctx.path === RouterStore.getInstance().getUrl()) {
@@ -252,6 +254,7 @@ export default class ClientAppDriver {
       //it uses the parent application
       if(route.hasComponent) {
         log(`binding ${urlPath}`, route);
+        urlPath = driver.rootUrl + urlPath;
 
         page(urlPath, co.wrap(function * (ctx) {
           if(driver[INIT_APP] && ctx.path === RouterStore.getInstance().getUrl()) {

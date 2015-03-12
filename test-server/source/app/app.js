@@ -27,14 +27,15 @@ class App extends React.Component {
   }
   render() {
     let Content = RouterStore.getChildComponent(App);
+    let rootUrl = RouterStore.rootUrl;
 
     if(!Content) {
       Content = Home;
     }
 
     return <div>
-      <a href="/">Home</a><br />
-      <a href="/modules">Modules</a><br />
+      <a href={`${rootUrl}/`}>Home</a><br />
+      <a href={`${rootUrl}/modules`}>Modules</a><br />
       <Content />
     </div>;
 
