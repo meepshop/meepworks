@@ -14,6 +14,7 @@ const _cache = new WeakMap();
 const KEY = Symbol();
 export const PROMOTE = Symbol();
 export const DEMOTE = Symbol();
+const BACKUP = {};
 /**
  * @class Instance
  *  simple implementation of instanced objects
@@ -90,6 +91,10 @@ export default class Instance {
  */
 function promote () {
   let cache = _cache.get(this.constructor);
+  let g = cache.get(this);
+  if(g) {
+    cache.set(BACKUP, g);
+  }
   cache.set(this.constructor, this);
 }
 /**
@@ -101,6 +106,11 @@ function demote() {
   let cache = _cache.get(this.constructor);
   if(cache.get(this.constructor)=== this) {
     cache.delete(this.constructor);
+    let g = cache.get(BACKUP);
+    if(g) {
+      cache.set(this.constructor, g);
+      cache.delete(BACKUP);
+    }
   }
 }
 

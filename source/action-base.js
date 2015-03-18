@@ -23,13 +23,6 @@ export default class ActionBase {
     this[PAYLOAD] = payload;
   }
   /**
-   * @property {Symbol} symbol
-   * @override - this.must be overriden by extended classes
-   */
-  get symbol() {
-    log('Class ${this.constructor.name} has not implemented symbol.');
-  }
-  /**
    * @function
    * @override - this must be overriden by the actual action handler.
    *  This can be a simple function returning the payload, or a generator
@@ -48,7 +41,7 @@ export default class ActionBase {
     let self = this;
     return co(function *() {
       Dispatcher.getInstance(self[KEY]).dispatch({
-        action: self.symbol,
+        action: self.constructor.symbol,
         payload: yield self.action(self[PAYLOAD])
       });
 

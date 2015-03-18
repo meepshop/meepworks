@@ -1,8 +1,8 @@
 import StoreBase from '../store-base';
 import Immutable from 'immutable';
 import debug from 'debug';
-import { NAVIGATE } from '../actions/navigate';
-import { SET_COMPONENTS } from '../actions/set-components';
+import Navigate from '../actions/navigate';
+import SetComponents from '../actions/set-components';
 import SetApproot from '../actions/set-approot';
 const log = debug('router-store');
 
@@ -22,10 +22,10 @@ export default class RouterStore extends StoreBase {
 
   get handlers() {
     return [{
-      action: NAVIGATE,
+      action: Navigate.symbol,
       handler: this.handleNavigate
     }, {
-      action: SET_COMPONENTS,
+      action: SetComponents.symbol,
       handler: this.handleSetComponents
     }, {
       action: SetApproot.symbol,

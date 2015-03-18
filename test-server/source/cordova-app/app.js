@@ -2,6 +2,20 @@ import React from 'react';
 import ApplicationStore from './stores/application-store';
 import RouteChange from './actions/route-change';
 import 'normalize.css/normalize.css!';
+import path from 'path';
+
+import Locale from '../../../dist/locale';
+import enUS from './locales/en-US.json!';
+
+const lc = new Locale({
+  path: path.resolve(__dirname,'./locales' ),
+  locales: [
+    'en-US'
+  ],
+  preload: {
+    'en-US': enUS
+  }
+});
 
 class App extends React.Component {
   constructor() {
@@ -39,6 +53,10 @@ class App extends React.Component {
       App<br />
       <br />
       Route: {route}
+      <br />
+      Content: {lc.format('content', {
+        name: 'Jack'
+      })}
     </div>;
   }
 }

@@ -8,6 +8,11 @@ import RouteTable from './stores/route-table';
 import Navigate from './actions/navigate';
 import SetApproot from './actions/set-approot';
 import { INIT_STORE, INIT } from './store-base';
+import {LOCALE_CACHE as LC} from './locale';
+import LocaleStore from './stores/locale-store';
+import DetectIntl from './actions/detect-intl';
+import DetectBrowserLanguage from './actions/detect-browser-language';
+import LoadLocales from './actions/load-locales';
 
 import url from 'url';
 
@@ -37,11 +42,24 @@ export default class StandAloneDriver {
       driver.dispatcher.register(rStore);
       yield new SetApproot(appRoot).exec();
 
+      let lStore = LocaleStore.getInstance();
+      lStore[INIT_STORE]();
+      driver.dispatcher.register(lStore);
+
       driver.srcRoot = srcRoot;
       yield driver.bindRoutes({
         app: driver.app,
         title: App.title
       }, '/');
+
+      yield new DetectBrowserLanguage().exec();
+
+      yield new DetectIntl().exec();
+      yield new LoadLocales({
+        lStore,
+        LC
+      }).exec();
+
       page();
     });
   }

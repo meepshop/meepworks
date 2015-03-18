@@ -1,7 +1,7 @@
 import StoreBase from '../store-base';
 import Im from 'immutable';
 import debug from 'debug';
-import {SET_ROUTES} from '../actions/set-routes';
+import SetRoutes from '../actions/set-routes';
 
 const log = debug('route-table');
 
@@ -17,7 +17,7 @@ export default class RouteTable extends StoreBase {
   }
   get handlers() {
     return [ {
-      action: SET_ROUTES,
+      action: SetRoutes.symbol,
       handler: this.handleSetRoutes
     }];
   }

@@ -8,6 +8,10 @@ import RouteTable from './stores/route-table';
 import Navigate from './actions/navigate';
 import SetComponents from './actions/set-components';
 import { INIT_STORE, INIT } from './store-base';
+import DetectIntl from './actions/detect-intl';
+import LocaleStore from './stores/locale-store';
+import LoadLocales from './actions/load-locales';
+import {LOCALE_CACHE as LC} from './locale';
 
 import url from 'url';
 
@@ -67,6 +71,19 @@ export default class ClientAppDriver {
       driver.dispatcher.register(rTable);
       rTable.rehydrate(driver.data.shift());
 
+
+      let lStore = LocaleStore.getInstance();
+      lStore[INIT_STORE]();
+      driver.dispatcher.register(lStore);
+      driver.lStore = lStore;
+      lStore.rehydrate(driver.data.shift());
+
+      yield new DetectIntl().exec();
+      yield new LoadLocales({
+        lStore: driver.lStore,
+        LC
+      }).exec();
+
       //compose client routing logic and repopulate RouterStores's components list
       driver.srcRoot = RouteTable.getInstance().getSrcRoot();
       let routeTable = RouteTable.getInstance().getRoutes();
@@ -125,6 +142,10 @@ export default class ClientAppDriver {
                 let canonicalAppPath = url.resolve(driver.appPath, p.app);
                 log(`fetching ${canonicalAppPath}`);
                 p.app = ( yield System.import(canonicalAppPath) );
+                yield new LoadLocales({
+                  lStore: driver.lStore,
+                  LC
+                }).exec();
                 log(`successfully fetched: `, p.app);
               }
             }
@@ -155,6 +176,10 @@ export default class ClientAppDriver {
               let canonicalAppPath = url.resolve(driver.appPath, route.app);
               log(`fetching ${canonicalAppPath}`);
               route.app = ( yield System.import(canonicalAppPath) );
+              yield new LoadLocales({
+                lStore: driver.lStore,
+                LC
+              }).exec();
               log(`successfully fetched: `, route.app);
             }
           }
@@ -272,6 +297,10 @@ export default class ClientAppDriver {
                 let canonicalAppPath = url.resolve(driver.appPath, p.app);
                 log(`fetching ${canonicalAppPath}`);
                 p.app = ( yield System.import(canonicalAppPath) );
+                yield new LoadLocales({
+                  lStore: driver.lStore,
+                  LC
+                }).exec();
                 log(`successfully fetched: `, p.app);
               }
             }

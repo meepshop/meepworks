@@ -6,6 +6,7 @@ import 'normalize.css/normalize.css!';
 import './test.css!';
 
 
+
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -42,11 +43,6 @@ class App extends React.Component {
   }
 }
 
-//const Home = React.createClass({
-//  render() {
-//    return <div>Welcome to Meepworks!</div>;
-//  }
-//});
 
 class Home extends React.Component {
   render() {

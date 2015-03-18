@@ -1,6 +1,6 @@
 import ActionBase from '../action-base';
 
-export const EXPOSE_CONTEXT = Symbol();
+const EXPOSE_CONTEXT = Symbol();
 
 /**
  * @default
@@ -9,7 +9,7 @@ export const EXPOSE_CONTEXT = Symbol();
  * Exposes the koa request context
  */
 export default class ExposeContext extends ActionBase {
-  get symbol() {
+  static get symbol() {
     return EXPOSE_CONTEXT;
   }
   *action(ctx) {

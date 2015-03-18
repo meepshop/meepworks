@@ -41,7 +41,7 @@ server.use(mount('/test-server/node', serve(path.resolve(__dirname, '../../test-
 server.use(function * (next) {
   let start = new Date().getTime();
   yield next;
-  log(`${this.req.url}, ${new Date().getTime() - start}ms.`);
+  console.log(`${this.req.url}, ${new Date().getTime() - start}ms.`);
 });
 
 //standalone server
@@ -66,7 +66,7 @@ function *standaloneHandler (next) {
               System.baseURL='/';
               System.import('dist/standalone-driver')
               .then(function (m) {
-              new m('test-server/node/app/app', '/standalone/', 'test-server/node');
+              new m('test-server/node/app/app', '/', 'test-server/node');
               }).catch(console.log);
               `
             }}></script>
@@ -75,7 +75,8 @@ function *standaloneHandler (next) {
         </body>
       </html>);
 }
-server.get(/\/standalone(\/.*)?/, standaloneHandler);
+
+//server.get(/.*/, standaloneHandler);
 
 
 server.use(mount('/', new AppDriver(TestApp, {

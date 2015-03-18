@@ -24,7 +24,10 @@ import RouteTable from './stores/route-table';
 import SetRoutes from './actions/set-routes';
 import ExposeContext from './actions/expose-context';
 import SetApproot from './actions/set-approot';
-
+import DetectIntl from './actions/detect-intl';
+import LocaleStore from './stores/locale-store';
+import LoadLocales from './actions/load-locales';
+import { LOCALE_CACHE as LC } from './locale';
 
 import debug from 'debug';
 var log = debug('app-driver');
@@ -58,18 +61,30 @@ export default class AppDriver {
       app: driver.config.appPath,
       title: App.title
     };
+
+    //let glStore = LocaleStore.getInstance();
+    //if(!glStore[INIT]) {
+    //  glStore[INIT_STORE]();
+    //  Dispatcher.getInstance().register(glStore);
+    //}
+
+
+
+
+
     //server logic entry point
     driver.koa.use(function * (next) {
+
       var ctx = this;
       //create instance specific dispatcher and store set
       ctx.dispatcher = Dispatcher.getInstance(ctx);
-      ctx.stores = new Set([RouterStore, RouteTable]);
+      ctx.stores = new Set([RouterStore, RouteTable, LocaleStore]);
 
       //init router store
       let rStore = RouterStore.getInstance(ctx);
       rStore[INIT_STORE]();
       ctx.dispatcher.register(rStore);
-      new SetApproot(driver.rootUrl)[SET_KEY](ctx).exec();
+      yield new SetApproot(driver.rootUrl)[SET_KEY](ctx).exec();
 
       //init route table store
       let rTable = RouteTable.getInstance(ctx);
@@ -77,11 +92,26 @@ export default class AppDriver {
       ctx.dispatcher.register(rTable);
 
 
+      let lStore = LocaleStore.getInstance(ctx);
+      lStore[INIT_STORE]();
+      ctx.dispatcher.register(lStore);
+
       //yields routing logic
       yield next;
 
+
+
+
       //application init is done, ready to render
       if(ctx[OK]) {
+
+        yield new DetectIntl()[SET_KEY](ctx).exec();
+        yield new LoadLocales({
+          lStore,
+          LC
+        })[SET_KEY](ctx).exec();
+
+
         //promote dispatcher and stores
         ctx.dispatcher[PROMOTE]();
         let stores = [];
@@ -156,6 +186,7 @@ export default class AppDriver {
 
     //start binding routes
     driver.bindRoutes(driver.routeTable, '/');
+    //driver.localeLoaded = new LoadLocales(glStore).exec();
 
     //return the actual koa instance instead of this AppDriver instance
     return driver.koa;
