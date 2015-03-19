@@ -15,8 +15,7 @@ export default class LocaleStore extends StoreBase {
   constructor() {
     this.rehydrate({
       locale: null,
-      acceptLanguages: [],
-      shim: false,
+      acceptLanguages: []
     });
   }
   dehydrate() {
@@ -52,10 +51,7 @@ export default class LocaleStore extends StoreBase {
     }];
   }
   handleDetectIntl(payload) {
-    this[DATA] = this[DATA].withMutations(map => {
-      map.set('intl', payload.intl)
-        .set('shim', payload.shim);
-    });
+    this[DATA] = this[DATA].set('intl', payload.intl);
   }
   handleExposeContext(ctx) {
     let list = ctx.get('accept-language');
@@ -88,7 +84,7 @@ export default class LocaleStore extends StoreBase {
     this[DATA] = this[DATA].withMutations(map => {
       map.set('data', Im.fromJS(payload.data))
         .set('mapping', Im.fromJS(payload.mapping));
-    })
+    });
     this.emit('change');
   }
 

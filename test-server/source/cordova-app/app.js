@@ -6,14 +6,14 @@ import path from 'path';
 
 import Locale from '../../../dist/locale';
 import enUS from './locales/en-US.json!';
+import zhTW from './locales/zh-TW.json!';
+
 
 const lc = new Locale({
   path: path.resolve(__dirname,'./locales' ),
-  locales: [
-    'en-US'
-  ],
   preload: {
-    'en-US': enUS
+    'en-US': enUS,
+    'zh-TW': zhTW
   }
 });
 
@@ -35,16 +35,23 @@ class App extends React.Component {
   }
   componentDidMount() {
     ApplicationStore.getInstance().on('change', this.handleChange);
+    lc.on('change', this.handleChange);
     setTimeout(() => {
       new RouteChange('/changed').exec();
+
     }, 1000);
+    setTimeout(() => {
+      lc.setLocale('zh-TW');
+    }, 3000);
   }
   componentWillUnmount() {
     ApplicationStore.getInstance().off('change', this.handleChange);
+    lc.off('change', this.handleChange);
   }
   handleChange() {
     this.setState({
-      app: ApplicationStore.getInstance().state
+      app: ApplicationStore.getInstance().state,
+      locale: lc.locale
     });
   }
   render() {

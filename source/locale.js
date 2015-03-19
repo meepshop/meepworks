@@ -24,10 +24,19 @@ export default class Locale {
       p.path = urlInfo.path.replace(root, '');
     }
 
+    if(!p.preload) {
+      p.preload = {};
+    } else {
+      p.locales = [];
+      for(let l in p.preload) {
+        p.locales.push(l);
+      }
+    }
+
     if(!LOCALE_CACHE.has(p.path)) {
       LOCALE_CACHE.set(p.path, {
         locales: new Set(p.locales),
-        preload: p.preload || {}
+        preload: p.preload
       });
     } else {
       let c = LOCALE_CACHE.get(p.path);
@@ -86,6 +95,18 @@ export default class Locale {
   }
   formatDate(t) {
 
+  }
+  on(e, f) {
+    LocaleStore.getInstance().on(e, f);
+  }
+  addEventListener(e, f) {
+    LocaleStore.getInstance().on(e, f);
+  }
+  off(e, f) {
+    LocaleStore.getInstance().off(e, f);
+  }
+  removeEventListener(e, f) {
+    LocaleStore.getInstance().off(e, f);
   }
 }
 
