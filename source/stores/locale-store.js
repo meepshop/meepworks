@@ -128,4 +128,11 @@ export default class LocaleStore extends StoreBase {
   get mapping() {
     return this[DATA].get('mapping');
   }
+
+  static get intl() {
+    return this.getInstance().intl;
+  }
+  get intl() {
+    return this[DATA].get('intl');
+  }
 }

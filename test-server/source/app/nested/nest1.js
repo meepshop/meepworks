@@ -7,7 +7,8 @@ const lc = new Locale({
   path: path.resolve(__dirname, './locale'),
   locales: [
     'en-US',
-    'zh-TW'
+    'zh-TW',
+    'fr-FR'
   ]
 });
 
@@ -28,14 +29,7 @@ class NestedApp1 extends React.Component {
     lc.on('change', this.handleChange);
     this[TIMEOUT_ID] = setTimeout(() => {
       this[TIMEOUT_ID] = null;
-      switch(lc.locale) {
-        case 'en-US':
-          lc.setLocale('zh-TW');
-        break;
-        case 'zh-TW':
-          lc.SetLocale('en-US');
-        break;
-      }
+      lc.setLocale('fr-FR');
     }, 1000);
   }
   componentWillUnmount() {
@@ -64,6 +58,9 @@ class NestedApp1 extends React.Component {
       }) }<br />
       {
         lc.format('nokey')
+      }<br />
+      {
+        lc.formatCurrency(1234.56, 'USD')
       }</div>
     );
   }

@@ -11,8 +11,12 @@ export const LOCALE_CACHE = new Map();
 
 const PATH = Symbol();
 const OVERRIDES = Symbol();
-const HTTP_PATH = /^\/(http|https):\//;
 const FORMAT = Symbol();
+
+const NUMBER_FORMATTERS = new Map();
+const DATE_FORMATTERS = new Map();
+
+const HTTP_PATH = /^\/(http|https):\//;
 
 export default class Locale {
   constructor(p) {
@@ -75,10 +79,13 @@ export default class Locale {
     }
     return res;
   }
+  static get locale() {
+    return LocaleStore.locale;
+  }
   get locale() {
     return LocaleStore.locale;
   }
-  setLocale(l) {
+  static setLocale(l) {
     return co(function * () {
       yield new SetLocale(l).exec();
       yield new LoadLocales({
@@ -87,13 +94,35 @@ export default class Locale {
       }).exec();
     });
   }
+  setLocale(l) {
+    return Locale.setLocale(l);
+  }
   formatDecimal(value) {
-
+    return this.formatNumber(value);
   }
   formatCurrency(value, currency) {
-
+    return this.formatNumber(value, {
+      style: 'currency',
+      currency
+    });
   }
-  formatDate(t) {
+  formatNumber(value, opts) {
+    let l = Locale.locale;
+    let key = `${l}:${JSON.stringify(opts)}`;
+    if(!NUMBER_FORMATTERS.has(key)) {
+      NUMBER_FORMATTERS.set(key, LocaleStore.intl.NumberFormat(l, opts));
+    }
+    let f = NUMBER_FORMATTERS.get(key);
+    return f.format(value);
+  }
+  formatDate(t, opts) {
+    let l = Locale.locale;
+    let key = `${l}:${JSON.stringify(opts)}`;
+    if(!DATE_FORMATTERS.has(key)) {
+      DATE_FORMATTERS.set(key, LocaleStore.intl.DateTimeFormat(l, opts));
+    }
+    let f = DATE_FORMATTERS.get(key);
+    return f.format(value);
 
   }
   on(e, f) {
