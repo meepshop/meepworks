@@ -1,8 +1,6 @@
 import Instance from './instance';
 import Emitter from 'component-emitter';
-import debug from 'debug';
 
-const log = debug('store-base');
 
 export const ACTION_HANDLER = Symbol();
 export const INIT_STORE = Symbol();
@@ -34,7 +32,6 @@ export default class StoreBase extends Instance {
    *  Returns the current state in JS object form.
    */
   dehydrate () {
-    log('Class ${this.constructor.name} has not implemented dehydrate function.');
   }
   /**
    * @function
@@ -42,7 +39,6 @@ export default class StoreBase extends Instance {
    *  Fill the data store with the state object, the underlying data is immutable.
    */
   rehydrate (state) {
-    log('Class ${this.constructor.name} has not implemented rehydrate function.');
   }
 
 }

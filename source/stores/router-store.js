@@ -1,10 +1,8 @@
 import StoreBase from '../store-base';
 import Immutable from 'immutable';
-import debug from 'debug';
 import Navigate from '../actions/navigate';
 import SetComponents from '../actions/set-components';
 import SetApproot from '../actions/set-approot';
-const log = debug('router-store');
 
 const DATA = Symbol();
 
@@ -49,11 +47,9 @@ export default class RouterStore extends StoreBase {
         .set('components', Immutable.fromJS(route.components));
     });
     this.emit('change');
-    log('Navigated');
 
   }
   handleSetComponents(comps) {
-    log('handleSetComponents', comps);
     this[DATA] = this[DATA].set('components', Immutable.fromJS(comps));
   }
 

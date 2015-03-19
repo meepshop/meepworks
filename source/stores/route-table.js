@@ -1,9 +1,7 @@
 import StoreBase from '../store-base';
 import Im from 'immutable';
-import debug from 'debug';
 import SetRoutes from '../actions/set-routes';
 
-const log = debug('route-table');
 
 const DATA = Symbol();
 
@@ -22,7 +20,6 @@ export default class RouteTable extends StoreBase {
     }];
   }
   handleSetRoutes(payload) {
-    log('handleSetRoutes', payload);
     this[DATA] = this[DATA].withMutations((map) => {
       map
         .set('routes', Im.fromJS(payload.routes))

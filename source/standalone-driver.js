@@ -1,7 +1,6 @@
 import React from 'react';
 import page from 'page';
 import co from 'co';
-import debug from 'debug';
 import Dispatcher from './dispatcher';
 import RouterStore from './stores/router-store';
 import RouteTable from './stores/route-table';

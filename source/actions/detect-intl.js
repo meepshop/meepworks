@@ -6,27 +6,20 @@ export default class DetectIntl extends ActionBase {
   static get symbol() {
     return DETECT_INTL;
   }
-  //get symbol() {
-  //  return DETECT_INTL;
-  //}
   *action() {
-      console.log('check', typeof global.Intl);
     if(!global.Intl) {
       if(typeof window === 'undefined') {
         return {
-          intl: require('intl'),
-          shim: true
+          intl: require('intl')
         };
       } else {
         return {
-          intl: yield System.import('intl'),
-          shim: true
+          intl: yield System.import('intl')
         };
       }
     }
     return {
-      intl: global.Intl,
-      shim: false
+      intl: global.Intl
     };
   }
 }

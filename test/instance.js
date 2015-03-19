@@ -1,10 +1,8 @@
 import chai from 'chai';
-import debug from 'debug';
 
 
 //debug.enable('test-instance');
 
-const log = debug('test-instance');
 const expect = chai.expect;
 
 import Instance from '../source/instance';
@@ -15,7 +13,7 @@ import { DEMOTE, PROMOTE } from '../source/instance';
 describe('Instance', () => {
   let a, b, key;
   afterEach(() => {
-    log('after each Instance test');
+    console.log('after each Instance test');
     if(a && a.destroy) {
       a.destroy();
     }

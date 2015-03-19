@@ -18,10 +18,8 @@ requireFilter.filter('.*!asset');
 
 
 import TestApp from './app/app';
-import debug from 'debug';
 
 
-let log = debug('req-log');
 
 import AppDriver from '../../dist/server-app-driver';
 

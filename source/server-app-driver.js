@@ -29,8 +29,6 @@ import LocaleStore from './stores/locale-store';
 import LoadLocales from './actions/load-locales';
 import { LOCALE_CACHE as LC } from './locale';
 
-import debug from 'debug';
-var log = debug('app-driver');
 
 const OK = Symbol();
 const CSS_PRELOAD = Symbol();
@@ -201,7 +199,6 @@ export default class AppDriver {
    *    Bind all the routing logic to the application driver.
    */
   bindRoutes(route, urlPath, filePath, files, table, parents = []) {
-    log('route: ', route);
     let driver = this;
 
     if(!table) {
@@ -239,7 +236,6 @@ export default class AppDriver {
       //if component is defined, and the urlPath is not delegated to child application
       if(App.component && !(App.routes&&App.routes[urlPath])) {
 
-        log(urlPath);
 
         this.koa.get(urlPath, function * (next) {
           var ctx = this;
@@ -331,16 +327,13 @@ export default class AppDriver {
       }
     } else {
       //if app is not defined, then use the current app
-      log('check: ', route);
       let App = parents[parents.length - 1];
-      log(App);
       if(App.component) {
         table.hasComponent = true;
       }
       //if component is defined
       if(App.component) {
 
-        log(urlPath);
 
         this.koa.get(urlPath, function * (next) {
           var ctx = this;

@@ -1,9 +1,7 @@
 import Instance from './instance';
 import Dispatcher from './dispatcher';
 import co from 'co';
-import debug from 'debug';
 
-const log = debug('ActionBase');
 const PAYLOAD = Symbol();
 const KEY = Symbol();
 export const SET_KEY = Symbol();

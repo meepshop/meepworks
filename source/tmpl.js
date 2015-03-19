@@ -1,6 +1,4 @@
-import debug from 'debug';
 
-const log = debug('tmpl-log');
 /**
  * @exports default
  * @class Tmpl
@@ -28,9 +26,7 @@ export default class Tmpl {
     }
     let res = tmpl;
     for(let p in params) {
-      log(`params[${p}] = '${params[p]}'`);
       let reg = new RegExp(`\\$\\{${escapeRegExp(p)}\\}`, 'g');
-      log(`RegExp: ${reg}`);
       res = res.replace(reg, params[p]);
     }
     return res;

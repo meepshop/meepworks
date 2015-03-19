@@ -1,7 +1,6 @@
 import React from 'react';
 import page from 'page';
 import co from 'co';
-import debug from 'debug';
 import Dispatcher from './dispatcher';
 import RouterStore from './stores/router-store';
 import RouteTable from './stores/route-table';
@@ -18,7 +17,6 @@ import url from 'url';
 import foreach from 'greasebox/co-foreach';
 import Tmpl from './tmpl';
 
-const log = debug('app-driver');
 
 const INIT_APP = Symbol();
 
@@ -37,9 +35,6 @@ export default class ClientAppDriver {
    * @param {string} dataId - string id for extracting initial states.
    */
   constructor (src, target, dataId) {
-    log(`application src: ${src}`);
-    log(`target element: ${target}`);
-    log(`dataId: ${dataId}`);
 
     let driver = this;
     driver.target = target;
@@ -52,12 +47,10 @@ export default class ClientAppDriver {
     let dataScript = document.querySelector(`script[id="${dataId}"]`);
     driver.data = JSON.parse(dataScript.innerText);
 
-    log(`data: ${JSON.stringify(driver.data, null, 2)}`);
 
     co(function * () {
       var App = (yield System.import(src));
       driver.app = App;
-      log('App: ', App);
 
       //initialize routerStore
       let rStore = RouterStore.getInstance();
@@ -93,7 +86,9 @@ export default class ClientAppDriver {
       //start page.js
       page();
 
-    }).catch(log);
+    }).catch((err) => {
+
+    });
   }
   /**
    * @function
@@ -112,26 +107,22 @@ export default class ClientAppDriver {
    *  configures page.js with the routes defined in the routing table.
    */
   bindRoutes(route, urlPath, parents = []) {
-    log('route: ', route, urlPath, parents);
     let driver = this;
 
     if(route.app) {
       //if current application has component, and its sub route table does not have current path
       if(route.hasComponent && !(route.routes && route.routes[urlPath])) {
-        log(`binding ${urlPath}`, route.app);
         urlPath = driver.rootUrl + urlPath;
         page(urlPath, co.wrap(function * (ctx) {
           //if routed path is already the current path, do nothing
           if(driver[INIT_APP] && ctx.path === RouterStore.getInstance().getUrl()) {
             return;
           }
-          log('routed to: ', urlPath, route, parents);
 
           //keep ordered list of the component hierarchy
           let compList = [];
 
           //check parents
-          log('check p: ', parents);
           yield foreach(parents, function * (p) {
             //load the application from server is app is still the src path.
             if(typeof p.app === 'string') {
@@ -140,13 +131,11 @@ export default class ClientAppDriver {
                 p.app = driver.app;
               } else {
                 let canonicalAppPath = url.resolve(driver.appPath, p.app);
-                log(`fetching ${canonicalAppPath}`);
                 p.app = ( yield System.import(canonicalAppPath) );
                 yield new LoadLocales({
                   lStore: driver.lStore,
                   LC
                 }).exec();
-                log(`successfully fetched: `, p.app);
               }
             }
             if(p.app.component) {
@@ -174,13 +163,11 @@ export default class ClientAppDriver {
               route.app = driver.app;
             } else {
               let canonicalAppPath = url.resolve(driver.appPath, route.app);
-              log(`fetching ${canonicalAppPath}`);
               route.app = ( yield System.import(canonicalAppPath) );
               yield new LoadLocales({
                 lStore: driver.lStore,
                 LC
               }).exec();
-              log(`successfully fetched: `, route.app);
             }
           }
           if(route.app.component) {
@@ -278,7 +265,6 @@ export default class ClientAppDriver {
       //if the current route object doesn't contain an application
       //it uses the parent application
       if(route.hasComponent) {
-        log(`binding ${urlPath}`, route);
         urlPath = driver.rootUrl + urlPath;
 
         page(urlPath, co.wrap(function * (ctx) {
@@ -286,7 +272,6 @@ export default class ClientAppDriver {
             return;
           }
 
-          log('routed to: ', urlPath, route, parents);
           let compList = [];
           //check parents
           yield foreach(parents, function * (p) {
@@ -295,13 +280,11 @@ export default class ClientAppDriver {
                 p.app = driver.app;
               } else {
                 let canonicalAppPath = url.resolve(driver.appPath, p.app);
-                log(`fetching ${canonicalAppPath}`);
                 p.app = ( yield System.import(canonicalAppPath) );
                 yield new LoadLocales({
                   lStore: driver.lStore,
                   LC
                 }).exec();
-                log(`successfully fetched: `, p.app);
               }
             }
             if(p.app.component) {

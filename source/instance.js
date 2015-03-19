@@ -1,6 +1,3 @@
-import debug from 'debug';
-
-const log = debug('class-instance');
 
 const _cache = new WeakMap();
 /**
@@ -68,16 +65,12 @@ export default class Instance {
   destroy() {
     let cache = _cache.get(this.constructor);
     if(this[KEY]) {
-      log('destroy key');
       //use key to clear _cache
       if(cache.has( this[KEY] )) {
-        log('destroyed key');
         cache.delete( this[KEY] );
       }
     } else {
-      log('destroy global');
       if(cache.has( this.constructor )) {
-        log('destroyed global');
         cache.delete( this.constructor );
       }
     }

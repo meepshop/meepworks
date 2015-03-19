@@ -1,6 +1,16 @@
 Change Log
 ===
 
+#v0.6.0
+*2015 Mar. 18*
+1. Bump packages to latest versions, including greasebox@0.9.0
+2. Remove debug dependency
+3. Implement locale support
+
+*known issues:*
+1. Mounting application to arbitary mount point is broken
+2. Hosting jspm_packages folder in arbitary mount point is also broken
+
 #v0.5.0
 *2015 Mar. 12*
 1. Add standalone-driver to run application on client only
