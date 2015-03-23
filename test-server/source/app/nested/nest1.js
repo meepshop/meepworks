@@ -15,9 +15,11 @@ const lc = new Locale({
 const TIMEOUT_ID = Symbol();
 
 lc.addOverride(lc);
-lc.addOverride(lc);
 
 class NestedApp1 extends React.Component {
+  static lc() {
+    return lc;
+  }
   constructor() {
     super();
     this.handleChange = this.handleChange.bind(this);
@@ -26,14 +28,14 @@ class NestedApp1 extends React.Component {
     };
   }
   componentDidMount() {
-    lc.on('change', this.handleChange);
+    lc.subscribe(this.handleChange);
     this[TIMEOUT_ID] = setTimeout(() => {
       this[TIMEOUT_ID] = null;
       lc.setLocale('fr-FR');
-    }, 1000);
+    }, 5000);
   }
   componentWillUnmount() {
-    lc.off('change', this.handleChange);
+    lc.unsubscribe(this.handleChange);
     if(this[TIMEOUT_ID]) {
       clearTimeout(this[TIMEOUT_ID]);
     }
@@ -53,7 +55,9 @@ class NestedApp1 extends React.Component {
   }
   render () {
     return (
-      <div>{ lc.format('content', {
+      <div> Locale: {lc.locale}
+        <br />
+        { lc.format('content', {
         name: 'Jack'
       }) }<br />
       {

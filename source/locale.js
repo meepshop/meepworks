@@ -101,6 +101,7 @@ export default class Locale {
     return this.formatNumber(value);
   }
   formatCurrency(value, currency) {
+    currency = currency.toUpperCase();
     return this.formatNumber(value, {
       style: 'currency',
       currency
@@ -125,17 +126,11 @@ export default class Locale {
     return f.format(value);
 
   }
-  on(e, f) {
-    LocaleStore.getInstance().on(e, f);
+  subscribe(f) {
+    LocaleStore.getInstance().subscribe(f);
   }
-  addEventListener(e, f) {
-    LocaleStore.getInstance().on(e, f);
-  }
-  off(e, f) {
-    LocaleStore.getInstance().off(e, f);
-  }
-  removeEventListener(e, f) {
-    LocaleStore.getInstance().off(e, f);
+  unsubscribe(f) {
+    LocaleStore.getInstance().unsubscribe(f);
   }
 }
 

@@ -16,10 +16,10 @@ class App extends React.Component {
     this.handleRouteChange = this.handleRouteChange.bind(this);
   }
   componentDidMount() {
-    RouterStore.getInstance().on('change', this.handleRouteChange);
+    RouterStore.getInstance().subscribe(this.handleRouteChange);
   }
   componentWillUnmount() {
-    RouterStore.getInstance().off('change', this.handleRouteChange);
+    RouterStore.getInstance().unsubscribe(this.handleRouteChange);
   }
   handleRouteChange() {
     this.setState({

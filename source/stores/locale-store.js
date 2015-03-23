@@ -34,19 +34,19 @@ export default class LocaleStore extends StoreBase {
   }
   get handlers() {
     return [{
-      action: DetectIntl.symbol,
+      action: DetectIntl,
       handler: this.handleDetectIntl
     }, {
-      action: LoadLocales.symbol,
+      action: LoadLocales,
       handler: this.handleLoadLocales
     }, {
-      action: SetLocale.symbol,
+      action: SetLocale,
       handler: this.handleSetLocale
     }, {
-      action: ExposeContext.symbol,
+      action: ExposeContext,
       handler: this.handleExposeContext
     }, {
-      action: DetectBrowserLanguage.symbol,
+      action: DetectBrowserLanguage,
       handler: this.handleDetectBrowserLanguage
     }];
   }

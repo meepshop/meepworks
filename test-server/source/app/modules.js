@@ -12,11 +12,11 @@ const Modules = React.createClass({
     };
   },
   componentDidMount() {
-    TimeStore.getInstance().on('change', this.handleTimeChange);
+    TimeStore.getInstance().subscribe(this.handleTimeChange);
       requestAnimationFrame(this.triggerUpdateTime);
   },
   componentWillUnmount() {
-    TimeStore.getInstance().off('change', this.handleTimeChange);
+    TimeStore.getInstance().unsubscribe(this.handleTimeChange);
   },
   triggerUpdateTime() {
     if(this.isMounted()) {

@@ -41,6 +41,20 @@ export default class StoreBase extends Instance {
   rehydrate (state) {
   }
 
+  static subscribe(f) {
+    this.getInstance().subscribe(f);
+  }
+  subscribe(f) {
+    this.on('change', f);
+  }
+
+  static unsubscribe(f) {
+    this.getInstance().unsubscribe(f);
+  }
+  unsubscribe(f) {
+    this.off('change', f);
+  }
+
 }
 
 //Make Stores an event emitter
@@ -58,7 +72,7 @@ StoreBase.prototype[INIT_STORE] = function () {
 
     //map handlers to self by the action symbol
     this.handlers.forEach((map) => {
-      this[map.action] = map.handler;
+      this[map.action.symbol] = map.handler;
     });
     //bind main action handler with bounded self in the scope
     this[ACTION_HANDLER] = (payload) => {

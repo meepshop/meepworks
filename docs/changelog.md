@@ -1,11 +1,15 @@
 Change Log
 ===
 
-#v0.6.0
+
+
+#v0.6.2
 *2015 Mar. 18*
 1. Bump packages to latest versions, including greasebox@0.9.0
 2. Remove debug dependency
 3. Implement locale support
+4. Remove the need to use Action.symbol mostly
+5. Add subscribe/unsubscribe funciton to StoreBase for listening to changes
 
 *known issues:*
 1. Mounting application to arbitary mount point is broken

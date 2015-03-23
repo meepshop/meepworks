@@ -34,8 +34,8 @@ class App extends React.Component {
     return false;
   }
   componentDidMount() {
-    ApplicationStore.getInstance().on('change', this.handleChange);
-    lc.on('change', this.handleChange);
+    ApplicationStore.getInstance().subscribe(this.handleChange);
+    lc.subscribe(this.handleChange);
     setTimeout(() => {
       new RouteChange('/changed').exec();
 
@@ -45,8 +45,8 @@ class App extends React.Component {
     }, 3000);
   }
   componentWillUnmount() {
-    ApplicationStore.getInstance().off('change', this.handleChange);
-    lc.off('change', this.handleChange);
+    ApplicationStore.getInstance().unsubscribe(this.handleChange);
+    lc.unsubscribe(this.handleChange);
   }
   handleChange() {
     this.setState({

@@ -20,13 +20,13 @@ export default class RouterStore extends StoreBase {
 
   get handlers() {
     return [{
-      action: Navigate.symbol,
+      action: Navigate,
       handler: this.handleNavigate
     }, {
-      action: SetComponents.symbol,
+      action: SetComponents,
       handler: this.handleSetComponents
     }, {
-      action: SetApproot.symbol,
+      action: SetApproot,
       handler: this.handleSetApproot
     }];
   }

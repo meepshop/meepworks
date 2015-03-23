@@ -15,7 +15,7 @@ export default class ApplicationStore extends StoreBase {
   }
   get handlers() {
     return [{
-      action: RouteChange.symbol,
+      action: RouteChange,
       handler: this.handleRouteChange
     }];
   }

@@ -15,7 +15,7 @@ export default class RouteTable extends StoreBase {
   }
   get handlers() {
     return [ {
-      action: SetRoutes.symbol,
+      action: SetRoutes,
       handler: this.handleSetRoutes
     }];
   }
