@@ -85,7 +85,7 @@ export default {
   component: Modules,
   stores: [TimeStore],
   routes: {
-    '/modules/nest1': {
+    '/nest1': {
       app: './nested/nest1',
       title: 'Nest App 1',
       name: 'nest1'

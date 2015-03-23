@@ -81,7 +81,7 @@ export default class ClientAppDriver {
       driver.srcRoot = RouteTable.getInstance().getSrcRoot();
       let routeTable = RouteTable.getInstance().getRoutes();
 
-      driver.bindRoutes(routeTable, '/');
+      driver.bindRoutes(routeTable, '');
 
       //start page.js
       page();
@@ -258,7 +258,7 @@ export default class ClientAppDriver {
       if(route.routes) {
         //recursively binds the sub route table
         for(let p in route.routes) {
-          this.bindRoutes(route.routes[p], p, parents.concat(route));
+          this.bindRoutes(route.routes[p], urlPath + p, parents.concat(route));
         }
       }
     } else {

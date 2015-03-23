@@ -74,7 +74,7 @@ function *standaloneHandler (next) {
       </html>);
 }
 
-//server.get(/.*/, standaloneHandler);
+server.get(/.*/, standaloneHandler);
 
 
 server.use(mount('/', new AppDriver(TestApp, {
