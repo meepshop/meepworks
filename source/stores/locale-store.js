@@ -54,9 +54,10 @@ export default class LocaleStore extends StoreBase {
     this[DATA] = this[DATA].set('intl', payload.intl);
   }
   handleExposeContext(ctx) {
+
     let list = ctx.get('accept-language');
     list = list.split(',').map((l) => {
-      return l.split(';').shift();
+      return normalizeLocaleCode(l.split(';').shift());
     });
     if(list.length === 0) {
       list.push('en-US');
@@ -72,8 +73,8 @@ export default class LocaleStore extends StoreBase {
   }
 
   handleDetectBrowserLanguage() {
-    let locale = navigator.language || navigator.userLanguage;
-    let acceptLanguages = navigator.languages || [locale];
+    let locale = normalizeLocaleCode(navigator.language || navigator.userLanguage);
+    let acceptLanguages = navigator.languages && navigator.languages.map(normalizeLocaleCode) || [locale];
     this[DATA] = this[DATA].withMutations(map => {
       map.set('locale', locale)
         .set('acceptLanguages', Im.fromJS(acceptLanguages));
@@ -89,7 +90,7 @@ export default class LocaleStore extends StoreBase {
   }
 
   handleSetLocale(l) {
-    this[DATA] = this[DATA].set('locale', l);
+    this[DATA] = this[DATA].set('locale', normalizeLocaleCode(l));
   }
 
 
@@ -135,4 +136,15 @@ export default class LocaleStore extends StoreBase {
   get intl() {
     return this[DATA].get('intl');
   }
+}
+
+const UNDERSCORE = /_/;
+function normalizeLocaleCode(code) {
+  code = code.replace(UNDERSCORE, '-');
+  code = code.split('-');
+  code[0] = code[0].toLowerCase();
+  if(code.length > 1) {
+    code[1] = code[1].toUpperCase();
+  }
+  return code.join('-');
 }
