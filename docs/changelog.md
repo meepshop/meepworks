@@ -2,6 +2,9 @@ Change Log
 ===
 
 
+#v0.7.0
+1. [Breaking] Nested subapps should now specify routes as if it were the root applicaiton.
+2. LocaleStore would try to normalize locale codes to avoid errors.
 
 #v0.6.2
 *2015 Mar. 18*
