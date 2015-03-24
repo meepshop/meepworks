@@ -7,6 +7,7 @@ import escapeRegExp from 'greasebox/escape-reg-exp';
 const ENABLED = Symbol();
 const ORIGINAL_REQUIRE = Symbol();
 const FILTERS = Symbol();
+const LOADERS = Symbol();
 const FILEROOT = Symbol();
 const URLROOT = Symbol();
 const VERSION = Symbol();
@@ -15,6 +16,7 @@ export default class RequireFilter extends Instance {
   constructor(param) {
     this[ENABLED] = true;
     this[FILTERS] = new Map();
+    this[LOADERS] = new Map();
     this[ORIGINAL_REQUIRE] = Module.prototype.require;
 
     if(param.fileRoot[param.fileRoot.length - 1] === '/') {
@@ -34,12 +36,17 @@ export default class RequireFilter extends Instance {
 
     Module.prototype.require = function (p) {
       if(instance[ENABLED]) {
-        for(let entry of instance[FILTERS]) {
-          if(entry[1].test(p)) {
+        for(let [f, reg] of instance[FILTERS]) {
+          if(reg.test(p)) {
             p = p.split('!')[0];
             let target = path.resolve(path.dirname(this.filename), p);
-            let relToRoot = path.relative(instance[FILEROOT], target);
-            return `${instance[URLROOT]}/${relToRoot}${instance[VERSION]}`;
+            if(instance[LOADERS].has(f)) {
+              let l = instance[LOADERS].get(f);
+              return instance[LOADERS].get(f)(target);
+            } else {
+              let relToRoot = path.relative(instance[FILEROOT], target);
+              return `${instance[URLROOT]}/${relToRoot}${instance[VERSION]}`;
+            }
           }
         }
       }
@@ -47,15 +54,20 @@ export default class RequireFilter extends Instance {
     };
   }
 
-  filter(f) {
+  filter(f, loader) {
     if(!this[FILTERS].has(f)) {
-
       this[FILTERS].set(f, new RegExp(`${asterickToAny(escapeRegExp(f))}$`, 'i'));
+      if(typeof loader === 'function') {
+        this[LOADERS].set(f, loader);
+      }
     }
   }
   removeFilter(f) {
     if(this[FILTERS].has(f)) {
       this[FILTERS].delete(f);
+      if(this[LOADERS].has(f)) {
+        this[LOADERS].delete(f);
+      }
     }
   }
   enable() {

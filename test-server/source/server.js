@@ -4,6 +4,7 @@ import serve from 'koa-static';
 import router from 'koa-router';
 import favicon from 'koa-favicon';
 import path from 'path';
+import fs from 'fs';
 
 import RequireFilter from '../../dist/require-filter';
 
@@ -11,10 +12,18 @@ const version = new Date().getTime();
 const requireFilter = new RequireFilter({
   fileRoot: path.resolve(__dirname, '..'),
   urlRoot: '/test-server/',
-  version: version
+  //version: version
 });
 requireFilter.filter('.css!');
 requireFilter.filter('.*!asset');
+requireFilter.filter('.*!text', (p) => {
+  if(fs.existsSync(p)) {
+    return fs.readFileSync(p, 'utf8');
+  }
+  return '';
+});
+
+
 
 
 import TestApp from './app/app';
@@ -25,6 +34,7 @@ import AppDriver from '../../dist/server-app-driver';
 
 let server = koa();
 server.use(favicon());
+
 server.use(mount('/jspm_packages', serve(path.resolve(__dirname, '../../jspm_packages/'), {
   maxage: 2*60*1000
 })));
@@ -74,7 +84,7 @@ function *standaloneHandler (next) {
       </html>);
 }
 
-server.get(/.*/, standaloneHandler);
+//server.get(/.*/, standaloneHandler);
 
 
 server.use(mount('/', new AppDriver(TestApp, {
@@ -89,8 +99,7 @@ server.use(mount('/', new AppDriver(TestApp, {
   },
   fileRoot: __dirname,
   localtest: true,
-  version: version,
-  debug: [],
+  //version: version,
   rootUrl: '/'
 })));
 

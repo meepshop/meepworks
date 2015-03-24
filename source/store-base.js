@@ -6,6 +6,8 @@ export const ACTION_HANDLER = Symbol();
 export const INIT_STORE = Symbol();
 export const INIT = Symbol();
 
+const handlerCache = new Map();
+
 /**
  * @exports default
  * @class StoreBase

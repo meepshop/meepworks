@@ -1,6 +1,6 @@
 {
   "name": "meepworks",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Isomorphic Framework based on ReactJS & Flux",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -10,7 +10,7 @@
     "url": "https://github.com/meepshop/meepworks"
   },
   "author": "Jack Tzu-Chieh Huang <u9520107@gmail.com>",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/meepshop/meepworks/issues"
   },
@@ -72,6 +72,7 @@
       "path": "github:jspm/nodelibs-path@^0.1.0",
       "react": "npm:react@^0.13.0",
       "systemjs-builder": "npm:systemjs-builder@^0.9.0",
+      "text": "github:systemjs/plugin-text@^0.0.2",
       "url": "github:jspm/nodelibs-url@^0.1.0"
     }
   }

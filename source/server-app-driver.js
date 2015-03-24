@@ -413,27 +413,21 @@ export default class AppDriver {
       let builder = new Builder();
       yield builder.loadConfig(this.config.jspm.config);
 
-      //TODO follow up on jspm's fix on windows systems
-      try {
-        var trace = yield builder.trace(src);
+      var trace = yield builder.trace(src);
 
-        _CssCache[src] = Object.keys(trace.tree).filter((item) => {
-          //filter imports to only css entries
-          return /\.css/i.test(trace.tree[item].address);
-        }).map((item)=> {
-          //normalize server-side address to client side relative address
-          if(trace.tree[item].address.indexOf(this.config.jspm.path) > -1) {
-            return '/' + path.relative(path.dirname(this.config.jspm.path), trace.tree[item].address.replace(/file:/i, '')).replace(/\\\\/g, '/');
-          } else {
-            let ver = `?${ this.config.version }` || '';
-            return `/${item.split('!')[0]}${ver}`;
-          }
-        });
+      _CssCache[src] = Object.keys(trace.tree).filter((item) => {
+        //filter imports to only css entries
+        return /\.css/i.test(trace.tree[item].address);
+      }).map((item)=> {
+        //normalize server-side address to client side relative address
+        if(trace.tree[item].address.indexOf(this.config.jspm.path) > -1) {
+          return '/' + path.relative(path.dirname(this.config.jspm.path), trace.tree[item].address.replace(/file:/i, '')).replace(/\\\\/g, '/');
+        } else {
+          let ver =  this.config.version ? `?${ this.config.version }` : '';
+          return `/${item.split('!')[0]}${ver}`;
+        }
+      });
 
-      } catch(err) {
-        //console.log(err);
-        _CssCache[src] = [];
-      }
       builder.reset();
 
     }
