@@ -39,7 +39,7 @@ export default class ActionBase {
     let self = this;
     return co(function *() {
       Dispatcher.getInstance(self[KEY]).dispatch({
-        action: self.constructor.symbol,
+        action: self.constructor,
         payload: yield self.action(self[PAYLOAD])
       });
 

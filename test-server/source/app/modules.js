@@ -47,11 +47,7 @@ const Modules = React.createClass({
   }
 });
 
-const UPDATE_TIME = Symbol();
 class UpdateTime extends ActionBase {
-  get symbol() {
-    return UPDATE_TIME;
-  }
   action (payload) {
     return Promise.resolve(new Date().toString());
   }
@@ -63,7 +59,7 @@ class TimeStore extends StoreBase {
   }
   get handlers() {
     return [{
-      action: UPDATE_TIME,
+      action: UpdateTime,
       handler: this.handleUpdateTime
     }];
   }

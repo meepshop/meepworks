@@ -73,16 +73,21 @@ StoreBase.prototype[INIT_STORE] = function () {
     var self = this;
 
     //map handlers to self by the action symbol
-    this.handlers.forEach((map) => {
-      this[map.action.symbol] = map.handler;
+    self.handlers.forEach((map) => {
+      if(!handlerCache.has(map.action)) {
+        handlerCache.set(map.action, Symbol());
+      }
+      let s = handlerCache.get(map.action);
+      self[s] = map.handler;
     });
     //bind main action handler with bounded self in the scope
-    this[ACTION_HANDLER] = (payload) => {
+    self[ACTION_HANDLER] = (payload) => {
       //run the actual action handlers using the action as the accessor
-      if (typeof self[payload.action] === 'function') {
-        self[payload.action](payload.payload);
+      let s = handlerCache.get(payload.action);
+      if (typeof self[s] === 'function') {
+        self[s](payload.payload);
       }
     };
-    this[INIT] = true;
+    self[INIT] = true;
   }
 };
