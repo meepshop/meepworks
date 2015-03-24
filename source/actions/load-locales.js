@@ -3,11 +3,7 @@ import path from 'path';
 import forEach from 'greasebox/co-foreach';
 import url from 'url';
 
-const LOAD_LOCALES = Symbol();
 export default class LoadLocales extends ActionBase {
-  static get symbol() {
-    return LOAD_LOCALES;
-  }
   *action (payload) {
     let data = payload.lStore.data.toJS();
     let mapping = payload.lStore.mapping.toJS();

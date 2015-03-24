@@ -1,11 +1,5 @@
 import ActionBase from '../action-base';
-
-const DETECT_INTL = Symbol();
-
 export default class DetectIntl extends ActionBase {
-  static get symbol() {
-    return DETECT_INTL;
-  }
   *action() {
     if(!global.Intl) {
       if(typeof window === 'undefined') {

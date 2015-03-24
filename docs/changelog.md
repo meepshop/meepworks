@@ -1,6 +1,14 @@
 Change Log
 ===
 
+#v0.7.2
+*2015 Mar. 23*
+1. Actions do not have to specify symbols anymore, action symbols will be automatically generated and cached.
+
+#v0.7.1
+*2015 Mar. 22*
+1. Fix the bug that when version is not specified, traceCss appends '?undefined' after the css file names
+
 
 #v0.7.0
 1. [Breaking] Nested subapps should now specify routes as if it were the root applicaiton.
