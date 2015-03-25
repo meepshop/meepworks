@@ -1,6 +1,15 @@
 Change Log
 ===
 
+
+#v0.7.6
+*2015 Mar. 25*
+1. Provide formatNumber, formatDecimal, formatCurrency, and formatDateTime as static functions on Locale module.
+
+#v0.7.5
+*2015 Mar. 25*
+1. Fix a bug where newly initialized stores would be rehydrated with 'undefined' in client-app-driver.
+
 #v0.7.3
 *2015 Mar. 25*
 1. Fix a bug where the title of the home route is not being set properly

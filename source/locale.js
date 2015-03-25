@@ -97,17 +97,28 @@ export default class Locale {
   setLocale(l) {
     return Locale.setLocale(l);
   }
-  formatDecimal(value) {
-    return this.formatNumber(value);
+
+  static formatDecimal() {
+    return Locale.formatNumber(value);
   }
-  formatCurrency(value, currency) {
+  formatDecimal(value) {
+    return Locale.formatNumber(value);
+  }
+
+
+  static formatCurrency(value, currency) {
     currency = currency.toUpperCase();
     return this.formatNumber(value, {
       style: 'currency',
       currency
     });
   }
-  formatNumber(value, opts) {
+  formatCurrency(value, currency) {
+    return Locale.formatCurrency(value, currency);
+  }
+
+
+  static formatNumber(value, opts) {
     let l = Locale.locale;
     let key = `${l}:${JSON.stringify(opts)}`;
     if(!NUMBER_FORMATTERS.has(key)) {
@@ -116,16 +127,26 @@ export default class Locale {
     let f = NUMBER_FORMATTERS.get(key);
     return f.format(value);
   }
-  formatDate(t, opts) {
+  formatNumber(value, opts) {
+    return Locale.formatNumber(value, opts);
+  }
+
+
+  static formatDateTime(t, opts) {
     let l = Locale.locale;
     let key = `${l}:${JSON.stringify(opts)}`;
     if(!DATE_FORMATTERS.has(key)) {
       DATE_FORMATTERS.set(key, LocaleStore.intl.DateTimeFormat(l, opts));
     }
     let f = DATE_FORMATTERS.get(key);
-    return f.format(value);
+    return f.format(t);
 
   }
+  formatDateTime(t, opts) {
+    return Locale.formatDate(t, opts);
+  }
+
+
   subscribe(f) {
     LocaleStore.getInstance().subscribe(f);
   }

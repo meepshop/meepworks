@@ -150,7 +150,7 @@ export default class ClientAppDriver {
                   driver.dispatcher.register(tmp);
 
                   //if this is the first load, load states from data
-                  if(!driver[INIT]) {
+                  if(!driver[INIT_APP]) {
                     tmp.rehydrate(driver.data.shift());
                   }
                 }
@@ -179,7 +179,7 @@ export default class ClientAppDriver {
               if(!tmp[INIT]) {
                 tmp[INIT_STORE]();
                 driver.dispatcher.register(tmp);
-                if(!driver[INIT]) {
+                if(!driver[INIT_APP]) {
                   tmp.rehydrate(driver.data.shift());
                 }
               }
@@ -299,7 +299,7 @@ export default class ClientAppDriver {
                 if(!tmp[INIT]) {
                   tmp[INIT_STORE]();
                   driver.dispatcher.register(tmp);
-                  if(!driver[INIT]) {
+                  if(!driver[INIT_APP]) {
                     tmp.rehydrate(driver.data.shift());
                   }
                 }

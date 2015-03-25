@@ -64,7 +64,10 @@ class NestedApp1 extends React.Component {
         lc.format('nokey')
       }<br />
       {
-        lc.formatCurrency(1234.56, 'USD')
+        Locale.formatCurrency(1234.56, 'USD')
+      }<br />
+      {
+        Locale.formatDateTime(new Date())
       }</div>
     );
   }
