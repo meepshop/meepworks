@@ -183,7 +183,7 @@ export default class AppDriver {
 
 
     //start binding routes
-    driver.bindRoutes(driver.routeTable, '');
+    driver.bindRoutes(driver.routeTable, '/');
     //driver.localeLoaded = new LoadLocales(glStore).exec();
 
     //return the actual koa instance instead of this AppDriver instance
@@ -322,6 +322,9 @@ export default class AppDriver {
       if(App.routes) {
         table.routes = App.routes;
         for( let p in App.routes) {
+          if(urlPath === '/') {
+            urlPath = '';
+          }
           this.bindRoutes(App.routes[p], urlPath + p, filePath, files, table.routes[p], parents.concat(App));
         }
       }

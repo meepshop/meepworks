@@ -1,6 +1,10 @@
 Change Log
 ===
 
+#v0.7.3
+*2015 Mar. 25*
+1. Fix a bug where the title of the home route is not being set properly
+
 #v0.7.2
 *2015 Mar. 23*
 1. Actions do not have to specify symbols anymore, action symbols will be automatically generated and cached.

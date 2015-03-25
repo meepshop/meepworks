@@ -49,7 +49,7 @@ export default class StandAloneDriver {
       yield driver.bindRoutes({
         app: driver.app,
         title: App.title
-      }, '');
+      }, '/');
 
       yield new DetectBrowserLanguage().exec();
 
@@ -183,6 +183,9 @@ export default class StandAloneDriver {
       }
       if(route.app.routes) {
         for( let p in route.app.routes) {
+          if(urlPath === '/') {
+            urlPath = '';
+          }
           yield this.bindRoutes(route.app.routes[p], urlPath + p, fileUrl, parents.concat(route.app));
         }
       }
