@@ -189,7 +189,7 @@ export default class ClientAppDriver {
 
           if(driver[INIT_APP]) {
             //trigger navigate action, if not the first load
-            let title = Tmpl.format(route.title, ctx.params) || route.app.name || '';
+            let title = Tmpl.format(route.title, ctx.params) || driver.app.title || '';
             yield new Navigate({
               params: ctx.params,
               title: title,
@@ -311,7 +311,7 @@ export default class ClientAppDriver {
           //navigate
           if(driver[INIT_APP]) {
             //trigger navigate action
-            let title = Tmpl.format(route.title, ctx.params) || '';
+            let title = Tmpl.format(route.title, ctx.params) || driver.app.title || '';
             yield new Navigate({
               params: ctx.params,
               title: title,

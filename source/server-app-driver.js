@@ -283,7 +283,7 @@ export default class AppDriver {
           //trigger navigate action
           yield new Navigate({
             params: ctx.params,
-            title: Tmpl.format(route.title, ctx.params) || route.app.name || '',
+            title: Tmpl.format(route.title, ctx.params) || driver.app.title || '',
             route: urlPath,
             url: ctx.req.url,
             components: compList
@@ -369,7 +369,7 @@ export default class AppDriver {
           //trigger navigate action
           yield new Navigate({
             params: ctx.params,
-            title: Tmpl.format(route.title, ctx.params) || '',
+            title: Tmpl.format(route.title, ctx.params) || driver.app.title || '',
             route: urlPath,
             url: ctx.req.url,
             components: compList
