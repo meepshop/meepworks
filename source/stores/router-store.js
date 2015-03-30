@@ -111,11 +111,12 @@ export default class RouterStore extends StoreBase {
   static getRoute() {
     return this.getInstance()[DATA].get('route');
   }
+
   static get route() {
     return this.getInstance().route;
   }
   get route() {
-    return this[DATA].route;
+    return this[DATA].get('route');
   }
 
 
@@ -129,7 +130,7 @@ export default class RouterStore extends StoreBase {
     return this.getInstance().url;
   }
   get url() {
-    return this[DATA].url;
+    return this[DATA].get('url');
   }
 
 

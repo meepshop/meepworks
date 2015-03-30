@@ -1,6 +1,11 @@
 Change Log
 ===
 
+#v0.7.8
+*2015 Mar. 30*
+
+1. Fix bug where RouterStore.route and RouterStore.url return undefined.
+
 #v0.7.7
 *2015 Mar. 27*
 
