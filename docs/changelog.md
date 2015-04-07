@@ -1,6 +1,12 @@
 Change Log
 ===
 
+#v0.7.10
+*2015 Apr. 7*
+
+1. Add page-actions
+
+
 #v0.7.9
 *2015 Apr. 7*
 
