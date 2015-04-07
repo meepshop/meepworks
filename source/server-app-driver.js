@@ -159,7 +159,7 @@ export default class AppDriver {
           ];
         } else {
           transpilerRuntime = [
-            <script key="babel-runtime" src={`/${config.jspm.path}/babel-polyfill.js${jsVer}`}></script>
+            //<script key="babel-runtime" src={`/${config.jspm.path}/babel-polyfill.js${jsVer}`}></script>
           ];
         }
 
@@ -462,13 +462,13 @@ export default class AppDriver {
 
       var trace = yield builder.trace(src);
 
-      _CssCache[src] = Object.keys(trace.tree).filter((item) => {
+      _CssCache[src] = Object.keys(trace).filter((item) => {
         //filter imports to only css entries
-        return /\.css/i.test(trace.tree[item].address);
+        return /\.css/i.test(trace[item].address);
       }).map((item)=> {
         //normalize server-side address to client side relative address
-        if(trace.tree[item].address.indexOf(this.config.jspm.path) > -1) {
-          return '/' + path.relative(path.dirname(this.config.jspm.path), trace.tree[item].address.replace(/file:/i, '')).replace(/\\\\/g, '/');
+        if(trace[item].address.indexOf(this.config.jspm.path) > -1) {
+          return '/' + path.relative(path.dirname(this.config.jspm.path), trace[item].address.replace(/file:/i, '')).replace(/\\\\/g, '/');
         } else {
           let ver =  this.config.version ? `?${ this.config.version }` : '';
           return `/${item.split('!')[0]}${ver}`;

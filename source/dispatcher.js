@@ -13,6 +13,7 @@ const DISPATCHER = Symbol();
  */
 export default class Dispatcher extends Instance {
   constructor() {
+    super();
     this[DISPATCHER] = new Flux.Dispatcher();
   }
   /**

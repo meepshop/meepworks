@@ -14,6 +14,7 @@ const VERSION = Symbol();
 
 export default class RequireFilter extends Instance {
   constructor(param) {
+    super();
     this[ENABLED] = true;
     this[FILTERS] = new Map();
     this[LOADERS] = new Map();

@@ -9,6 +9,7 @@ const DATA = Symbol();
 
 export default class ApplicationStore extends StoreBase {
   constructor() {
+    super();
     this[DATA] = new Im.Map({
       route: '/'
     });

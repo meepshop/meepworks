@@ -55,6 +55,7 @@ class UpdateTime extends ActionBase {
 
 class TimeStore extends StoreBase {
   constructor() {
+    super();
     this.time = new Date().toString();
   }
   get handlers() {

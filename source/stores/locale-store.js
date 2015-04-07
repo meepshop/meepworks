@@ -8,6 +8,7 @@ const DEFAULT = Symbol();
 
 export default class LocaleStore extends StoreBase {
   constructor() {
+    super();
     this.rehydrate({
       locale: null,
       acceptLanguages: []

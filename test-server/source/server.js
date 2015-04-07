@@ -5,31 +5,15 @@ import router from 'koa-router';
 import favicon from 'koa-favicon';
 import path from 'path';
 import fs from 'fs';
-
-import RequireFilter from '../../dist/require-filter';
+import './filter';
+import React from 'react';
+import dedent from '../../dist/dedent';
 
 const version = new Date().getTime();
-const requireFilter = new RequireFilter({
-  fileRoot: path.resolve(__dirname, '..'),
-  urlRoot: '/test-server/',
-  //version: version
-});
-requireFilter.filter('.css!');
-requireFilter.filter('.*!asset');
-requireFilter.filter('.*!text', (p) => {
-  if(fs.existsSync(p)) {
-    return fs.readFileSync(p, 'utf8');
-  }
-  return '';
-});
-
 
 
 
 import TestApp from './app/app';
-
-
-
 import AppDriver from '../../dist/server-app-driver';
 
 let server = koa();
@@ -46,7 +30,7 @@ server.use(mount('/test-server/node', serve(path.resolve(__dirname, '../../test-
 })));
 
 
-server.use(function * (next) {
+server.use(function * timer(next) {
   let start = new Date().getTime();
   yield next;
   console.log(`${this.req.url}, ${new Date().getTime() - start}ms.`);
@@ -54,8 +38,6 @@ server.use(function * (next) {
 
 //standalone server
 
-import React from 'react';
-import dedent from '../../dist/dedent';
 
 server.use(router(server));
 function *standaloneHandler (next) {
@@ -81,7 +63,8 @@ function *standaloneHandler (next) {
         </head>
         <body>
         </body>
-      </html>);
+      </html>
+    );
 }
 
 //server.get(/.*/, standaloneHandler);

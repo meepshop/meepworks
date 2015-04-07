@@ -7,6 +7,7 @@ const DATA = Symbol();
 
 export default class RouteTable extends StoreBase {
   constructor() {
+    super();
     this.rehydrate({
         routes: {},
         srcRoot: '/',

@@ -8,6 +8,7 @@ const DATA = Symbol();
 
 export default class RouterStore extends StoreBase {
   constructor() {
+    super();
     let state = {
         title: '',
         params: null,
