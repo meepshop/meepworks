@@ -1,6 +1,12 @@
 Change Log
 ===
 
+#v0.7.11
+*2015 Apr. 7*
+
+1. Check if request header's accept-language is null before trying to parse it
+
+
 #v0.7.10
 *2015 Apr. 7*
 

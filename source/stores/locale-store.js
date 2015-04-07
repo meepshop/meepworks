@@ -51,9 +51,13 @@ export default class LocaleStore extends StoreBase {
   handleExposeContext(ctx) {
 
     let list = ctx.get('accept-language');
-    list = list.split(',').map((l) => {
-      return normalizeLocaleCode(l.split(';').shift());
-    });
+    if(list) {
+      list = list.split(',').map((l) => {
+        return normalizeLocaleCode(l.split(';').shift());
+      });
+    } else {
+      list = [];
+    }
     if(list.length === 0) {
       list.push('en-US');
     }
