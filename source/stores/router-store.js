@@ -31,6 +31,7 @@ export default class RouterStore extends StoreBase {
     }];
   }
   handleSetApproot(root) {
+    console.log(root);
     if(root[root.length -1] === '/') {
       root = root.substr(0, root.length - 1);
     }

@@ -1,9 +1,4 @@
 import StoreBase from '../store-base';
-import DetectIntl from '../actions/detect-intl';
-import LoadLocales from '../actions/load-locales';
-import SetLocale from '../actions/set-locale';
-import ExposeContext from '../actions/expose-context';
-import DetectBrowserLanguage from '../actions/detect-browser-language';
 
 import Im from 'immutable';
 
@@ -148,3 +143,9 @@ function normalizeLocaleCode(code) {
   }
   return code.join('-');
 }
+
+import DetectIntl from '../actions/detect-intl';
+import LoadLocales from '../actions/load-locales';
+import SetLocale from '../actions/set-locale';
+import ExposeContext from '../actions/expose-context';
+import DetectBrowserLanguage from '../actions/detect-browser-language';

@@ -16,7 +16,6 @@ import Tmpl from './tmpl';
 import appLoader from './app-loader';
 import {PROMOTE, DEMOTE} from './instance';
 import Navigate from './actions/navigate';
-import {SET_KEY} from './action-base';
 import Dispatcher from './dispatcher';
 import { INIT_STORE, INIT } from './store-base';
 import RouterStore from './stores/router-store';
@@ -82,7 +81,11 @@ export default class AppDriver {
       let rStore = RouterStore.getInstance(ctx);
       rStore[INIT_STORE]();
       ctx.dispatcher.register(rStore);
-      yield new SetApproot(driver.rootUrl)[SET_KEY](ctx).exec();
+      {
+        let sa = new SetApproot(driver.rootUrl);
+        sa.ctx = ctx;
+        yield sa.exec();
+      }
 
       //init route table store
       let rTable = RouteTable.getInstance(ctx);
@@ -103,11 +106,20 @@ export default class AppDriver {
       //application init is done, ready to render
       if(ctx[OK]) {
 
-        yield new DetectIntl()[SET_KEY](ctx).exec();
-        yield new LoadLocales({
-          lStore,
-          LC
-        })[SET_KEY](ctx).exec();
+        {
+          let di = new DetectIntl();
+          di.ctx = ctx;
+          yield di.exec();
+        }
+        {
+          let ll = new LoadLocales();
+          ll.ctx = ctx;
+          yield ll.exec();
+        }
+        //yield new LoadLocales({
+        //  lStore,
+        //  LC
+        //})[SET_KEY](ctx).exec();
 
 
         //promote dispatcher and stores
@@ -272,36 +284,52 @@ export default class AppDriver {
           //expose the context
           //this helps to allow middlewares to pass information into the stores
           //for the root application
-          yield new ExposeContext(ctx)[SET_KEY](ctx).exec();
+          {
+            let ec = new ExposeContext(ctx);
+            ec.ctx = ctx;
+            yield ec.exec();
+          }
 
           //set routing information
-          yield new SetRoutes({
+          {
+            let sr = new SetRoutes({
             srcRoot: driver.config.distPath.external,
             routes: driver.routeTable
-          })[SET_KEY](ctx).exec();
+            });
+            sr.ctx = ctx;
+            yield sr.exec();
+          }
 
           //trigger navigate action
-          yield new Navigate({
+          {
+            let n = new Navigate({
             params: ctx.params,
             title: Tmpl.format(route.title, ctx.params) || driver.app.title || '',
             route: urlPath,
             url: ctx.req.url,
             components: compList
-          })[SET_KEY](ctx).exec();
+            });
+            n.ctx = ctx;
+            yield n.exec();
+          }
 
           //exec parent Apps' initial actions & routeActions
           yield driver.execParentActions(parents, ctx);
 
           //exec ctx App's initial actions
           if(Array.isArray(App.initialActions)) {
-            yield foreach(App.initialActions, (initialAction) => {
-              return new initialAction.action(initialAction.payload)[SET_KEY](ctx).exec();
+            yield foreach(App.initialActions, function * (initialAction) {
+              let ia = new initialAction.action(initialAction.payload);
+              ia.ctx = ctx;
+              yield ia.exec();
             });
           }
 
           if(Array.isArray(App.routeActions)) {
             yield foreach(App.routeActions, function * (routeAction) {
-              yield new routeAction.action(routeAction.payload)[SET_KEY](ctx).exec();
+              let ra = new routeAction.action(routeAction.payload);
+              ra.ctx = ctx;
+              yield ra.exec();
             });
           }
 
@@ -359,21 +387,33 @@ export default class AppDriver {
             }
           });
 
-          yield new ExposeContext(ctx)[SET_KEY](ctx).exec();
+          {
+            let ec = new ExposeContext(ctx);
+            ec.ctx = ctx;
+            yield ec.exec();
+          }
           //set routing information
-          yield new SetRoutes({
+          {
+            let sr = new SetRoutes({
             srcRoot: driver.config.distPath.external,
             routes: driver.routeTable
-          })[SET_KEY](ctx).exec();
+            });
+            sr.ctx = ctx;
+            yield sr.exec();
+          }
 
           //trigger navigate action
-          yield new Navigate({
+          {
+            let n = new Navigate({
             params: ctx.params,
             title: Tmpl.format(route.title, ctx.params) || driver.app.title || '',
             route: urlPath,
             url: ctx.req.url,
             components: compList
-          })[SET_KEY](ctx).exec();
+            });
+            n.ctx = ctx;
+            yield n.exec();
+          }
 
           //exec parent Apps' initial actions
           yield driver.execParentActions(parents, ctx);
@@ -398,12 +438,16 @@ export default class AppDriver {
     yield foreach(parents, function * (Mod) {
       if(Array.isArray(Mod.initialActions)) {
         yield foreach(Mod.initialActions, function * (initialAction) {
-          yield new initialAction.action(initialAction.payload)[SET_KEY](ctx).exec();
+          let ia = new initialAction.action(initialAction.payload);
+          ia.ctx = ctx;
+          yield ia.exec();
         });
       }
       if(Array.isArray(Mod.routeActions)) {
         yield foreach(Mod.routeActions, function * (routeAction) {
-          yield new routeAction.action(routeAction.payload)[SET_KEY](ctx).exec();
+          let ra = new routeAction.action(routeAction.payload);
+          ra.ctx = ctx;
+          yield ra.exec();
         });
       }
     });
@@ -436,5 +480,6 @@ export default class AppDriver {
     }
     return _CssCache[src];
   }
+
 }
 

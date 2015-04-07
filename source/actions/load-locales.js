@@ -5,12 +5,14 @@ import url from 'url';
 
 export default class LoadLocales extends ActionBase {
   *action (payload) {
-    let data = payload.lStore.data.toJS();
-    let mapping = payload.lStore.mapping.toJS();
-    let locale = payload.lStore.locale;
-    let accept = payload.lStore.acceptLanguages.toJS();
 
-    for(let [p, c] of payload.LC) {
+    let lStore =  LocaleStore.getInstance(this.ctx);
+    let data = lStore.data.toJS();
+    let mapping = lStore.mapping.toJS();
+    let locale = lStore.locale;
+    let accept = lStore.acceptLanguages.toJS();
+
+    for(let [p, c] of LC) {
       if(!data[p]) {
         data[p] = {};
       }
@@ -67,3 +69,6 @@ function findMatch(locale, list) {
     }
   }
 }
+
+import LocaleStore from '../stores/locale-store';
+import {LOCALE_CACHE as LC} from '../locale';

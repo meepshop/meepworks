@@ -3,8 +3,7 @@ import Dispatcher from './dispatcher';
 import co from 'co';
 
 const PAYLOAD = Symbol();
-const KEY = Symbol();
-export const SET_KEY = Symbol();
+const CTX = Symbol();
 
 
 /**
@@ -38,22 +37,20 @@ export default class ActionBase {
   exec() {
     let self = this;
     return co(function *() {
-      Dispatcher.getInstance(self[KEY]).dispatch({
+      Dispatcher.getInstance(self[CTX]).dispatch({
         action: self.constructor,
         payload: yield self.action(self[PAYLOAD])
       });
 
     });
   }
+
+  get ctx() {
+    return this[CTX];
+  }
+  set ctx(ctx) {
+    this[CTX] = ctx;
+  }
 }
-/**
- * @function
- * @param {Object} key - instance key
- *   Used on the server side to bind request specific key to the action.
- */
-ActionBase.prototype[SET_KEY] = function (key) {
-  this[KEY] = key;
-  return this;
-};
 
 

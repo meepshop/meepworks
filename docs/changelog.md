@@ -1,6 +1,11 @@
 Change Log
 ===
 
+#v0.7.9
+*2015 Apr. 7*
+
+1. Expose ctx to actions and add ctx getter/setter
+
 #v0.7.8
 *2015 Mar. 30*
 
