@@ -163,8 +163,10 @@ export default class AppDriver {
           ];
         }
 
+        let Html = driver.config.htmlComponent || HtmlPage;
+        let View = driver.config.viewportComponent || Viewport;
         //generate html container
-        let htmlOut = React.renderToStaticMarkup(<HtmlPage
+        let htmlOut = React.renderToStaticMarkup(<Html
           scripts={[
             transpilerRuntime,
             <script key="sys" src={ `/${config.jspm.path}/system.src.js${jsVer}` }></script>,
@@ -172,7 +174,7 @@ export default class AppDriver {
               cssPreloads,
             yield appLoader(config, '#viewport', data)
           ]}
-          body={<Viewport
+          body={<View
             innerHTML={appString}
           />}
         />);

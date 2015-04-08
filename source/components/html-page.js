@@ -14,7 +14,7 @@ export default class HtmlPage extends React.Component {
   render() {
     return <html>
       <head>
-        <meta name='viewport' content='width=device-width, initial-scale=1' />
+        <meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0' />
         <meta httpEquiv='Content-Type' content='text/html; charset=utf-8' />
         {this.props.metas}
         <title>{RouterStore.getInstance().getTitle()}</title>

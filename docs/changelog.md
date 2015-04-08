@@ -1,6 +1,12 @@
 Change Log
 ===
 
+#v0.7.13
+*2015 Apr. 8*
+
+1. Make viewport meta to disable scaling by default
+2. Allow html and viewport component to be substituted.
+
 #v0.7.11
 *2015 Apr. 7*
 
