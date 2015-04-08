@@ -27,7 +27,6 @@ class Action3 extends ActionBase {
   }
 }
 
-
 class TestStore extends StoreBase {
   get handlers() {
     return [{

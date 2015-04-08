@@ -167,7 +167,7 @@ export default class AppDriver {
         let htmlOut = React.renderToStaticMarkup(<HtmlPage
           scripts={[
             transpilerRuntime,
-            <script key="sys" src={ `/${config.jspm.path}/system.js${jsVer}` }></script>,
+            <script key="sys" src={ `/${config.jspm.path}/system.src.js${jsVer}` }></script>,
             <script key="config" src={ `/${config.jspm.config}${jsVer}` }></script>,
               cssPreloads,
             yield appLoader(config, '#viewport', data)

@@ -14,7 +14,6 @@ gulp.task('build', ['clean:dist'], (cb) => {
   }))
   .pipe(gb.loadMap())
   .pipe(gb.babelTransform({
-    modules: 'common',
     optional: ['runtime']
   }))
   .pipe(gb.writeMap())
