@@ -147,8 +147,14 @@ export default class Locale {
   }
 
 
+  static subscribe(f) {
+    LocaleStore.getInstance().subscribe(f);
+  }
   subscribe(f) {
     LocaleStore.getInstance().subscribe(f);
+  }
+  static unsubscribe(f) {
+    LocaleStore.getInstance().unsubscribe(f);
   }
   unsubscribe(f) {
     LocaleStore.getInstance().unsubscribe(f);

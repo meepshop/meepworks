@@ -1,6 +1,11 @@
 Change Log
 ===
 
+#v0.7.15
+*2014 Apr. 10*
+
+1. Added static subscribe and unsubscribe methods for Locale
+
 #v0.7.14
 *2014 Apr. 10*
 
