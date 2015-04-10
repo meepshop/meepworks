@@ -81,10 +81,15 @@ export default class ClientAppDriver {
       driver.srcRoot = RouteTable.getInstance().getSrcRoot();
       let routeTable = RouteTable.getInstance().getRoutes();
 
+      page(function(ctx, next) {
+        console.log('check');
+        next();
+      });
       driver.bindRoutes(routeTable, '/');
 
       //start page.js
-      page();
+      window.page = page;
+      page.start();
 
     }).catch((err) => {
 
@@ -113,7 +118,7 @@ export default class ClientAppDriver {
       //if current application has component, and its sub route table does not have current path
       if(route.hasComponent && !(route.routes && route.routes[urlPath])) {
         urlPath = driver.rootUrl + urlPath;
-        page(urlPath, co.wrap(function * (ctx) {
+        page(urlPath, co.wrap(function * (ctx, next) {
           //if routed path is already the current path, do nothing
           if(driver[INIT_APP] && ctx.path === RouterStore.getInstance().getUrl()) {
             return;
@@ -252,7 +257,7 @@ export default class ClientAppDriver {
             //starts the application
             driver.init();
           }
-
+          next();
         }));
       }
       if(route.routes) {
@@ -270,7 +275,7 @@ export default class ClientAppDriver {
       if(route.hasComponent) {
         urlPath = driver.rootUrl + urlPath;
 
-        page(urlPath, co.wrap(function * (ctx) {
+        page(urlPath, co.wrap(function * (ctx, next) {
           if(driver[INIT_APP] && ctx.path === RouterStore.getInstance().getUrl()) {
             return;
           }
@@ -352,6 +357,7 @@ export default class ClientAppDriver {
             driver.init();
           }
 
+          next();
         }));
       }
 

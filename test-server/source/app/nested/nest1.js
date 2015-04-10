@@ -1,7 +1,7 @@
 import React from 'react';
 import Locale from '../../../../dist/locale';
 import path from 'path';
-
+import {ReplaceState, Back} from '../../../../dist/actions/page-actions';
 
 const lc = new Locale({
   path: path.resolve(__dirname, './locale'),
@@ -68,7 +68,11 @@ class NestedApp1 extends React.Component {
       }<br />
       {
         Locale.formatDateTime(new Date())
-      }</div>
+      }<br />
+      <div onClick={()=> {
+        new Back().exec();
+      }}>Return to modules</div>
+      </div>
     );
   }
 }

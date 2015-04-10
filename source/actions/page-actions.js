@@ -27,3 +27,13 @@ export class Forward extends ActionBase {
     history.forward();
   }
 }
+
+export class ReplaceState extends ActionBase {
+  *action(p) {
+    if(this.ctx) {
+      throw new Error('ReplaceState can only be used on the client side');
+    }
+    let page = yield System.import('page');
+    page.redirect(p);
+  }
+}

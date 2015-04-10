@@ -1,6 +1,11 @@
 Change Log
 ===
 
+#v0.7.14
+*2014 Apr. 10*
+
+1. Added ReplaceState action to page-actions, this allows the target route to replace the current route in the history stack
+
 #v0.7.13
 *2015 Apr. 8*
 
