@@ -1,6 +1,16 @@
 Change Log
 ===
 
+#v0.7.17
+*2014 Apr. 13*
+
+1. Allow route titles to be functions
+
+#v0.7.16
+*2014 Apr. 13*
+
+1. Remove test code
+
 #v0.7.15
 *2014 Apr. 10*
 

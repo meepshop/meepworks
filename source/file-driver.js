@@ -29,10 +29,7 @@ export default class FileDriver {
 
       yield new DetectIntl().exec();
       yield new DetectBrowserLanguage().exec();
-      yield new LoadLocales({
-        lStore,
-        LC
-      }).exec();
+      yield new LoadLocales().exec();
 
       let AppComponent = App.component;
       React.render(<AppComponent />, document.body);

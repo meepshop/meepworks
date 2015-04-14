@@ -3,6 +3,7 @@ import Immutable from 'immutable';
 import Navigate from '../actions/navigate';
 import SetComponents from '../actions/set-components';
 import SetApproot from '../actions/set-approot';
+import SetInitialTitle from '../actions/set-initial-title';
 
 const DATA = Symbol();
 
@@ -29,10 +30,12 @@ export default class RouterStore extends StoreBase {
     }, {
       action: SetApproot,
       handler: this.handleSetApproot
+    }, {
+      action: SetInitialTitle,
+      handler: this.handleSetInitialTitle
     }];
   }
   handleSetApproot(root) {
-    console.log(root);
     if(root[root.length -1] === '/') {
       root = root.substr(0, root.length - 1);
     }
@@ -53,6 +56,10 @@ export default class RouterStore extends StoreBase {
   }
   handleSetComponents(comps) {
     this[DATA] = this[DATA].set('components', Immutable.fromJS(comps));
+  }
+  handleSetInitialTitle(fn) {
+    this[DATA] = this[DATA].set('title', fn);
+    this.emit('change');
   }
 
   rehydrate(state) {
@@ -94,17 +101,17 @@ export default class RouterStore extends StoreBase {
   }
 
   getTitle() {
-    return this[DATA].get('title');
+    return this[DATA].get('title')();
   }
   static getTitle() {
-    return this.getInstance()[DATA].get('title');
+    return this.getInstance()[DATA].get('title')();
   }
 
   static get title() {
     return this.getInstance().title;
   }
   get title() {
-    return this[DATA].get('title');
+    return this[DATA].get('title')();
   }
 
   getRoute() {

@@ -116,10 +116,6 @@ export default class AppDriver {
           ll.ctx = ctx;
           yield ll.exec();
         }
-        //yield new LoadLocales({
-        //  lStore,
-        //  LC
-        //})[SET_KEY](ctx).exec();
 
 
         //promote dispatcher and stores
@@ -304,9 +300,16 @@ export default class AppDriver {
 
           //trigger navigate action
           {
+            let title = () => {
+              let t = route.title || driver.app.title || '';
+              if('function' === typeof t) {
+                t = t();
+              }
+              return Tmpl.format(t);
+            };
             let n = new Navigate({
             params: ctx.params,
-            title: Tmpl.format(route.title, ctx.params) || driver.app.title || '',
+            title,
             route: urlPath,
             url: ctx.req.url,
             components: compList
@@ -406,9 +409,16 @@ export default class AppDriver {
 
           //trigger navigate action
           {
+            let title = () => {
+              let t = route.title || driver.app.title || '';
+              if('function' === typeof t) {
+                t = t();
+              }
+              return Tmpl.format(t);
+            };
             let n = new Navigate({
             params: ctx.params,
-            title: Tmpl.format(route.title, ctx.params) || driver.app.title || '',
+            title,
             route: urlPath,
             url: ctx.req.url,
             components: compList

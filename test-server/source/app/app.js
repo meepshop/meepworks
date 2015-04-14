@@ -109,7 +109,9 @@ export default {
     '/modules': {
       name: 'Modules',
       app: './modules',
-      title: 'Modules'
+      title: function () {
+        return 'moDules';
+      }
     }
   }
 };

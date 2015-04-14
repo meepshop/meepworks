@@ -54,10 +54,7 @@ export default class StandAloneDriver {
       yield new DetectBrowserLanguage().exec();
 
       yield new DetectIntl().exec();
-      yield new LoadLocales({
-        lStore,
-        LC
-      }).exec();
+      yield new LoadLocales().exec();
 
       page();
     });
@@ -126,16 +123,22 @@ export default class StandAloneDriver {
           //module loaded
 
           //trigger navigate action, if not the first load
-          let title = Tmpl.format(route.title, ctx.params) || driver.app.title || '';
+          let title = () => {
+            let t = route.title || driver.app.title || '';
+            if('function' === typeof t) {
+              t = t();
+            }
+            return Tmpl.format(t);
+          };
           yield new Navigate({
             params: ctx.params,
-            title: title,
+            title,
             route: urlPath,
             url: ctx.path,
             components: compList
           }).exec();
           if(typeof document !== 'undefined') {
-            document.title = title;
+            document.title = title();
           }
 
           //run actions
@@ -216,16 +219,22 @@ export default class StandAloneDriver {
           });
 
           //trigger navigate action
-          let title = Tmpl.format(route.title, ctx.params) || driver.app.title ||'';
+          let title = () => {
+            let t = route.title || driver.app.title || '';
+            if('function' === typeof t) {
+              t = t();
+            }
+            return Tmpl.format(t);
+          };
           yield new Navigate({
             params: ctx.params,
-            title: title,
+            title,
             route: urlPath,
             url: ctx.path,
             components: compList
           }).exec();
           if(typeof document !== 'undefined') {
-            document.title = title;
+            document.title = title();
           }
 
           //run actions

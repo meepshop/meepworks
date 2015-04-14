@@ -4,7 +4,7 @@ import forEach from 'greasebox/co-foreach';
 import url from 'url';
 
 export default class LoadLocales extends ActionBase {
-  *action (payload) {
+  *action () {
 
     let lStore =  LocaleStore.getInstance(this.ctx);
     let data = lStore.data.toJS();

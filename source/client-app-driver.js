@@ -11,6 +11,7 @@ import DetectIntl from './actions/detect-intl';
 import LocaleStore from './stores/locale-store';
 import LoadLocales from './actions/load-locales';
 import {LOCALE_CACHE as LC} from './locale';
+import SetInitialTitle from './actions/set-initial-title';
 
 import url from 'url';
 
@@ -72,20 +73,13 @@ export default class ClientAppDriver {
       lStore.rehydrate(driver.data.shift());
 
       yield new DetectIntl().exec();
-      yield new LoadLocales({
-        lStore: driver.lStore,
-        LC
-      }).exec();
+      yield new LoadLocales().exec();
 
       //compose client routing logic and repopulate RouterStores's components list
       driver.srcRoot = RouteTable.getInstance().getSrcRoot();
       let routeTable = RouteTable.getInstance().getRoutes();
 
-      page(function(ctx, next) {
-        console.log('check');
-        next();
-      });
-      driver.bindRoutes(routeTable, '/');
+      driver.bindRoutes(routeTable, '/', '/');
 
       //start page.js
       window.page = page;
@@ -111,7 +105,7 @@ export default class ClientAppDriver {
    * @param {Array<Application>} parents - Array of parent applications of current route
    *  configures page.js with the routes defined in the routing table.
    */
-  bindRoutes(route, urlPath, parents = []) {
+  bindRoutes(route, urlPath, subPath, parents = []) {
     let driver = this;
 
     if(route.app) {
@@ -128,7 +122,7 @@ export default class ClientAppDriver {
           let compList = [];
 
           //check parents
-          yield foreach(parents, function * (p) {
+          yield foreach(parents, function * (p, idx) {
             //load the application from server is app is still the src path.
             if(typeof p.app === 'string') {
               //root application path is already loaded
@@ -137,10 +131,7 @@ export default class ClientAppDriver {
               } else {
                 let canonicalAppPath = url.resolve(driver.appPath, p.app);
                 p.app = ( yield System.import(canonicalAppPath) );
-                yield new LoadLocales({
-                  lStore: driver.lStore,
-                  LC
-                }).exec();
+                yield new LoadLocales().exec();
               }
             }
             if(p.app.component) {
@@ -161,6 +152,9 @@ export default class ClientAppDriver {
                 }
               });
             }
+            if(!route.title && idx === parents.length - 1) {
+              route.title = p.app.routes[subPath].title;
+            }
           });
           //check self
           if(typeof route.app === 'string') {
@@ -169,10 +163,7 @@ export default class ClientAppDriver {
             } else {
               let canonicalAppPath = url.resolve(driver.appPath, route.app);
               route.app = ( yield System.import(canonicalAppPath) );
-              yield new LoadLocales({
-                lStore: driver.lStore,
-                LC
-              }).exec();
+              yield new LoadLocales().exec();
             }
           }
           if(route.app.component) {
@@ -192,19 +183,27 @@ export default class ClientAppDriver {
           }
           //module loaded
 
+          let title = () => {
+            let t = route.title || driver.app.title || '';
+            if('function' === typeof t) {
+              t = t();
+            }
+            return Tmpl.format(t);
+          };
           if(driver[INIT_APP]) {
             //trigger navigate action, if not the first load
-            let title = Tmpl.format(route.title, ctx.params) || driver.app.title || '';
             yield new Navigate({
               params: ctx.params,
-              title: title,
+              title,
               route: urlPath,
               url: ctx.path,
               components: compList
             }).exec();
             if(typeof document !== 'undefined') {
-              document.title = title;
+              document.title = title();
             }
+          } else {
+            yield new SetInitialTitle(title).exec();
           }
           //run actions
           yield foreach(parents, function * (p) {
@@ -266,7 +265,7 @@ export default class ClientAppDriver {
           if(urlPath === '/') {
             urlPath = '';
           }
-          this.bindRoutes(route.routes[p], urlPath + p, parents.concat(route));
+          this.bindRoutes(route.routes[p], urlPath + p, p, parents.concat(route));
         }
       }
     } else {
@@ -282,17 +281,14 @@ export default class ClientAppDriver {
 
           let compList = [];
           //check parents
-          yield foreach(parents, function * (p) {
+          yield foreach(parents, function * (p, idx) {
             if(typeof p.app === 'string') {
               if(`${driver.srcRoot}/${p.app}`===driver.appPath) {
                 p.app = driver.app;
               } else {
                 let canonicalAppPath = url.resolve(driver.appPath, p.app);
                 p.app = ( yield System.import(canonicalAppPath) );
-                yield new LoadLocales({
-                  lStore: driver.lStore,
-                  LC
-                }).exec();
+                yield new LoadLocales().exec();
               }
             }
             if(p.app.component) {
@@ -310,23 +306,34 @@ export default class ClientAppDriver {
                 }
               });
             }
+            if(!route.title && idx === parents.length - 1) {
+              route.title = p.app.routes[subPath].title;
+            }
 
           });
 
           //navigate
+          let title = () => {
+            let t = route.title || driver.app.title || '';
+            if('function' === typeof t) {
+              t = t();
+            }
+            return Tmpl.format(t);
+          };
           if(driver[INIT_APP]) {
-            //trigger navigate action
-            let title = Tmpl.format(route.title, ctx.params) || driver.app.title || '';
+            //trigger navigate action, if not the first load
             yield new Navigate({
               params: ctx.params,
-              title: title,
+              title,
               route: urlPath,
               url: ctx.path,
               components: compList
             }).exec();
             if(typeof document !== 'undefined') {
-              document.title = title;
+              document.title = title();
             }
+          } else {
+            yield new SetInitialTitle(title).exec();
           }
 
           //run actions
