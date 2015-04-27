@@ -88,10 +88,7 @@ export default class Locale {
   static setLocale(l) {
     return co(function * () {
       yield new SetLocale(l).exec();
-      yield new LoadLocales({
-        lStore: LocaleStore.getInstance(),
-        LC: LOCALE_CACHE
-      }).exec();
+      yield new LoadLocales().exec();
     });
   }
   setLocale(l) {
