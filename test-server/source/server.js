@@ -25,7 +25,7 @@ server.use(mount('/jspm_packages', serve(path.resolve(__dirname, '../../jspm_pac
 server.use(mount('/dist', serve(path.resolve(__dirname, '../../dist'), {
   maxage: 2*60*1000
 })));
-server.use(mount('/test-server/node', serve(path.resolve(__dirname, '../../test-server/node'), {
+server.use(mount('/test-server/build', serve(path.resolve(__dirname, '../../test-server/build'), {
   maxage: 2*60*1000
 })));
 
@@ -56,7 +56,7 @@ function *standaloneHandler (next) {
               System.baseURL='/';
               System.import('dist/standalone-driver')
               .then(function (m) {
-              new m('test-server/node/app/app', '/', 'test-server/node');
+              new m('test-server/build/app/app', '/', 'test-server/build');
               }).catch(console.log);
               `
             }}></script>
@@ -77,8 +77,8 @@ server.use(mount('/', new AppDriver(TestApp, {
     config: 'jspm_packages/config.js'
   },
   distPath: {
-    external: 'test-server/node',
-    internal: 'test-server/node'
+    external: 'test-server/build',
+    internal: 'test-server/build'
   },
   fileRoot: __dirname,
   localtest: true,

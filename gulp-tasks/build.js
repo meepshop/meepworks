@@ -5,6 +5,8 @@ import plumber from 'gulp-plumber';
 import * as config from './config';
 
 import * as gb from 'greasebox';
+import sourcemaps from 'gulp-sourcemaps';
+import babel from 'gulp-babel';
 
 
 gulp.task('build', ['clean:dist'], (cb) => {
@@ -12,11 +14,12 @@ gulp.task('build', ['clean:dist'], (cb) => {
   .pipe(plumber({
     errorHandler: cb
   }))
-  .pipe(gb.loadMap())
-  .pipe(gb.babelTransform({
+  .pipe(sourcemaps.init())
+  .pipe(babel({
+    modules: 'common',
     optional: ['runtime']
   }))
-  .pipe(gb.writeMap())
+  .pipe(sourcemaps.write('.'))
   .pipe(gulp.dest('dist'))
   .on('end', cb);
 });
