@@ -46,7 +46,7 @@ function *standaloneHandler (next) {
         <html>
           <head>
             <title></title>
-            <script key="sys" src="/jspm_packages/system.js"></script>
+            <script key="sys" src="/jspm_packages/system.src.js"></script>
             <script key="config" src="/jspm_packages/config.js"></script>
             {
               // <script key="stand-alone" src={`/test-server/node/standalone.js?${version}`}></script>

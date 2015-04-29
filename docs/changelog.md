@@ -1,5 +1,11 @@
 Change Log
 ===
+#v0.8.0
+**2014 Apr. 29**
+
+1. Bump versions to use latest babel and jspm
+2. Fix firefox error
+3. Modify load-locales module to accomodate latest \_\_dirname implementation in nodelibs.
 
 #v0.7.17
 *2014 Apr. 13*

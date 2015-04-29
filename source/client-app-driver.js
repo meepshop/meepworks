@@ -46,7 +46,7 @@ export default class ClientAppDriver {
 
     //find data
     let dataScript = document.querySelector(`script[id="${dataId}"]`);
-    driver.data = JSON.parse(dataScript.innerText);
+    driver.data = JSON.parse(dataScript.innerHTML);
 
 
     co(function * () {

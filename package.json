@@ -1,6 +1,6 @@
 {
   "name": "meepworks",
-  "version": "0.7.17",
+  "version": "0.8.0",
   "description": "Isomorphic Framework based on ReactJS & Flux",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -69,9 +69,9 @@
       "url": "github:jspm/nodelibs-url@^0.1.0"
     },
     "devDependencies": {
-      "babel": "npm:babel-core@^5.1.11",
-      "babel-runtime": "npm:babel-runtime@^5.1.11",
-      "core-js": "npm:core-js@^0.9.0"
+      "babel": "npm:babel-core@^5.1.13",
+      "babel-runtime": "npm:babel-runtime@^5.1.13",
+      "core-js": "npm:core-js@^0.9.4"
     }
   }
 }

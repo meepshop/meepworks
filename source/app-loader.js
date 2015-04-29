@@ -33,9 +33,9 @@ let LoaderScript = React.createClass({
           if(load.address.indexOf(System.meepworks.jspmPath) === -1) {
             load.address += System.meepworks.appVersion;
           }
-          return fetch.call(this, load);
+          var result = fetch.call(this, load);
+          return result;
         };
-
         System.import('${p}/client-app-driver')
         .then(function (m) {
           new m('${this.props.config.distPath.external}/${this.props.config.appPath}', '${this.props.target}'${dataId});
