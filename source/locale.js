@@ -16,8 +16,6 @@ const FORMAT = Symbol();
 const NUMBER_FORMATTERS = new Map();
 const DATE_FORMATTERS = new Map();
 
-//const HTTP_PATH = /^\/(http|https):\//;
-
 export default class Locale {
   constructor(p) {
     /**
@@ -29,14 +27,6 @@ export default class Locale {
     if(typeof System !== 'undefined' && typeof window !== 'undefined') {
       p.path = '.' + p.path;
     }
-    //console.log('@@', p.path);
-    //let match = p.path.match(HTTP_PATH);
-    //if(match) {
-    //  p.path = p.path.replace(match.shift(), `${match.shift()}://`);
-    //  let root = `${RouterStore.rootUrl}/`;
-    //  let urlInfo = url.parse(p.path);
-    //  p.path = urlInfo.path.replace(root, '');
-    //}
 
     if(!p.preload) {
       p.preload = {};

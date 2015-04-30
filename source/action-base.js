@@ -16,8 +16,8 @@ export default class ActionBase {
    * @constructor
    * @param {any} payload - parameter passed into the action handler
    */
-  constructor(payload) {
-    this[PAYLOAD] = payload;
+  constructor(...payloads) {
+    this[PAYLOAD] = payloads;
   }
   /**
    * @function
@@ -39,7 +39,7 @@ export default class ActionBase {
     return co(function *() {
       Dispatcher.getInstance(self[CTX]).dispatch({
         action: self.constructor,
-        payload: yield self.action(self[PAYLOAD])
+        payload: yield self.action(...self[PAYLOAD])
       });
 
     });

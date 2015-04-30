@@ -1,5 +1,10 @@
 Change Log
 ===
+
+#v0.8.1
+**2014 Apr. 30**
+1. Allow actions to handle multiple parameters.
+
 #v0.8.0
 **2014 Apr. 29**
 
