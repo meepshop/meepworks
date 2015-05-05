@@ -1,8 +1,14 @@
 Change Log
 ===
 
+#v0.8.2
+**2014 May 5**
+
+1. Fix title template subsitution
+
 #v0.8.1
 **2014 Apr. 30**
+
 1. Allow actions to handle multiple parameters.
 
 #v0.8.0

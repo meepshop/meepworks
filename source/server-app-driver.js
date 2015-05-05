@@ -305,7 +305,7 @@ export default class AppDriver {
               if('function' === typeof t) {
                 t = t();
               }
-              return Tmpl.format(t);
+              return Tmpl.format(t, ctx.params);
             };
             let n = new Navigate({
             params: ctx.params,
@@ -414,7 +414,7 @@ export default class AppDriver {
               if('function' === typeof t) {
                 t = t();
               }
-              return Tmpl.format(t);
+              return Tmpl.format(t, ctx.params);
             };
             let n = new Navigate({
             params: ctx.params,

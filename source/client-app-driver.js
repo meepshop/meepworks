@@ -188,7 +188,7 @@ export default class ClientAppDriver {
             if('function' === typeof t) {
               t = t();
             }
-            return Tmpl.format(t);
+            return Tmpl.format(t, ctx.params);
           };
           if(driver[INIT_APP]) {
             //trigger navigate action, if not the first load
@@ -318,7 +318,7 @@ export default class ClientAppDriver {
             if('function' === typeof t) {
               t = t();
             }
-            return Tmpl.format(t);
+            return Tmpl.format(t, ctx.params);
           };
           if(driver[INIT_APP]) {
             //trigger navigate action, if not the first load

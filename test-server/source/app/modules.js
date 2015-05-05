@@ -82,10 +82,9 @@ export default {
   component: Modules,
   stores: [TimeStore],
   routes: {
-    '/nest1': {
+    '/:nested': {
       app: './nested/nest1',
-      title: 'Nest App 1',
-      name: 'nest1'
+      title: '${nested} App'
     }
   }
 };

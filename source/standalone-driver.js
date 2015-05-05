@@ -128,7 +128,7 @@ export default class StandAloneDriver {
             if('function' === typeof t) {
               t = t();
             }
-            return Tmpl.format(t);
+            return Tmpl.format(t, ctx.params);
           };
           yield new Navigate({
             params: ctx.params,
@@ -224,7 +224,7 @@ export default class StandAloneDriver {
             if('function' === typeof t) {
               t = t();
             }
-            return Tmpl.format(t);
+            return Tmpl.format(t, ctx.params);
           };
           yield new Navigate({
             params: ctx.params,
