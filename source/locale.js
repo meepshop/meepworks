@@ -49,8 +49,8 @@ export default class Locale {
       });
       if(p.preload) {
         for(let l in p.preload) {
-          if(!c.preload.has(l)) {
-            c.preload.set(l, p.preload[l]);
+          if(!c.preload[l]) {
+            c.preload[l] = p.preload[l];
           }
         }
       }

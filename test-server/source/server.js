@@ -39,38 +39,39 @@ server.use(function * timer(next) {
 //standalone server
 
 
-server.use(router(server));
-function *standaloneHandler (next) {
-    this.body = '<!DOCTYPE html>' +
-      React.renderToStaticMarkup(
-        <html>
-          <head>
-            <title></title>
-            <script key="sys" src="/jspm_packages/system.src.js"></script>
-            <script key="config" src="/jspm_packages/config.js"></script>
-            {
-              // <script key="stand-alone" src={`/test-server/node/standalone.js?${version}`}></script>
-            }
-            <script key="bootstrap" dangerouslySetInnerHTML={{
-              __html: dedent `
-              System.baseURL='/';
-              System.import('dist/standalone-driver')
-              .then(function (m) {
-              new m('test-server/build/app/app', '/', 'test-server/build');
-              }).catch(console.log);
-              `
-            }}></script>
-        </head>
-        <body>
-        </body>
-      </html>
-    );
-}
+//server.use(router(server));
+//function *standaloneHandler (next) {
+//    this.body = '<!DOCTYPE html>' +
+//      React.renderToStaticMarkup(
+//        <html>
+//          <head>
+//            <title></title>
+//            <script key="sys" src="/jspm_packages/system.src.js"></script>
+//            <script key="config" src="/jspm_packages/config.js"></script>
+//            {
+//              // <script key="stand-alone" src={`/test-server/node/standalone.js?${version}`}></script>
+//            }
+//            <script key="bootstrap" dangerouslySetInnerHTML={{
+//              __html: dedent `
+//              System.baseURL='/';
+//              System.import('dist/standalone-driver')
+//              .then(function (m) {
+//              new m('test-server/build/app/app', '/', 'test-server/build');
+//              }).catch(console.log);
+//              `
+//            }}></script>
+//        </head>
+//        <body>
+//        </body>
+//      </html>
+//    );
+//}
+//
+////server.get(/.*/, standaloneHandler);
+//
+//server.use(mount('/', )));
 
-//server.get(/.*/, standaloneHandler);
-
-
-server.use(mount('/', new AppDriver(TestApp, {
+let testApp = new AppDriver(TestApp, {
   appPath: 'app/app',
   jspm: {
     path: 'jspm_packages',
@@ -84,8 +85,9 @@ server.use(mount('/', new AppDriver(TestApp, {
   localtest: true,
   //version: version,
   rootUrl: '/'
-})));
+});
 
+server.use(testApp.routes());
 
 
 

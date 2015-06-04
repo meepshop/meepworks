@@ -1,40 +1,55 @@
 Change Log
 ===
 
+
+#v0.9.0
+**2015 Jun. 04**
+
+1. Bumped dependency versions.
+
+Breaking Changes:
+
+1. ServerAppDriver no longer wraps koa, and is based purely on koa-router. The mounting syntax is thus different.
+
+#v0.8.3
+**2015 May 20**
+
+1. Fix error where creating multiple locale objects with the same path result in errors.
+
 #v0.8.2
-**2014 May 5**
+**2015 May 5**
 
 1. Fix title template subsitution
 
 #v0.8.1
-**2014 Apr. 30**
+**2015 Apr. 30**
 
 1. Allow actions to handle multiple parameters.
 
 #v0.8.0
-**2014 Apr. 29**
+**2015 Apr. 29**
 
 1. Bump versions to use latest babel and jspm
 2. Fix firefox error
 3. Modify load-locales module to accomodate latest \_\_dirname implementation in nodelibs.
 
 #v0.7.17
-*2014 Apr. 13*
+*2015 Apr. 13*
 
 1. Allow route titles to be functions
 
 #v0.7.16
-*2014 Apr. 13*
+*2015 Apr. 13*
 
 1. Remove test code
 
 #v0.7.15
-*2014 Apr. 10*
+*2015 Apr. 10*
 
 1. Added static subscribe and unsubscribe methods for Locale
 
 #v0.7.14
-*2014 Apr. 10*
+*2015 Apr. 10*
 
 1. Added ReplaceState action to page-actions, this allows the target route to replace the current route in the history stack
 

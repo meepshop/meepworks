@@ -1,5 +1,4 @@
-import koa from 'koa';
-import router from 'koa-router';
+import Router from 'koa-router';
 
 import React from 'react';
 import HtmlPage from './components/html-page';
@@ -31,6 +30,9 @@ import { LOCALE_CACHE as LC } from './locale';
 
 const OK = Symbol();
 const CSS_PRELOAD = Symbol();
+const ROUTER = Symbol();
+
+
 const DOCTYPE = '<!DOCTYPE html>';
 
 
@@ -39,7 +41,7 @@ let _CssCache = {};
 /**
  * @exports default
  * @class AppDriver
- *  Wraps around koa and router as an application driver.
+ *  Wraps around router as an application driver.
  */
 export default class AppDriver {
   /**
@@ -50,7 +52,7 @@ export default class AppDriver {
    */
   constructor(App, config) {
     var driver = this;
-    driver.koa = new koa();
+    driver[ROUTER] = new Router();
     driver.app = App;
     driver.config = config;
     driver.rootUrl = config.rootUrl || '/';
@@ -70,7 +72,7 @@ export default class AppDriver {
 
 
     //server logic entry point
-    driver.koa.use(function * (next) {
+    driver[ROUTER].use(function * (next) {
 
       var ctx = this;
       //create instance specific dispatcher and store set
@@ -189,17 +191,21 @@ export default class AppDriver {
     });
 
     //add routing to the driver
-    driver.koa.use(router(driver.koa));
 
 
     //start binding routes
-    driver.bindRoutes(driver.routeTable, '/');
+    bindRoutes.call(this, driver.routeTable, '/');
     //driver.localeLoaded = new LoadLocales(glStore).exec();
 
-    //return the actual koa instance instead of this AppDriver instance
-    return driver.koa;
   }
-  /**
+
+  routes() {
+    return this[ROUTER].routes();
+  }
+
+}
+
+/**
    * @function
    * @param {Object} route - route description
    * @param {String} urlPath - current url path path
@@ -208,7 +214,7 @@ export default class AppDriver {
    * @param {Array<Object>} parents - array of parent app manifests
    *    Bind all the routing logic to the application driver.
    */
-  bindRoutes(route, urlPath, filePath, files, table, parents = []) {
+  function bindRoutes(route, urlPath, filePath, files, table, parents = []) {
     let driver = this;
 
     if(!table) {
@@ -247,7 +253,7 @@ export default class AppDriver {
       if(App.component && !(App.routes&&App.routes[urlPath])) {
 
 
-        this.koa.get(urlPath, function * (next) {
+        this[ROUTER].get(urlPath, function * (next) {
           var ctx = this;
           //populate components list
           let compList = [];
@@ -319,7 +325,7 @@ export default class AppDriver {
           }
 
           //exec parent Apps' initial actions & routeActions
-          yield driver.execParentActions(parents, ctx);
+          yield execParentActions.call(driver, parents, ctx);
 
           //exec ctx App's initial actions
           if(Array.isArray(App.initialActions)) {
@@ -342,7 +348,7 @@ export default class AppDriver {
           ctx[CSS_PRELOAD] = new Set();
 
           (yield map(files, (f)=> {
-            return driver.traceCss(f);
+            return traceCss.call(driver, f);
           })).forEach((list) => {
             list.forEach((css) => {
               ctx[CSS_PRELOAD].add(css);
@@ -358,7 +364,7 @@ export default class AppDriver {
           if(urlPath === '/') {
             urlPath = '';
           }
-          this.bindRoutes(App.routes[p], urlPath + p, filePath, files, table.routes[p], parents.concat(App));
+          bindRoutes.call(this, App.routes[p], urlPath + p, filePath, files, table.routes[p], parents.concat(App));
         }
       }
     } else {
@@ -371,7 +377,7 @@ export default class AppDriver {
       if(App.component) {
 
 
-        this.koa.get(urlPath, function * (next) {
+        this[ROUTER].get(urlPath, function * (next) {
           var ctx = this;
           //populate components list
           let compList = [];
@@ -428,13 +434,13 @@ export default class AppDriver {
           }
 
           //exec parent Apps' initial actions
-          yield driver.execParentActions(parents, ctx);
+          yield execParentActions.call(driver, parents, ctx);
 
           //trace css
           ctx[CSS_PRELOAD] = new Set();
 
           (yield map(files, (f)=> {
-            return driver.traceCss(f);
+            return traceCss.call(driver, f);
           })).forEach((list) => {
             list.forEach((css) => {
               ctx[CSS_PRELOAD].add(css);
@@ -446,7 +452,8 @@ export default class AppDriver {
       }
     }
   }
-  *execParentActions(parents, ctx) {
+
+  function *execParentActions(parents, ctx) {
     yield foreach(parents, function * (Mod) {
       if(Array.isArray(Mod.initialActions)) {
         yield foreach(Mod.initialActions, function * (initialAction) {
@@ -465,7 +472,7 @@ export default class AppDriver {
     });
 
   }
-  *traceCss(src, jspm) {
+  function *traceCss(src, jspm) {
     var css;
     if(!_CssCache[src]) {
       //trace app for all module imports
@@ -492,6 +499,3 @@ export default class AppDriver {
     }
     return _CssCache[src];
   }
-
-}
-
