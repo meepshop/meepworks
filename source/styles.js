@@ -1,8 +1,9 @@
+
 /**
  *  @exports default
  *  @class StyleMap - Represents a map of style definations.
  */
-export default class StyleMap {
+export default class Styles {
   /**
    *  @constructor
    *  @param {Object} map - A map of style definitions.
@@ -26,7 +27,7 @@ class Style {
    * @param {Object} def - The css style definition in object literal form.
    */
   constructor(def) {
-    traverseDefinition.call(this, def);
+    this::traverseDefinition(def);
   }
 }
 
@@ -35,7 +36,7 @@ function traverseDefinition(def) {
     if(typeof def[prop] === 'object') {
       //Any nested object should be treated as style definitions returned by
       //functions, and merged into this definition.
-      traverseDefinition.call(this, def[prop]);
+      this::traverseDefinition(def[prop]);
     } else {
       this[prop] = def[prop];
     }

@@ -1,4 +1,3 @@
-
 const _cache = new WeakMap();
 /**
  * Use weak maps for instances so that instances can easily be gc'ed
@@ -37,21 +36,21 @@ export default class Instance {
 
     if(key) {
       if(!cache.has(key)) {
-        let tmp = new this();
+        let inst = new this();
         //bind promote/demote functions
-        tmp[PROMOTE] = promote;
-        tmp[DEMOTE] = demote;
+        inst[PROMOTE] = promote;
+        inst[DEMOTE] = demote;
 
 
-        cache.set(key, tmp);
+        cache.set(key, inst);
         //keep a reference to the key for destroy
-        tmp[KEY] = key;
+        inst[KEY] = key;
       }
       return cache.get(key);
     } else {
       if(!cache.has(this)) {
-        let tmp  = new this();
-        cache.set(this, tmp);
+        let inst  = new this();
+        cache.set(this, inst);
       }
       return cache.get(this);
     }

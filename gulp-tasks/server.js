@@ -6,15 +6,11 @@ import * as config from './config';
 let _p;
 
 
-gulp.task('test-server', ['build-server', 'build'], () => {
-  spawnServer();
-});
-
 export function spawnServer() {
   if(_p) {
     _p.kill();
   }
-  _p = cp.spawn('node', ['--harmony', `${config.paths.server}/server`], {
+  _p = cp.spawn('node', ['--harmony', `${config.paths.serverBuild}/server`], {
     stdio: 'inherit'
   });
 }
@@ -24,4 +20,5 @@ export function killServer() {
     _p.kill();
   }
 }
+
 process.on('exit', killServer);
