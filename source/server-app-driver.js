@@ -3,8 +3,9 @@ import React from 'react';
 import path from 'path';
 import url from 'url';
 import AppLoader from './app-loader';
-import DefaultNotFound from './components/default-not-found';
+import DefaultNotFoundHandler from './components/default-not-found-handler';
 import AppContext from './app-context';
+import Dispatcher from './dispatcher';
 
 
 
@@ -26,7 +27,8 @@ export default class AppDriver {
 
 
       let ctx = new AppContext();
-      //init dispatchercher
+
+
       //init stores
       //
       //
@@ -34,7 +36,7 @@ export default class AppDriver {
         let routes = (
           <Route>
             {driver::generateRoutes(driver.routeTable, ctx)}
-            <NotFoundRoute handler={DefaultNotFound} />
+            <NotFoundRoute handler={DefaultNotFoundHandler} />
           </Route>
         )
 

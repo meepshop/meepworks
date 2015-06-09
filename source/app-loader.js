@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 
+const LOADED = Symbol();
 
 
 export default class AppLoader {
@@ -31,12 +32,11 @@ export default class AppLoader {
                 cb();
               }
             } else {
-              console.log('no will transi')
                cb();
             }
 
           }).catch((err) => {
-            console.log('Err:', err);
+            transition.abort();
             cb(err);
           });
         }
@@ -60,7 +60,15 @@ export default class AppLoader {
     }
   }
   get loaded()  {
+
     if(typeof this.App === 'string') {
+      if(!this[LOADED]) {
+        this[LOADED] = (async () => {
+          this.App = await System.import(this.App);
+        }());
+      }
+      return this[LOADED];
+
 
     } else {
       return Promise.resolve();
@@ -68,23 +76,3 @@ export default class AppLoader {
   }
 }
 
-//class Loader extends React.Component {
-//  static get contextTypes() {
-//    return {
-//      router: React.PropTypes.func
-//    };
-//  }
-//  static willTransitionFrom() {
-//    console.log('from: loader');
-//  }
-//  static willTransitionTo(t) {
-//    console.log('@', t.path);
-//    if(!AppCache[t.path]) {
-//      AppCache[t.path] = Inner;
-//    }
-//  }
-//  render () {
-//    let Mod = AppCache[this.context.router.getCurrentPath()];
-//    return <Mod />;
-//  }
-//}

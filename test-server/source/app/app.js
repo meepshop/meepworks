@@ -2,11 +2,9 @@ import Application from '../../../build/application';
 import React from 'react';
 import RouteHandler from '../../../build/components/route-handler';
 import Link from '../../../build/components/link';
+import Store from './store';
 
 export default class App extends Application {
-  constructor() {
-    super();
-  }
   static get routes() {
     return {
       'sub': {
@@ -19,6 +17,23 @@ export default class App extends Application {
         appPath: './not-found'
       }
     };
+  }
+  static get stores() {
+    return [
+      Store
+    ];
+  }
+  constructor(props, context) {
+    super(props, context);
+
+    console.log(Store.getInstance(this.context.appCtx));
+
+    this.changeHandler = () => {
+
+    };
+  }
+  componentDidMount() {
+    this.context.appCtx.getStore(Store).on(this.changeHandler);
   }
   render() {
     return (

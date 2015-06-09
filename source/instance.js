@@ -7,7 +7,7 @@ const _cache = new WeakMap();
 
 
 
-const KEY = Symbol();
+const CTX = Symbol();
 export const PROMOTE = Symbol();
 export const DEMOTE = Symbol();
 const BACKUP = {};
@@ -44,7 +44,7 @@ export default class Instance {
 
         cache.set(key, inst);
         //keep a reference to the key for destroy
-        inst[KEY] = key;
+        inst[CTX] = key;
       }
       return cache.get(key);
     } else {
@@ -56,6 +56,10 @@ export default class Instance {
     }
   }
 
+  get ctx() {
+    return this[CTX];
+  }
+
   /**
    * @function
    *
@@ -63,10 +67,10 @@ export default class Instance {
    */
   destroy() {
     let cache = _cache.get(this.constructor);
-    if(this[KEY]) {
+    if(this[CTX]) {
       //use key to clear _cache
-      if(cache.has( this[KEY] )) {
-        cache.delete( this[KEY] );
+      if(cache.has( this[CTX] )) {
+        cache.delete( this[CTX] );
       }
     } else {
       if(cache.has( this.constructor )) {
