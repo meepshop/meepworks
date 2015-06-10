@@ -3,11 +3,15 @@ import React from 'react';
 import path from 'path';
 import url from 'url';
 import AppLoader from './app-loader';
-import DefaultNotFoundHandler from './components/default-not-found-handler';
-import AppContext from './app-context';
+import NotFound from './components/not-found';
+import AppContext, { APP_INIT } from './app-context';
 import Dispatcher from './dispatcher';
+import Tmpl from './tmpl';
+import HtmlPage from './components/html-page';
+import Viewport from './components/viewport';
+import bootstrap from './bootstrap';
 
-
+const DOCTYPE = '<!DOCTYPE html>';
 
 export default class AppDriver {
   constructor(config) {
@@ -16,7 +20,6 @@ export default class AppDriver {
     this.routeTable = this::traceRoutes({
       appPath: config.appPath
     }, appPath);
-    console.log('@', JSON.stringify(this.routeTable, null, 2));
   }
   get router() {
 
@@ -27,16 +30,14 @@ export default class AppDriver {
 
 
       let ctx = new AppContext();
+      ctx[APP_INIT] = true;
 
 
-      //init stores
-      //
-      //
       yield new Promise((resolve, reject) => {
         let routes = (
           <Route>
             {driver::generateRoutes(driver.routeTable, ctx)}
-            <NotFoundRoute handler={DefaultNotFoundHandler} />
+            <NotFoundRoute handler={NotFound} />
           </Route>
         )
 
@@ -55,12 +56,48 @@ export default class AppDriver {
             }
           },
           onError: (err) => {
-            console.log('err', err);
+            console.log('err', err, err.stack);
           }
         });
         r.run((Root, state) => {
 
-          this.body = React.renderToString(<Root />);
+          let title = ctx.title;
+          if(title !== void 0) {
+            title = Tmpl.format(title, state.params);
+          }
+
+
+          //gather route table and dehydrate stores
+          let data = {
+            table: driver.routeTable,
+            stores: [],
+            root: driver.config.root || ''
+          };
+          ctx.stores.forEach(s => {
+            data.stores.push(s.dehydrate());
+          });
+
+
+
+          let appHtml = React.renderToString(<Root />);
+
+          let Html = driver.config.htmlComponent || HtmlPage;
+          let View = driver.config.viewportComponent || Viewport;
+
+
+          let body = React.renderToStaticMarkup(<Html
+            scripts={[
+                driver::bootstrap('#viewport', data)
+            ]}
+            body={<View
+              innerHTML={appHtml}
+            />}
+            title={title}
+          />);
+
+          this.body = DOCTYPE + body;
+          this.status = 200;
+          this.type = 'text/html';
           resolve();
         });
 
@@ -69,6 +106,7 @@ export default class AppDriver {
     }
   }
 }
+
 
 
 function traceRoutes(table, appPath) {
@@ -86,7 +124,10 @@ function traceRoutes(table, appPath) {
   return table;
 }
 
-function generateRoutes(table, ctx) {
+function generateRoutes(table, ctx, root) {
+  if(!root) {
+    root = this.config.root || '';
+  }
 
   let children = [];
   if(table.routes) {
@@ -100,18 +141,15 @@ function generateRoutes(table, ctx) {
           <NotFoundRoute key={p} handler={new AppLoader(table.routes[p].App, ctx)} />
         );
       } else {
-        children.push(
-          <Route name={p} key={p}>
-            {this::generateRoutes(table.routes[p],  ctx)}
-          </Route>
-        );
+        children.push(this::generateRoutes(table.routes[p],  ctx, root === '' ? p : `${root}/${p}`));
       }
     }
   }
   return (
-    <Route handler={new AppLoader(table.App, ctx)}>
+    <Route path={`/${root}`} key={`/${root}`} handler={new AppLoader(table.App, ctx, root)}>
       {children}
     </Route>
   );
 
 }
+

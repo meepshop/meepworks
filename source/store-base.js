@@ -6,8 +6,9 @@ export const ACTION_HANDLER = Symbol();
 import Dispatcher from './dispatcher';
 
 const EMITTER = Symbol();
+const REGISTERED = Symbol();
+const SYMBOLS = Symbol();
 
-const handlerCache = new Map();
 
 /**
  * @exports default
@@ -29,25 +30,34 @@ export default class StoreBase extends Instance {
   constructor() {
     super();
     this[EMITTER] = new Emitter();
+    this[SYMBOLS] = new Map();
 
-    //map handlers to self by the action symbol
-    this.handlers.forEach((map) => {
-      if(!handlerCache.has(map.action)) {
-        handlerCache.set(map.action, Symbol());
-      }
-      let s = handlerCache.get(map.action);
-      this[s] = map.handler;
-    });
     //bind main action handler with bounded this in the scope
     this[ACTION_HANDLER] = (payload) => {
-      //run the actual action handlers using the action as the accessor
-      let s = handlerCache.get(payload.action);
-      if (typeof this[s] === 'function') {
-        this[s](payload.payload);
-      }
-    };
-    Dispatcher.getInstance(this.ctx).register(this);
+       //run the actual action handlers using the action as the accessor
+       let s = this[SYMBOLS].get(payload.action);
+       if (typeof this[s] === 'function') {
+         this[s](payload.payload);
+       }
+     };
 
+  }
+  bindHandler(action, handler) {
+    if(!this[SYMBOLS].has(action)) {
+      this[SYMBOLS].set(action, Symbol());
+    }
+    this[this[SYMBOLS].get(action)] = handler;
+  }
+
+  static getInstance(ctx) {
+    let self = super.getInstance(ctx);
+
+    if(!self[REGISTERED]) {
+      ctx.stores.add(self);
+      Dispatcher.getInstance(ctx).register(self);
+      self[REGISTERED] = true;
+    }
+    return self;
   }
 
   get handlers() {

@@ -3,6 +3,7 @@ import React from 'react';
 import RouteHandler from '../../../build/components/route-handler';
 import Link from '../../../build/components/link';
 import Store from './store';
+import * as Actions from './actions';
 
 export default class App extends Application {
   static get routes() {
@@ -18,28 +19,44 @@ export default class App extends Application {
       }
     };
   }
+  static get title() {
+    return 'Meepworks';
+  }
   static get stores() {
     return [
       Store
     ];
   }
+  static willTransitionTo(transition, params, query, cb) {
+    this.context.appCtx.runAction(new Actions.Test('Hello')).then(cb).catch(cb);
+  }
   constructor(props, context) {
     super(props, context);
 
-    console.log(Store.getInstance(this.context.appCtx));
+    this.state = {
+      store: Store.getInstance(this.context.appCtx).state
+    };
 
     this.changeHandler = () => {
-
+      this.setState({
+        store: Store.getInstance(this.context.appCtx).state
+      });
     };
   }
   componentDidMount() {
-    this.context.appCtx.getStore(Store).on(this.changeHandler);
+    Store.getInstance(this.context.appCtx).on(this.changeHandler);
+  }
+  componentWillUnmount() {
+    Store.getInstance(this.context.appCtx).off(this.changeHandler);
   }
   render() {
+    console.log('render');
+    console.log(this.context);
     return (
-      <div>Hello World!<br />
-        <Link to="/">Home</Link><br />
-        <Link to="sub">Sub</Link><br />
+      <div>Current Route: {this.context.router.getCurrentPath()}<br />
+        Msg: {this.state.store.get('msg')}<br />
+        <Link to={`${this.context.root}/`}>Home</Link><br />
+        <Link to={`${this.context.root}/sub`}>Sub</Link><br />
         <RouteHandler />
       </div>
     );

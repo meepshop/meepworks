@@ -1,11 +1,36 @@
 import Dispatcher from './dispatcher';
+import co from 'co';
+import { PAYLOAD } from './action-base';
 
-
+export const APP_INIT = Symbol();
 const DISPATCHER = Symbol();
+const TITLE = Symbol();
+const STORES = Symbol();
 
 
 export default class AppContext {
   constructor() {
     this[DISPATCHER] = Dispatcher.getInstance(this);
+    this[TITLE] = [];
+    this[STORES] = new Set();
+    this[APP_INIT] = false;
+  }
+  runAction(action) {
+    let self = this;
+    action.ctx = self;
+
+    return co(function *() {
+      self[DISPATCHER].dispatch({
+        action: action.constructor,
+        payload: yield action.action(...action[PAYLOAD])
+      });
+
+    });
+  }
+  get title() {
+    return this[TITLE];
+  }
+  get stores() {
+    return this[STORES];
   }
 }

@@ -11,7 +11,8 @@ export default class Application extends Component {
   static get contextTypes() {
     return {
       router: PropTypes.func,
-      appCtx: PropTypes.object
+      appCtx: PropTypes.object,
+      root: PropTypes.string
     };
   }
   static get stores() {
@@ -19,6 +20,9 @@ export default class Application extends Component {
   }
   static get routes() {
     return {};
+  }
+  static get title() {
+    return void 0;
   }
   render() {
     return null;
