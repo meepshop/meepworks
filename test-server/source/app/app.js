@@ -1,4 +1,5 @@
 import Application from '../../../build/application';
+import Component from '../../../build/component';
 import React from 'react';
 import RouteHandler from '../../../build/components/route-handler';
 import Link from '../../../build/components/link';
@@ -19,7 +20,7 @@ export default class App extends Application {
       }
     };
   }
-  static get title() {
+  static title() {
     return 'Meepworks';
   }
   static get stores() {
@@ -28,7 +29,7 @@ export default class App extends Application {
     ];
   }
   static willTransitionTo(transition, params, query, cb) {
-    this.context.appCtx.runAction(new Actions.Test('Hello')).then(cb).catch(cb);
+    this.runAction(new Actions.Test('Hello')).then(cb).catch(cb);
   }
   constructor(props, context) {
     super(props, context);
@@ -45,17 +46,20 @@ export default class App extends Application {
   }
   componentDidMount() {
     Store.getInstance(this.context.appCtx).on(this.changeHandler);
+    this.runAction(new Actions.Test('Hello World!'));
+    setTimeout(() => {
+      this.context.appCtx.setLocale('zh-TW');
+    }, 2000);
   }
   componentWillUnmount() {
     Store.getInstance(this.context.appCtx).off(this.changeHandler);
   }
   render() {
     console.log('render');
-    console.log(this.context);
     return (
-      <div>Current Route: {this.context.router.getCurrentPath()}<br />
-        Msg: {this.state.store.get('msg')}<br />
-        <Link to={`${this.context.root}/`}>Home</Link><br />
+      <div><ShowRoute />
+        Msg: { this.state.store.get('msg') }<br />
+        <Link to={`${this.context.root}`}>Home</Link><br />
         <Link to={`${this.context.root}/sub`}>Sub</Link><br />
         <RouteHandler />
       </div>
@@ -64,3 +68,12 @@ export default class App extends Application {
 }
 
 
+class ShowRoute extends Component {
+  render() {
+    return (
+      <div>Current Route: { this.context.currentPath }<br />
+        { this.locale('content') }
+      </div>
+    );
+  }
+}

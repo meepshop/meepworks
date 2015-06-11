@@ -1,40 +1,41 @@
-import React, { Component, PropTypes } from 'react';
+import React, {  PropTypes } from 'react';
+import Component from './component';
 import {APP_INIT} from './app-context';
 
 const LOADED = Symbol();
 
 
 export default class AppLoader {
-  constructor(App, ctx, root) {
+  constructor(App, appCtx, currentPath, root = '' ) {
     const loader = this;
     this.App = App;
     this.context = {
-      appCtx: ctx
+      appCtx
     };
-    this.ctx = ctx;
-
 
     return class K extends Component {
         static get contextTypes() {
           return {
             router: PropTypes.func,
             appCtx: PropTypes.object,
-            root: PropTypes.string
+            root: PropTypes.string,
+            currentPath: PropTypes.string
           };
         }
         getChildContext() {
           return {
-            appCtx: ctx,
-            root
+            appCtx,
+            root: resolveRoot(root, currentPath),
+            currentPath: this.context.router.getCurrentPath()
           };
         }
         static willTransitionTo(transition, params, query, cb) {
           loader.loaded.then(() => {
-            let title = loader.App.title;
+            let title = loader::loader.App.title();
             if(title !== void 0) {
-              loader.ctx.title.push(title);
+              appCtx.title.push(title);
             }
-            if(ctx[APP_INIT] && typeof loader.App.willTransitionTo === 'function') {
+            if(appCtx[APP_INIT] && typeof loader.App.willTransitionTo === 'function') {
               loader::(loader.App.willTransitionTo)(transition, params, query, cb);
               if(loader.App.willTransitionTo.length < 4) {
                 cb();
@@ -49,9 +50,9 @@ export default class AppLoader {
           });
         }
         static willTransitionFrom(transition, component, cb) {
-          let title = loader.App.title;
+          let title = loader::loader.App.title();
           if(title !== void 0) {
-
+            appCtx.title.pop();
           }
           if(typeof loader.App.willTransitionFrom === 'function') {
             loader::(loader.App.willTransitionFrom)(transition, component, cb);
@@ -65,12 +66,13 @@ export default class AppLoader {
         static get childContextTypes () {
           return {
             appCtx: PropTypes.object,
-            root: PropTypes.string
+            root: PropTypes.string,
+            currentPath: PropTypes.string
           }
         }
         render () {
           let App = loader.App;
-          return <App ctx={loader.ctx}/>;
+          return <App />;
         }
 
     }
@@ -94,8 +96,26 @@ export default class AppLoader {
   }
   initStores() {
     this.App.stores.forEach(s => {
-      s.getInstance(this.ctx);
+      s.getInstance(this.context.appCtx);
     });
+  }
+  runAction(action) {
+    return this.context.appCtx.runAction(action);
+  }
+  getStore(Store) {
+    return Store.getInstance(this.context.appCtx);
   }
 }
 
+
+function resolveRoot(root = '', currentPath = '') {
+
+  if(root === '') {
+    return '/' + currentPath;
+  } else if(currentPath === '') {
+    return '/' + root;
+  } else {
+    return `/${root}/${currentPath}`;
+  }
+
+}

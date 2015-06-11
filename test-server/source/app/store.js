@@ -14,7 +14,6 @@ export default class Store extends StoreBase {
       msg: ''
     });
 
-
     this.bindHandler(Actions.Test, this.handleTest);
   }
   dehydrate() {
@@ -29,7 +28,6 @@ export default class Store extends StoreBase {
   }
 
   handleTest(msg) {
-    console.log('changed');
     this[DATA] = this[DATA].set('msg', msg);
     this.changed();
   }

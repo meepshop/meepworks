@@ -34,9 +34,10 @@ const app = new AppDriver({
   },
   dirname: __dirname,
   localtest: true,
-  buildPath: 'test-server'
+  buildPath: 'test-server',
+  root: 'my-app'
 });
-server.use(app.router);
+server.use(mount('/my-app', app.router));
 
 server.listen(18881);
 console.log('listening to 18881');

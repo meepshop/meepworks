@@ -2,6 +2,7 @@ import Router, {Route, NotFoundRoute, DefaultRoute } from 'react-router';
 import React from 'react';
 import path from 'path';
 import url from 'url';
+import AppRoot from './app-root';
 import AppLoader from './app-loader';
 import NotFound from './components/not-found';
 import AppContext, { APP_INIT } from './app-context';
@@ -35,7 +36,7 @@ export default class AppDriver {
 
       yield new Promise((resolve, reject) => {
         let routes = (
-          <Route>
+          <Route handler={new AppLoader(AppRoot, ctx)}>
             {driver::generateRoutes(driver.routeTable, ctx)}
             <NotFoundRoute handler={NotFound} />
           </Route>
@@ -61,7 +62,7 @@ export default class AppDriver {
         });
         r.run((Root, state) => {
 
-          let title = ctx.title;
+          let title = ctx.title[ctx.title.length - 1];
           if(title !== void 0) {
             title = Tmpl.format(title, state.params);
           }
@@ -124,29 +125,26 @@ function traceRoutes(table, appPath) {
   return table;
 }
 
-function generateRoutes(table, ctx, root) {
-  if(!root) {
-    root = this.config.root || '';
-  }
+function generateRoutes(table, ctx, currentPath = '') {
 
   let children = [];
   if(table.routes) {
     for(let p in table.routes) {
       if(p === '$default') {
         children.push(
-          <DefaultRoute key={p} handler={new AppLoader(table.routes[p].App, ctx)}/>
+          <DefaultRoute key={p} handler={new AppLoader(table.routes[p].App, ctx, currentPath, this.config.root)}/>
         );
       } else if (p === '$notfound') {
         children.push(
-          <NotFoundRoute key={p} handler={new AppLoader(table.routes[p].App, ctx)} />
+          <NotFoundRoute key={p} handler={new AppLoader(table.routes[p].App, ctx, currentPath, this.config.root)} />
         );
       } else {
-        children.push(this::generateRoutes(table.routes[p],  ctx, root === '' ? p : `${root}/${p}`));
+        children.push(this::generateRoutes(table.routes[p],  ctx, currentPath === '' ? p : `${currentPath}/${p}`));
       }
     }
   }
   return (
-    <Route path={`/${root}`} key={`/${root}`} handler={new AppLoader(table.App, ctx, root)}>
+    <Route path={`/${currentPath}`} key={`/${currentPath}`} handler={new AppLoader(table.App, ctx, currentPath, this.config.root)}>
       {children}
     </Route>
   );

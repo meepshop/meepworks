@@ -3,9 +3,8 @@ import Application from '../../../build/application';
 
 export default class SubApp extends Application {
   static willTransitionFrom(transition) {
-    console.log('from SubApp');
   }
-  static get title() {
+  static title() {
     return 'Sub App';
   }
   static get routes() {

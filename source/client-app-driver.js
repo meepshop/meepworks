@@ -7,6 +7,8 @@ import NotFound from './components/not-found';
 import AppContext, { APP_INIT } from './app-context';
 import Dispatcher from './dispatcher';
 import Tmpl from './tmpl';
+import Location from './location';
+import AppRoot from './app-root';
 
 
 export default class AppDriver {
@@ -15,7 +17,6 @@ export default class AppDriver {
     driver.target = target;
     driver.appSrc = src;
 
-    console.log(src, target, dataId);
 
 
     let dataScript = document.querySelector(`script[id="${dataId}"]`);
@@ -28,7 +29,7 @@ export default class AppDriver {
     driver.ctx = ctx;
 
     let routes = (
-      <Route>
+      <Route handler={new AppLoader(AppRoot, ctx)}>
         {generateRoutes(driver.routeTable, ctx, data.root)}
         <NotFoundRoute handler={NotFound} />
       </Route>
@@ -36,7 +37,7 @@ export default class AppDriver {
 
     let r = Router.create({
       routes,
-      location: HistoryLocation,
+      location: new Location(data.root),
       onAbort: (redirect) => {
         if(typeof redirect === 'string') {
           //aborted
@@ -110,26 +111,27 @@ function traceRoutes(table, src) {
   return table;
 }
 
-function generateRoutes(table, ctx, root) {
+function generateRoutes(table, ctx, root = '', currentPath = '') {
 
+  console.log('root: ', root, 'currentPath: ', currentPath);
   let children = [];
   if(table.routes) {
     for(let p in table.routes) {
       if(p === '$default') {
         children.push(
-          <DefaultRoute key={p} handler={new AppLoader(table.routes[p].appPath, ctx)}/>
+          <DefaultRoute key={p} handler={new AppLoader(table.routes[p].appPath, ctx, currentPath, root)}/>
         );
       } else if (p === '$notfound') {
         children.push(
-          <NotFoundRoute key={p} handler={new AppLoader(table.routes[p].appPath, ctx)} />
+          <NotFoundRoute key={p} handler={new AppLoader(table.routes[p].appPath, ctx, currentPath, root)} />
         );
       } else {
-        children.push(this::generateRoutes(table.routes[p],  ctx, root === '' ? p : `${root}/${p}`));
+        children.push(this::generateRoutes(table.routes[p],  ctx, root, currentPath === '' ? p : `${currentPath}/${p}`));
       }
     }
   }
   return (
-    <Route path={`/${root}`} key={`/${root}`} handler={new AppLoader(table.appPath, ctx, root)}>
+    <Route path={`/${currentPath}`} key={`/${currentPath}`} handler={new AppLoader(table.appPath, ctx, currentPath, root)}>
       {children}
     </Route>
   );

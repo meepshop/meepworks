@@ -1,18 +1,17 @@
-import { Component, PropTypes } from 'react';
+import { PropTypes } from 'react';
+import Component from './component';
 import Dispatcher from './dispatcher';
 
 export default class Application extends Component {
   constructor(props, context) {
     super(props, context);
-
-
-
   }
   static get contextTypes() {
     return {
       router: PropTypes.func,
       appCtx: PropTypes.object,
-      root: PropTypes.string
+      root: PropTypes.string,
+      currentPath: PropTypes.string
     };
   }
   static get stores() {
@@ -21,7 +20,10 @@ export default class Application extends Component {
   static get routes() {
     return {};
   }
-  static get title() {
+  static get locales() {
+    return {};
+  }
+  static title() {
     return void 0;
   }
   render() {
