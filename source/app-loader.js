@@ -25,8 +25,7 @@ export default class AppLoader {
         getChildContext() {
           return {
             appCtx,
-            root: resolveRoot(root, currentPath),
-            currentPath: this.context.router.getCurrentPath()
+            root: resolveRoot(root, currentPath)
           };
         }
         static willTransitionTo(transition, params, query, cb) {
