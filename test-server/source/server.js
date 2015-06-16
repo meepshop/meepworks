@@ -21,9 +21,12 @@ server.use(mount('/build', serve(path.resolve(__dirname, '../../build'), {
 server.use(mount('/test-server', serve(__dirname, {
 })));
 
+
 server.use(function * (next) {
-  console.log('req url: ', this.req.url);
+  console.log('req start: ', this.req.url);
+  console.time('req');
   yield next;
+  console.timeEnd('req');
 });
 
 const app = new AppDriver({
@@ -35,6 +38,7 @@ const app = new AppDriver({
   dirname: __dirname,
   localtest: true,
   buildPath: 'test-server',
+  abortPath: 'my-app',
   root: 'my-app'
 });
 server.use(mount('/my-app', app.router));

@@ -28,7 +28,19 @@ export default class App extends Application {
       Store
     ];
   }
+  static get localeSetting() {
+    return {
+      path: './locales',
+      locales: [
+        'en-US',
+        'zh-TW',
+        'fr-FR'
+      ]
+    };
+  }
   static willTransitionTo(transition, params, query, cb) {
+    console.log('checkpoint A');
+    console.log(this.tmpl('content'));
     this.runAction(new Actions.Test('Hello')).then(cb).catch(cb);
   }
   constructor(props, context) {
@@ -48,7 +60,7 @@ export default class App extends Application {
     Store.getInstance(this.context.appCtx).on(this.changeHandler);
     this.runAction(new Actions.Test('Hello World!'));
     setTimeout(() => {
-      this.context.appCtx.setLocale('zh-TW');
+      this.setLocale('zh-TW');
     }, 2000);
   }
   componentWillUnmount() {
@@ -70,10 +82,13 @@ export default class App extends Application {
 
 class ShowRoute extends Component {
   render() {
+    console.log('checkpoint B');
     return (
       <div>Current Route: { this.context.currentPath }<br />
-        { this.locale('content') }
+        { this.tmpl('content', {name: 'Jack'}) }
       </div>
     );
   }
 }
+
+

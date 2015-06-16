@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import RouteHandler from './components/route-handler';
 import Application from './application';
-import { APPROOT } from './app-context';
+
+export const APPROOT = Symbol();
 
 export default class AppRoot extends Application {
   getChildContext() {
@@ -13,7 +14,8 @@ export default class AppRoot extends Application {
     return {
       appCtx: PropTypes.object,
       root: PropTypes.string,
-      currentPath: PropTypes.string
+      currentPath: PropTypes.string,
+      locale: PropTypes.func
     }
   }
   componentDidMount() {

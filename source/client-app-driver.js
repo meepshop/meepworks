@@ -4,7 +4,7 @@ import path from 'path';
 import url from 'url';
 import AppLoader from './app-loader';
 import NotFound from './components/not-found';
-import AppContext, { APP_INIT } from './app-context';
+import AppContext, { APP_INIT, STATE } from './app-context';
 import Dispatcher from './dispatcher';
 import Tmpl from './tmpl';
 import Location from './location';
@@ -26,6 +26,7 @@ export default class AppDriver {
 
 
     let ctx = new AppContext();
+    ctx[STATE] = data.context;
     driver.ctx = ctx;
 
     let routes = (
@@ -41,10 +42,9 @@ export default class AppDriver {
       onAbort: (redirect) => {
         if(typeof redirect === 'string') {
           //aborted
-          resolve();
         }
         else if(redirect) {
-          resolve();
+
         }
       },
       onError: (err) => {
@@ -113,7 +113,6 @@ function traceRoutes(table, src) {
 
 function generateRoutes(table, ctx, root = '', currentPath = '') {
 
-  console.log('root: ', root, 'currentPath: ', currentPath);
   let children = [];
   if(table.routes) {
     for(let p in table.routes) {

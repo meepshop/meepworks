@@ -9,7 +9,7 @@ import sourcemaps from 'gulp-sourcemaps';
 import babel from 'gulp-babel';
 
 
-gulp.task('server-build', ['clean:server-build'], (cb) => {
+gulp.task('server-build', ['server-copy', 'clean:server-build'], (cb) => {
   gulp.src('test-server/source/**/*.js')
   .pipe(plumber({
     errorHandler: cb
@@ -19,6 +19,11 @@ gulp.task('server-build', ['clean:server-build'], (cb) => {
   .pipe(sourcemaps.write('.'))
   .pipe(gulp.dest('test-server/build'))
   .on('end', cb);
+});
+
+gulp.task('server-copy', ['clean:server-build'], () => {
+  return gulp.src('test-server/source/**/*.json')
+    .pipe(gulp.dest('test-server/build'));
 });
 
 gulp.task('clean:server-build', (cb) => {

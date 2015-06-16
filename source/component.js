@@ -6,7 +6,8 @@ export default class Component extends React.Component {
       router: PropTypes.func,
       appCtx: PropTypes.object,
       root: PropTypes.string,
-      currentPath: PropTypes.string
+      currentPath: PropTypes.string,
+      locale: PropTypes.func
     };
   }
   static get localeSetting() {
@@ -18,8 +19,15 @@ export default class Component extends React.Component {
   getStore(Store) {
     return Store.getInstance(this.context.appCtx);
   }
-  locale(key, params) {
-
+  get locale() {
+    return this.context.locale.locale;
+  }
+  setLocale(l) {
+    console.log(this.context);
+    return this.context.locale.setLocale(l);
+  }
+  tmpl(key, params) {
+    return this.context.locale(key, params);
   }
   formatNumber() {
 
@@ -28,9 +36,6 @@ export default class Component extends React.Component {
 
   }
   formatDate() {
-
-  }
-  setLocale() {
 
   }
 }

@@ -16,7 +16,7 @@ export default class SubApp extends Application {
   }
   render() {
     return (
-      <div>SubApp</div>
+      <div>SubApp @ {this.context.currentPath}</div>
     );
   }
 }

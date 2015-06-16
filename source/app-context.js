@@ -1,14 +1,14 @@
 import Dispatcher from './dispatcher';
 import co from 'co';
 import { PAYLOAD } from './action-base';
+import { LOCALE, ACCEPTLANG, LOCALEMAPPING } from './locale';
 
 export const APP_INIT = Symbol();
-export const APPROOT = Symbol();
+export const STATE = Symbol();
+
 const DISPATCHER = Symbol();
 const TITLE = Symbol();
 const STORES = Symbol();
-const LOCALE = Symbol();
-const ACCEPTLANG = Symbol();
 
 
 export default class AppContext {
@@ -19,6 +19,8 @@ export default class AppContext {
     this[APP_INIT] = false;
     this[LOCALE] = 'en-US';
     this[ACCEPTLANG] = [];
+    this[LOCALEMAPPING] = {};
+
   }
   runAction(action) {
     let self = this;
@@ -32,14 +34,6 @@ export default class AppContext {
 
     });
   }
-  setLocale(locale) {
-    console.log('@', this);
-    this[LOCALE] = locale;
-    if(typeof this[APPROOT] === 'function') {
-      this[APPROOT](locale);
-    }
-
-  }
   get title() {
     return this[TITLE];
   }
@@ -47,3 +41,17 @@ export default class AppContext {
     return this[STORES];
   }
 }
+
+Object.defineProperty(AppContext.prototype, STATE, {
+  get() {
+    return {
+      locale: this[LOCALE],
+      acceptLanguage: this[ACCEPTLANG],
+      mapping: this[LOCALEMAPPING]
+    };
+  },
+  set(val) {
+    this[LOCALE] = val.locale;
+    this[ACCEPTLANG] = val.acceptLanguage;
+  }
+});

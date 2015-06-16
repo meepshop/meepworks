@@ -1,12 +1,4 @@
-import Router from 'react-router';
-import { PropTypes } from 'react';
+import { RouteHandler } from 'react-router';
 
-export default class RouteHandler extends Router.RouteHandler {
-  static get contextTypes() {
-    return {
-      appCtx: PropTypes.object,
-      root: PropTypes.string,
-      currentPath: PropTypes.string
-    };
-  }
-}
+export default RouteHandler;
+

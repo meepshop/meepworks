@@ -5,7 +5,7 @@ import url from 'url';
 import AppRoot from './app-root';
 import AppLoader from './app-loader';
 import NotFound from './components/not-found';
-import AppContext, { APP_INIT } from './app-context';
+import AppContext, { APP_INIT, STATE } from './app-context';
 import Dispatcher from './dispatcher';
 import Tmpl from './tmpl';
 import HtmlPage from './components/html-page';
@@ -30,18 +30,21 @@ export default class AppDriver {
     return function * (next) {
 
 
-      let ctx = new AppContext();
+      let ctx = new AppContext(this);
       ctx[APP_INIT] = true;
 
 
       yield new Promise((resolve, reject) => {
+        console.time('generateRoutes');
         let routes = (
           <Route handler={new AppLoader(AppRoot, ctx)}>
-            {driver::generateRoutes(driver.routeTable, ctx)}
+            {driver::generateRoutes(driver.routeTable, ctx, '', path.resolve(driver.config.dirname, driver.config.appPath))}
             <NotFoundRoute handler={NotFound} />
           </Route>
-        )
+        );
+        console.timeEnd('generateRoutes');
 
+        console.time('createRouter');
         let r = Router.create({
           routes,
           location: this.req.url,
@@ -60,8 +63,10 @@ export default class AppDriver {
             console.log('err', err, err.stack);
           }
         });
+        console.timeEnd('createRouter');
+        console.time('RouterRun');
         r.run((Root, state) => {
-
+          console.timeEnd('RouterRun');
           let title = ctx.title[ctx.title.length - 1];
           if(title !== void 0) {
             title = Tmpl.format(title, state.params);
@@ -72,7 +77,8 @@ export default class AppDriver {
           let data = {
             table: driver.routeTable,
             stores: [],
-            root: driver.config.root || ''
+            root: driver.config.root || '',
+            context: ctx[STATE]
           };
           ctx.stores.forEach(s => {
             data.stores.push(s.dehydrate());
@@ -125,26 +131,50 @@ function traceRoutes(table, appPath) {
   return table;
 }
 
-function generateRoutes(table, ctx, currentPath = '') {
+function generateRoutes(table, ctx, currentPath, appPath) {
 
   let children = [];
   if(table.routes) {
     for(let p in table.routes) {
       if(p === '$default') {
         children.push(
-          <DefaultRoute key={p} handler={new AppLoader(table.routes[p].App, ctx, currentPath, this.config.root)}/>
+          <DefaultRoute
+            key={p}
+            handler={ new AppLoader(
+              table.routes[p].App,
+              ctx,
+              currentPath,
+              this.config.root,
+              path.resolve(path.dirname(appPath, table.routes[p].appPath))
+            )}/>
         );
       } else if (p === '$notfound') {
         children.push(
-          <NotFoundRoute key={p} handler={new AppLoader(table.routes[p].App, ctx, currentPath, this.config.root)} />
+          <NotFoundRoute
+            key={p}
+            handler={ new AppLoader(
+              table.routes[p].App,
+              ctx,
+              currentPath,
+              this.config.root,
+              this.config.dirname,
+              path.resolve(path.dirname(appPath, table.routes[p].appPath))
+            )} />
         );
       } else {
-        children.push(this::generateRoutes(table.routes[p],  ctx, currentPath === '' ? p : `${currentPath}/${p}`));
+        children.push(
+          this::generateRoutes(
+            table.routes[p],
+            ctx,
+            currentPath === '' ? p : `${currentPath}/${p}`,
+            path.resolve(path.dirname(appPath, table.routes[p].appPath))
+          )
+        );
       }
     }
   }
   return (
-    <Route path={`/${currentPath}`} key={`/${currentPath}`} handler={new AppLoader(table.App, ctx, currentPath, this.config.root)}>
+    <Route path={`/${currentPath}`} key={`/${currentPath}`} handler={new AppLoader(table.App, ctx, currentPath, this.config.root, appPath)}>
       {children}
     </Route>
   );

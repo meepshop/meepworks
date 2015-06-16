@@ -11,7 +11,8 @@ export default class Application extends Component {
       router: PropTypes.func,
       appCtx: PropTypes.object,
       root: PropTypes.string,
-      currentPath: PropTypes.string
+      currentPath: PropTypes.string,
+      locale: PropTypes.func
     };
   }
   static get stores() {
