@@ -38,7 +38,7 @@ const app = new AppDriver({
   dirname: __dirname,
   localtest: true,
   buildPath: 'test-server',
-  abortPath: 'my-app',
+  abortPath: '/my-app/sub',
   root: 'my-app'
 });
 server.use(mount('/my-app', app.router));

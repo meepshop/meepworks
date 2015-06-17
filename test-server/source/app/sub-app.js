@@ -14,9 +14,24 @@ export default class SubApp extends Application {
       }
     };
   }
+  static get localeSetting() {
+    return {
+      path: './sub-locales',
+      locales: [
+        'en-US',
+        'zh-TW'
+      ]
+    };
+  }
   render() {
     return (
-      <div>SubApp @ {this.context.currentPath}</div>
+      <div>SubApp @ {this.context.currentPath}<br />
+        {this.tmpl('content', { name: 'Joe'})}<br />
+        {this.formatNumber(-1234.5678)}<br />
+        {this.formatCurrency(1234.5678, 'USD')}<br />
+        {this.formatCurrency(1234.5678, 'USD', 0)}<br />
+        {this.formatDateTime(new Date())}
+      </div>
     );
   }
 }

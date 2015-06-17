@@ -3,8 +3,8 @@ import Tmpl from './tmpl';
 import { APPROOT } from './app-root';
 
 
-const Intl = global.Intl || IntlPolyfill;
-
+//const Intl = global.Intl || IntlPolyfill;
+const Intl = IntlPolyfill;
 const Cache = new Map();
 const NumberFormatters = new Map();
 const DateFormatters = new Map();
@@ -18,10 +18,13 @@ export const ACCEPTLANG = Symbol();
 export const LOCALEMAPPING = Symbol();
 
 export default class Locale {
-  constructor(p, ctx) {
+  constructor(ctx, setting) {
     //load files and create mappings
     let self = (key, params) => {
       let p = self[PATH];
+      if(!p) {
+        return key;
+      }
       let m = self[CTX][LOCALEMAPPING][p];
       let res = Cache.get(self[PATH]).preload[m][key];
       if(typeof res === 'undefined') {
@@ -34,34 +37,35 @@ export default class Locale {
       return res;
     };
 
-    console.log('@@@', self);
     self[CTX] = ctx;
-    self[PATH] = p.path;
 
+    if(typeof setting !== 'undefined') {
 
-    if(!p.preload) {
-      p.preload = {};
-    } else {
-      p.locales = [];
-      for(let l in p.preload) {
-        p.locales.push(l);
+      self[PATH] = setting.path;
+      if(!setting.preload) {
+        setting.preload = {};
+      } else {
+        setting.locales = [];
+        for(let l in setting.preload) {
+          setting.locales.push(l);
+        }
       }
-    }
 
-    if(!Cache.has(p.path)) {
-      Cache.set(p.path, {
-        locales: new Set(p.locales),
-        preload: p.preload
-      });
-    } else {
-      let c = Cache.get(p.path);
-      p.locales.forEach((l) => {
-        c.locales.add(l);
-      });
-      if(p.preload) {
-        for(let l in p.preload) {
-          if(!c.preload[l]) {
-            c.preload[l] = p.preload[l];
+      if(!Cache.has(setting.path)) {
+        Cache.set(setting.path, {
+          locales: new Set(setting.locales),
+          preload: setting.preload
+        });
+      } else {
+        let c = Cache.get(setting.path);
+        setting.locales.forEach((l) => {
+          c.locales.add(l);
+        });
+        if(setting.preload) {
+          for(let l in setting.preload) {
+            if(!c.preload[l]) {
+              c.preload[l] = setting.preload[l];
+            }
           }
         }
       }
@@ -73,7 +77,6 @@ export default class Locale {
 
   async loadLocales() {
 
-    console.log('@loadLocales', this, this[CTX]);
     let mapping = this[CTX][LOCALEMAPPING];
     let locale = this[CTX][LOCALE];
     let acceptedLanguagees = this[CTX][ACCEPTLANG];
@@ -111,25 +114,34 @@ export default class Locale {
   }
 
 
-  static formatNumber(value, opts) {
-    let l = this.locale || DefaultLocale;
-    let key = `${l}:${JSON.stringify(opts)}`;
+  static formatNumber(locale, value, opts) {
+    let key = `${locale}:${JSON.stringify(opts)}`;
     if(!NumberFormatters.has(key)) {
-      NumberFormatters.set(key, Intl.NumberFormat(l, opts));
+      NumberFormatters.set(key, Intl.NumberFormat(locale, opts));
     }
     let f = NumberFormatters.get(key);
     return f.format(value);
   }
-  static formatDateTime(t, opts) {
-    let l = this.locale || DefaultLocale;
-    let key = `${l}:${JSON.stringify(opts)}`;
+  formatNumber(...args) {
+    let locale = this[CTX][LOCALE];
+    return Locale.formatNumber(Locale, ...args);
+  }
+
+
+  static formatDateTime(locale, t, opts) {
+    let key = `${locale}:${JSON.stringify(opts)}`;
     if(!DateFormatters.has(key)) {
-      DateFormatters.set(key, Intl.DateTimeFormat(l, opts));
+      DateFormatters.set(key, Intl.DateTimeFormat(locale, opts));
     }
     let f = DateFormatters.get(key);
     return f.format(t);
   }
-  static formatCurrency(value, currency, fixed) {
+  formatDateTime(...args) {
+    let locale = this[CTX][LOCALE];
+    return Locale.formatDateTime(locale, ...args);
+  }
+
+  static formatCurrency(locale, value, currency, fixed) {
     currency = currency.toUpperCase();
     let opts = {
       style: 'currency',
@@ -140,7 +152,11 @@ export default class Locale {
       opts.minimumFractionDigits = fixed;
       opts.maximumFractionDigits = fixed;
     }
-    return this.formatNumber(value, opts);
+    return this.formatNumber(locale, value, opts);
+  }
+  formatCurrency(...args) {
+    let locale = this[CTX][LOCALE];
+    return Locale.formatCurrency(locale, ...args);
   }
 }
 

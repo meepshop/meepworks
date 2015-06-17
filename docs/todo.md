@@ -2,6 +2,10 @@ Todo List
 =========
 
 1. Locale System
-2. ContextStore for passing application context information from server to client
-3. Css loading detection
+  a. dehydrate locale mapping to client side
+  b. browser locale detection
+
+2. Css loading detection
+
+3. Performance profiling
 

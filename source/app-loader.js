@@ -4,6 +4,7 @@ import Locale from './locale';
 import {APP_INIT} from './app-context';
 import path from 'path';
 import url from 'url';
+import AppRoot from './app-root';
 
 const LOADED = Symbol();
 
@@ -33,14 +34,12 @@ export default class AppLoader {
             appCtx,
             root: loader.context.root
           };
-          console.log('@getChildContext', loader.context.locale);
           if(loader.context.locale !== void 0) {
             res.locale = loader.context.locale;
           }
           return res;
         }
         static willTransitionTo(transition, params, query, cb) {
-
           //provide similar context interface
           loader.context.currentPath = transition.path;
 
@@ -123,6 +122,15 @@ export default class AppLoader {
   tmpl(key, params) {
     return this.context.locale(key, params);
   }
+  formatNumber(...args) {
+    return this.context.locale.formatNumber(...args);
+  }
+  formatCurrency(...args) {
+    return this.context.locale.formatCurrency(...args);
+  }
+  formatDateTime(...args) {
+    return this.context.locale.formatDateTime(...args);
+  }
 
 }
 
@@ -133,17 +141,24 @@ function loaded()  {
         this.appPath = this.App;
         this.App = await System.import(this.App);
       }
-      let setting = this.App.localeSetting;
-      if(setting !== void 0) {
-        let appPath = this.resolvedPath || this.appPath;
+      if(this.App === AppRoot) {
+        this.context.locale = new Locale(this.context.appCtx);
+      } else {
+        let setting = this.App.localeSetting;
+
+        if(setting !== void 0) {
+
+          let appPath = this.resolvedPath || this.appPath;
+          setting.path = path.resolve(path.dirname(appPath), setting.path);
 
 
-        setting.path = path.resolve(path.dirname(appPath), setting.path);
-        if(typeof window !== 'undefined' && typeof System !== 'undefined') {
-          setting.path = setting.path.substr(1);
+          if(typeof window !== 'undefined' && typeof System !== 'undefined') {
+            setting.path = setting.path.substr(1);
+          }
+          this.context.locale = new Locale(this.context.appCtx, setting);
+          await this.context.locale.loadLocales();
         }
-        this.context.locale = new Locale(setting, this.context.appCtx);
-        await this.context.locale.loadLocales();
+
       }
       this.initStores();
     }());

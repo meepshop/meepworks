@@ -23,19 +23,18 @@ export default class Component extends React.Component {
     return this.context.locale.locale;
   }
   setLocale(l) {
-    console.log(this.context);
     return this.context.locale.setLocale(l);
   }
   tmpl(key, params) {
     return this.context.locale(key, params);
   }
-  formatNumber() {
-
+  formatNumber(...args) {
+    return this.context.locale.formatNumber(...args);
   }
-  formatCurrency() {
-
+  formatCurrency(...args) {
+    return this.context.locale.formatCurrency(...args);
   }
-  formatDate() {
-
+  formatDateTime(...args) {
+    return this.context.locale.formatDateTime(...args);
   }
 }

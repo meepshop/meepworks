@@ -39,8 +39,6 @@ export default class App extends Application {
     };
   }
   static willTransitionTo(transition, params, query, cb) {
-    console.log('checkpoint A');
-    console.log(this.tmpl('content'));
     this.runAction(new Actions.Test('Hello')).then(cb).catch(cb);
   }
   constructor(props, context) {
@@ -67,7 +65,6 @@ export default class App extends Application {
     Store.getInstance(this.context.appCtx).off(this.changeHandler);
   }
   render() {
-    console.log('render');
     return (
       <div><ShowRoute />
         Msg: { this.state.store.get('msg') }<br />
@@ -82,7 +79,6 @@ export default class App extends Application {
 
 class ShowRoute extends Component {
   render() {
-    console.log('checkpoint B');
     return (
       <div>Current Route: { this.context.currentPath }<br />
         { this.tmpl('content', {name: 'Jack'}) }

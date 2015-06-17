@@ -145,7 +145,7 @@ function generateRoutes(table, ctx, currentPath, appPath) {
               ctx,
               currentPath,
               this.config.root,
-              path.resolve(path.dirname(appPath, table.routes[p].appPath))
+              path.resolve(path.dirname(appPath), table.routes[p].appPath)
             )}/>
         );
       } else if (p === '$notfound') {
@@ -158,7 +158,7 @@ function generateRoutes(table, ctx, currentPath, appPath) {
               currentPath,
               this.config.root,
               this.config.dirname,
-              path.resolve(path.dirname(appPath, table.routes[p].appPath))
+              path.resolve(path.dirname(appPath), table.routes[p].appPath)
             )} />
         );
       } else {
@@ -167,7 +167,7 @@ function generateRoutes(table, ctx, currentPath, appPath) {
             table.routes[p],
             ctx,
             currentPath === '' ? p : `${currentPath}/${p}`,
-            path.resolve(path.dirname(appPath, table.routes[p].appPath))
+            path.resolve(path.dirname(appPath), table.routes[p].appPath)
           )
         );
       }
