@@ -22,7 +22,7 @@ gulp.task('server-build', ['server-copy', 'clean:server-build'], (cb) => {
 });
 
 gulp.task('server-copy', ['clean:server-build'], () => {
-  return gulp.src('test-server/source/**/*.json')
+  return gulp.src([ 'test-server/source/**/*.json', 'test-server/source/**/*.css' ])
     .pipe(gulp.dest('test-server/build'));
 });
 

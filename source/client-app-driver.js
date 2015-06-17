@@ -31,14 +31,14 @@ export default class AppDriver {
 
     let routes = (
       <Route handler={new AppLoader(AppRoot, ctx)}>
-        {generateRoutes(driver.routeTable, ctx, data.root)}
+        {generateRoutes(driver.routeTable, ctx, data.baseURL)}
         <NotFoundRoute handler={NotFound} />
       </Route>
     );
 
     let r = Router.create({
       routes,
-      location: new Location(data.root),
+      location: new Location(data.baseURL),
       onAbort: (redirect) => {
         if(typeof redirect === 'string') {
           //aborted
@@ -111,26 +111,26 @@ function traceRoutes(table, src) {
   return table;
 }
 
-function generateRoutes(table, ctx, root = '', currentPath = '') {
+function generateRoutes(table, ctx, baseURL = '', currentPath = '') {
 
   let children = [];
   if(table.routes) {
     for(let p in table.routes) {
       if(p === '$default') {
         children.push(
-          <DefaultRoute key={p} handler={new AppLoader(table.routes[p].appPath, ctx, currentPath, root)}/>
+          <DefaultRoute key={p} handler={new AppLoader(table.routes[p].appPath, ctx, currentPath, baseURL)}/>
         );
       } else if (p === '$notfound') {
         children.push(
-          <NotFoundRoute key={p} handler={new AppLoader(table.routes[p].appPath, ctx, currentPath, root)} />
+          <NotFoundRoute key={p} handler={new AppLoader(table.routes[p].appPath, ctx, currentPath, baseURL)} />
         );
       } else {
-        children.push(this::generateRoutes(table.routes[p],  ctx, root, currentPath === '' ? p : `${currentPath}/${p}`));
+        children.push(this::generateRoutes(table.routes[p],  ctx, baseURL, currentPath === '' ? p : `${currentPath}/${p}`));
       }
     }
   }
   return (
-    <Route path={`/${currentPath}`} key={`/${currentPath}`} handler={new AppLoader(table.appPath, ctx, currentPath, root)}>
+    <Route path={`/${currentPath}`} key={`/${currentPath}`} handler={new AppLoader(table.appPath, ctx, currentPath, baseURL)}>
       {children}
     </Route>
   );

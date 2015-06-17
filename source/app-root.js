@@ -13,7 +13,7 @@ export default class AppRoot extends Application {
   static get childContextTypes () {
     return {
       appCtx: PropTypes.object,
-      root: PropTypes.string,
+      baseURL: PropTypes.string,
       currentPath: PropTypes.string,
       locale: PropTypes.func
     }

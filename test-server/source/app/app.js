@@ -5,6 +5,7 @@ import RouteHandler from '../../../build/components/route-handler';
 import Link from '../../../build/components/link';
 import Store from './store';
 import * as Actions from './actions';
+import './base.css!';
 
 export default class App extends Application {
   static get routes() {
@@ -58,7 +59,7 @@ export default class App extends Application {
     Store.getInstance(this.context.appCtx).on(this.changeHandler);
     this.runAction(new Actions.Test('Hello World!'));
     setTimeout(() => {
-      this.setLocale('zh-TW');
+      this.setLocale('en-US');
     }, 2000);
   }
   componentWillUnmount() {
@@ -68,8 +69,8 @@ export default class App extends Application {
     return (
       <div><ShowRoute />
         Msg: { this.state.store.get('msg') }<br />
-        <Link to={`${this.context.root}`}>Home</Link><br />
-        <Link to={`${this.context.root}/sub`}>Sub</Link><br />
+        <Link to={`${this.context.baseURL}`}>Home</Link><br />
+        <Link to={`${this.context.baseURL}/sub`}>Sub</Link><br />
         <RouteHandler />
       </div>
     );

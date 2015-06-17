@@ -10,12 +10,12 @@ const LOADED = Symbol();
 
 
 export default class AppLoader {
-  constructor(App, appCtx, currentPath, root = '', resolvedPath) {
+  constructor(App, appCtx, currentPath, baseURL = '', resolvedPath) {
     const loader = this;
     this.App = App;
     this.context = {
       appCtx,
-      root: resolveRoot(root, currentPath)
+      baseURL: resolveBaseURL(baseURL, currentPath)
     };
     this.resolvedPath = resolvedPath;
 
@@ -24,7 +24,7 @@ export default class AppLoader {
           return {
             router: PropTypes.func,
             appCtx: PropTypes.object,
-            root: PropTypes.string,
+            baseURL: PropTypes.string,
             currentPath: PropTypes.string,
             locale: PropTypes.func
           };
@@ -32,7 +32,7 @@ export default class AppLoader {
         getChildContext() {
           let res = {
             appCtx,
-            root: loader.context.root
+            baseURL: loader.context.baseURL
           };
           if(loader.context.locale !== void 0) {
             res.locale = loader.context.locale;
@@ -41,6 +41,9 @@ export default class AppLoader {
         }
         static willTransitionTo(transition, params, query, cb) {
           //provide similar context interface
+          if(loader.resolvedPath) {
+            appCtx.files.push(loader.resolvedPath);
+          }
           loader.context.currentPath = transition.path;
 
 
@@ -90,7 +93,7 @@ export default class AppLoader {
         static get childContextTypes () {
           return {
             appCtx: PropTypes.object,
-            root: PropTypes.string,
+            baseURL: PropTypes.string,
             currentPath: PropTypes.string,
             locale: PropTypes.func
           }
@@ -148,13 +151,10 @@ function loaded()  {
 
         if(setting !== void 0) {
 
-          let appPath = this.resolvedPath || this.appPath;
-          setting.path = path.resolve(path.dirname(appPath), setting.path);
+          setting.path = this.resolvedPath ?
+            path.join(path.dirname(this.resolvedPath), setting.path) :
+            path.join(path.dirname(this.appPath), setting.path);
 
-
-          if(typeof window !== 'undefined' && typeof System !== 'undefined') {
-            setting.path = setting.path.substr(1);
-          }
           this.context.locale = new Locale(this.context.appCtx, setting);
           await this.context.locale.loadLocales();
         }
@@ -168,14 +168,14 @@ function loaded()  {
 }
 
 
-function resolveRoot(root = '', currentPath = '') {
+function resolveBaseURL(baseURL = '', currentPath = '') {
 
-  if(root === '') {
+  if(baseURL === '') {
     return '/' + currentPath;
   } else if(currentPath === '') {
-    return '/' + root;
+    return '/' + baseURL;
   } else {
-    return `/${root}/${currentPath}`;
+    return `/${baseURL}/${currentPath}`;
   }
 
 }

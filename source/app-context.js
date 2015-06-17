@@ -9,6 +9,7 @@ export const STATE = Symbol();
 const DISPATCHER = Symbol();
 const TITLE = Symbol();
 const STORES = Symbol();
+export const FILES = Symbol();
 
 
 export default class AppContext {
@@ -20,6 +21,7 @@ export default class AppContext {
     this[LOCALE] = 'en-US';
     this[ACCEPTLANG] = [];
     this[LOCALEMAPPING] = {};
+    this[FILES] = [];
 
   }
   runAction(action) {
@@ -40,6 +42,9 @@ export default class AppContext {
   get stores() {
     return this[STORES];
   }
+  get files() {
+    return this[FILES];
+  }
 }
 
 Object.defineProperty(AppContext.prototype, STATE, {
@@ -53,5 +58,6 @@ Object.defineProperty(AppContext.prototype, STATE, {
   set(val) {
     this[LOCALE] = val.locale;
     this[ACCEPTLANG] = val.acceptLanguage;
+    this[LOCALEMAPPING] = val.mapping;
   }
 });

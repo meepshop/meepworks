@@ -46,7 +46,7 @@ class Loader extends Component {
           };
           System.import('${p}/client-app-driver')
           .then(function (m) {
-            new m('${this.props.config.buildPath}/${this.props.config.appPath}', '${this.props.target}'${dataId});
+            new m('${this.props.config.buildURL}/${this.props.config.appPath}', '${this.props.target}'${dataId});
           })
           .catch(console.log);
         }());`

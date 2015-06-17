@@ -5,7 +5,5 @@ Todo List
   a. dehydrate locale mapping to client side
   b. browser locale detection
 
-2. Css loading detection
-
-3. Performance profiling
+2. Performance profiling
 

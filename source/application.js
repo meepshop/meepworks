@@ -10,7 +10,7 @@ export default class Application extends Component {
     return {
       router: PropTypes.func,
       appCtx: PropTypes.object,
-      root: PropTypes.string,
+      baseURL: PropTypes.string,
       currentPath: PropTypes.string,
       locale: PropTypes.func
     };

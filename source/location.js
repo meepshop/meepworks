@@ -3,12 +3,12 @@ import escapeRegExp from 'greasebox/escape-reg-exp';
 
 
 export default class Location {
-  constructor(root='') {
-    this.root = root;
-    let escapedRoot = escapeRegExp(root);
-    this.reg = new RegExp(`/(${escapeRegExp}|${escapedRoot}/?)`);
+  constructor(baseURL='') {
+    this.baseURL = baseURL;
+    let escapeBaseURL = escapeRegExp(baseURL);
+    this.reg = new RegExp(`/(${escapeRegExp}|${escapeBaseURL}/?)`);
     HistoryLocation.addChangeListener((change) => {
-    if(this.root !== '') {
+    if(this.baseURL !== '') {
       change.path = change.path.replace(this.reg, '/');
     }
     this.listeners.slice().forEach(fn => {
@@ -42,7 +42,7 @@ export default class Location {
   }
   getCurrentPath() {
     let p = HistoryLocation.getCurrentPath();
-    if(this.root !== '') {
+    if(this.baseURL !== '') {
       p = p.replace(this.reg, '/');
     }
     return p;
