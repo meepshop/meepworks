@@ -5,7 +5,9 @@ import RouteHandler from '../../../build/components/route-handler';
 import Link from '../../../build/components/link';
 import Store from './store';
 import * as Actions from './actions';
-import './base.css!';
+import path from 'path';
+import css from './base.css!';
+import { AppLoadFailed } from '../../../build/errors';
 
 export default class App extends Application {
   static get routes() {
@@ -56,10 +58,14 @@ export default class App extends Application {
     };
   }
   componentDidMount() {
-    Store.getInstance(this.context.appCtx).on(this.changeHandler);
+    this.getStore(Store).on(this.changeHandler);
+    this.context.appCtx.on('error', (err) => {
+      console.log('child application load failed', err);
+    });
     this.runAction(new Actions.Test('Hello World!'));
+
     setTimeout(() => {
-      this.setLocale('en-US');
+      //this.setLocale('en-US');
     }, 2000);
   }
   componentWillUnmount() {

@@ -13,6 +13,9 @@ import Viewport from './components/viewport';
 import bootstrap from './bootstrap';
 import Builder from 'systemjs-builder';
 import { LOCALE, ACCEPTLANG } from './locale';
+import * as errors from './errors';
+
+
 const DOCTYPE = '<!DOCTYPE html>';
 
 const CssCache = new Map();
@@ -98,7 +101,7 @@ export default class AppDriver {
             }
           },
           onError: (err) => {
-            //console.log('err', err, err.stack);
+            console.log(err, err.stack);
           }
         });
         //console.timeEnd('createRouter');
@@ -107,56 +110,61 @@ export default class AppDriver {
           //console.timeEnd('RouterRun');
 
           //get document title from context
-          let title = ctx.title[ctx.title.length - 1];
-          if(title !== void 0) {
-            title = Tmpl.format(title, state.params);
+          try {
+            let title = ctx.title[ctx.title.length - 1];
+            if(title !== void 0) {
+              title = Tmpl.format(title, state.params);
+            }
+
+
+            //gather route table and dehydrate stores
+            let data = {
+              table: driver.routeTable,
+              stores: [],
+              baseURL: driver.config.baseURL || '',
+              context: ctx[STATE]
+            };
+            ctx.stores.forEach(s => {
+              data.stores.push(s.dehydrate());
+            });
+
+
+
+            let appHtml = React.renderToString(<Root />);
+
+            let cssPreloads = [];
+            //console.time('traceCss');
+            for(let src of ctx.files) {
+              let preloads = await driver::traceCss(src);
+              cssPreloads.push(preloads.map(css => {
+                return <link rel="stylesheet" href={css} />;
+              }));
+
+            }
+
+            let Html = driver.config.htmlComponent || HtmlPage;
+            let View = driver.config.viewportComponent || Viewport;
+
+
+            let body = React.renderToStaticMarkup(<Html
+              scripts={[
+                driver::bootstrap('#viewport', data)
+              ]}
+              styles={cssPreloads}
+              body={<View
+                innerHTML={appHtml}
+              />}
+              title={title}
+            />);
+
+            this.body = DOCTYPE + body;
+            this.status = 200;
+            this.type = 'text/html';
+            resolve();
+
+          } catch (err) {
+            reject(err);
           }
-
-
-          //gather route table and dehydrate stores
-          let data = {
-            table: driver.routeTable,
-            stores: [],
-            baseURL: driver.config.baseURL || '',
-            context: ctx[STATE]
-          };
-          ctx.stores.forEach(s => {
-            data.stores.push(s.dehydrate());
-          });
-
-
-
-          let appHtml = React.renderToString(<Root />);
-
-          let cssPreloads = [];
-          //console.time('traceCss');
-          for(let src of ctx.files) {
-            let preloads = await driver::traceCss(src);
-            cssPreloads.push(preloads.map(css => {
-              return <link rel="stylesheet" href={css} />;
-            }));
-
-          }
-
-          let Html = driver.config.htmlComponent || HtmlPage;
-          let View = driver.config.viewportComponent || Viewport;
-
-
-          let body = React.renderToStaticMarkup(<Html
-            scripts={[
-              driver::bootstrap('#viewport', data)
-            ]}
-            styles={cssPreloads}
-            body={<View
-              innerHTML={appHtml}
-            />}
-            title={title}
-          />);
-
-          this.body = DOCTYPE + body;
-          this.status = 200;
-          this.type = 'text/html';
-          resolve();
         });
 
       });

@@ -26,6 +26,10 @@ export default class SubApp extends Application {
   render() {
     return (
       <div>SubApp @ {this.context.currentPath}<br />
+        <button onClick={() => {
+          console.log(this.locale);
+          this.setLocale(this.locale === 'en-US' ? 'zh-TW' : 'en-US');
+        }}>Switch Language</button><br />
         {this.tmpl('content', { name: 'Joe'})}<br />
         {this.formatNumber(-1234.5678)}<br />
         {this.formatCurrency(1234.5678, 'USD')}<br />

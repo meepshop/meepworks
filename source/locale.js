@@ -1,6 +1,7 @@
 import IntlPolyfill from 'intl';
 import Tmpl from './tmpl';
 import { APPROOT } from './app-root';
+import { LocaleLoadFailed } from './errors';
 
 
 //const Intl = global.Intl || IntlPolyfill;
@@ -104,11 +105,22 @@ export default class Locale {
     }
   }
 
+  get locale() {
+    return this[CTX][LOCALE];
+  }
+
   async setLocale(l) {
+    let previousLocale = this[CTX][LOCALE];
     this[CTX][LOCALE] = l;
-    await this.loadLocales();
-    if(typeof this[CTX][APPROOT] === 'function') {
-      this[CTX][APPROOT](l);
+    try {
+      await this.loadLocales();
+      if(typeof this[CTX][APPROOT] === 'function') {
+        this[CTX][APPROOT](l);
+      }
+    } catch (err) {
+      this[CTX][LOCALE] = previousLocale;
+      await this.loadLocales();
+      this[CTX].emit('error', new LocaleLoadFailed(err));
     }
 
   }

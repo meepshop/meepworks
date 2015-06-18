@@ -2,6 +2,7 @@ import Dispatcher from './dispatcher';
 import co from 'co';
 import { PAYLOAD } from './action-base';
 import { LOCALE, ACCEPTLANG, LOCALEMAPPING } from './locale';
+import Emitter from 'component-emitter';
 
 export const APP_INIT = Symbol();
 export const STATE = Symbol();
@@ -46,6 +47,8 @@ export default class AppContext {
     return this[FILES];
   }
 }
+
+Emitter(AppContext.prototype);
 
 Object.defineProperty(AppContext.prototype, STATE, {
   get() {

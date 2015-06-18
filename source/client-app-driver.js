@@ -9,12 +9,13 @@ import Dispatcher from './dispatcher';
 import Tmpl from './tmpl';
 import Location from './location';
 import AppRoot from './app-root';
+import * as errors from './errors';
 
 
 export default class AppDriver {
   constructor(src, target, dataId) {
     let driver = this;
-    driver.target = target;
+    driver.target = document.querySelector(target);
     driver.appSrc = src;
 
 
@@ -48,12 +49,11 @@ export default class AppDriver {
         }
       },
       onError: (err) => {
-        console.log('err', err, err.stack);
+        ctx.emit('error', err);
       }
     });
     r.run((Root, state) => {
         //rehydrate stores
-
         if(ctx[APP_INIT]) {
           let title = ctx.title[ctx.title.length - 1];
           if(title !== void 0) {
@@ -66,30 +66,7 @@ export default class AppDriver {
           });
           ctx[APP_INIT] = true;
         }
-        React.render(<Root />, document.querySelector(driver.target));
-
-
-
-    //      let appHtml = React.renderToString(<Root />);
-
-    //      let Html = driver.config.htmlComponent || HtmlPage;
-    //      let View = driver.config.viewportComponent || Viewport;
-
-
-    //      let body = React.renderToStaticMarkup(<Html
-    //        scripts={[
-    //            driver::bootstrap('#viewport', data)
-    //        ]}
-    //        body={<View
-    //          innerHTML={appHtml}
-    //        />}
-    //        title={title}
-    //      />);
-
-    //      this.body = DOCTYPE + body;
-    //      this.status = 200;
-    //      this.type = 'text/html';
-    //      resolve();
+        React.render(<Root />, driver.target);
      });
 
 

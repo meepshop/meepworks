@@ -5,6 +5,7 @@ import {APP_INIT} from './app-context';
 import path from 'path';
 import url from 'url';
 import AppRoot from './app-root';
+import { AppLoadFailed, LocaleLoadFailed } from './errors';
 
 const LOADED = Symbol();
 
@@ -63,8 +64,11 @@ export default class AppLoader {
             }
 
           }).catch((err) => {
+            loader[LOADED] = false;
+            //console.log(err, err.stack);
             transition.abort();
             cb(err);
+            history.back();
           });
         }
         static willTransitionFrom(transition, component, cb) {
@@ -142,7 +146,11 @@ function loaded()  {
     this[LOADED] = (async () => {
       if(typeof this.App === 'string') {
         this.appPath = this.App;
-        this.App = await System.import(this.App);
+        try {
+          this.App = await System.import(this.App);
+        } catch(err) {
+          throw new AppLoadFailed(err);
+        }
       }
       if(this.App === AppRoot) {
         this.context.locale = new Locale(this.context.appCtx);
@@ -156,7 +164,11 @@ function loaded()  {
             path.join(path.dirname(this.appPath), setting.path);
 
           this.context.locale = new Locale(this.context.appCtx, setting);
-          await this.context.locale.loadLocales();
+          try {
+            await this.context.locale.loadLocales();
+          } catch(err) {
+            throw new LocaleLoadFailed(err);
+          }
         }
 
       }

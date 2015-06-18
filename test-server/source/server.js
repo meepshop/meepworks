@@ -12,8 +12,8 @@ import RequireFilter from '../../build/require-filter';
 //console.log('start');
 //console.time('setFilter');
 const requireFilter = new RequireFilter({
-  fileRoot: path.resolve(__dirname, '..'),
-  urlRoot: '/test-server/',
+  root: path.resolve(__dirname, '../..'),
+  baseURL: 'test-server',
   //version: version
 });
 requireFilter.filter('.css!');
@@ -35,7 +35,7 @@ server.use(mount('/test-server', serve(__dirname, {
 
 
 server.use(function * (next) {
-  //console.log('req start: ', this.req.url);
+  console.log('req start: ', this.req.url);
   //console.time('req');
   yield next;
   //console.timeEnd('req');
@@ -60,6 +60,6 @@ server.use(mount('/my-app', app.router));
 //console.timeEnd('mountApp');
 
 server.listen(18881);
-//console.log('listening to 18881');
+console.log('listening to 18881');
 
 
