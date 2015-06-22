@@ -3,24 +3,30 @@ import uuid from 'uuid';
 import dedent from 'greasebox/dedent';
 
 
+
 /**
- *  @class DataScript
+ *  @class Data
+ *  @description Component for rendering data to be sent to client side.
  */
 class Data extends Component {
   render() {
+    //convert data to base64 string avoid html injection
     return (
       <script
         id={this.props.dataId}
         type='application/json'
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(this.props.data)
+          __html: (new Buffer(JSON.stringify(this.props.data))).toString('base64')
         }}
       />
     );
 
   }
 }
-
+/**
+ * @class Loader
+ * @description Script that loads the framework and starts the application.
+ */
 class Loader extends Component {
   render () {
     let dataId = this.props.dataId ? `, '${this.props.dataId}'` : '';

@@ -129,11 +129,12 @@ export default class AppDriver {
             });
 
 
-
+            //render application to string
             let appHtml = React.renderToString(<Root />);
 
             let cssPreloads = [];
             //console.time('traceCss');
+            //trace files for imported css files
             for(let src of ctx.files) {
               let preloads = await driver::traceCss(src);
               cssPreloads.push(preloads.map(css => {
@@ -219,7 +220,6 @@ function generateRoutes(table, ctx, currentPath, appPath) {
               ctx,
               currentPath,
               this.config.baseURL,
-              this.config.dirname,
               path.join(path.dirname(appPath), table.routes[p].appPath)
             )} />
         );

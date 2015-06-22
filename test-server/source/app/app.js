@@ -75,8 +75,8 @@ export default class App extends Application {
     return (
       <div><ShowRoute />
         Msg: { this.state.store.get('msg') }<br />
-        <Link to={`${this.context.baseURL}`}>Home</Link><br />
-        <Link to={`${this.context.baseURL}/sub`}>Sub</Link><br />
+        <Link to={`${this.context.appURL}`}>Home</Link><br />
+        <Link to={`${this.context.appURL}/sub`}>Sub</Link><br />
         <RouteHandler />
       </div>
     );

@@ -6,6 +6,7 @@ export default class Component extends React.Component {
       router: PropTypes.func,
       appCtx: PropTypes.object,
       baseURL: PropTypes.string,
+      appURL: PropTypes.string,
       currentPath: PropTypes.string,
       locale: PropTypes.func
     };

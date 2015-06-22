@@ -2,6 +2,10 @@ import { PropTypes } from 'react';
 import Component from './component';
 import Dispatcher from './dispatcher';
 
+/**
+ * @class Application
+ * @description Application base class
+ */
 export default class Application extends Component {
   constructor(props, context) {
     super(props, context);
@@ -11,6 +15,7 @@ export default class Application extends Component {
       router: PropTypes.func,
       appCtx: PropTypes.object,
       baseURL: PropTypes.string,
+      appURL: PropTypes.string,
       currentPath: PropTypes.string,
       locale: PropTypes.func
     };

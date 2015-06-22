@@ -30,20 +30,6 @@ export default class ActionBase {
     //allow actions to be used as events by defaulting to resolved promise
     return Promise.resolve();
   }
-  /**
-   *  @function
-   *    Starts the execution of the action.
-   */
-  //exec() {
-  //  let self = this;
-  //  return co(function *() {
-  //    Dispatcher.getInstance(self[CTX]).dispatch({
-  //      action: self.constructor,
-  //      payload: yield self.action(...self[PAYLOAD])
-  //    });
-
-  //  });
-  //}
 
   get ctx() {
     return this[CTX];

@@ -32,9 +32,8 @@ export default class HtmlPage extends React.Component {
           {this.props.metas}
           <title>{this.props.title}</title>
           {this.props.styles}
-          {this.props.scripts}
         </head>
-        {this.props.innerHTML ? <body dangerouslySetInnerHTML={{__html: this.props.innerHTML}}></body> : <body>{this.props.body}</body>}
+        {this.props.innerHTML ? <body dangerouslySetInnerHTML={{__html: this.props.innerHTML}}></body> : <body>{this.props.body}{this.props.scripts}</body>}
       </html>
     );
   }

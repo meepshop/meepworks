@@ -6,17 +6,17 @@ export default class Location {
   constructor(baseURL='') {
     this.baseURL = baseURL;
     let escapeBaseURL = escapeRegExp(baseURL);
-    this.reg = new RegExp(`/(${escapeRegExp}|${escapeBaseURL}/?)`);
+    this.reg = new RegExp(`/${escapeBaseURL}/?`);
     HistoryLocation.addChangeListener((change) => {
-    if(this.baseURL !== '') {
-      change.path = change.path.replace(this.reg, '/');
-    }
-    this.listeners.slice().forEach(fn => {
-      if(typeof fn === 'function') {
-        fn(change);
+      if(this.baseURL !== '') {
+        change.path = change.path.replace(this.reg, '/');
       }
+      this.listeners.slice().forEach(fn => {
+        if(typeof fn === 'function') {
+          fn(change);
+        }
+      });
     });
-  });
     this.listeners = [];
   }
   addChangeListener(listener) {

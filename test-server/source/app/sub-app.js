@@ -23,11 +23,18 @@ export default class SubApp extends Application {
       ]
     };
   }
+  static willTransitionTo(transition) {
+    if(Math.random() > 0.5) {
+    } else if(Math.random() > 0.3) {
+      transition.abort('reject');
+    } else {
+      transition.redirect(this.context.baseURL + '/not-found');
+    }
+  }
   render() {
     return (
       <div>SubApp @ {this.context.currentPath}<br />
         <button onClick={() => {
-          console.log(this.locale);
           this.setLocale(this.locale === 'en-US' ? 'zh-TW' : 'en-US');
         }}>Switch Language</button><br />
         {this.tmpl('content', { name: 'Joe'})}<br />

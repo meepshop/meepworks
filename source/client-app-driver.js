@@ -21,7 +21,7 @@ export default class AppDriver {
 
 
     let dataScript = document.querySelector(`script[id="${dataId}"]`);
-    let data = JSON.parse(dataScript.innerHTML);
+    let data = JSON.parse(atob(dataScript.innerHTML));
 
     driver.routeTable = driver::traceRoutes(data.table);
 
@@ -37,17 +37,11 @@ export default class AppDriver {
       </Route>
     );
 
+    let location = new Location(data.baseURL);
+
     let r = Router.create({
       routes,
-      location: new Location(data.baseURL),
-      onAbort: (redirect) => {
-        if(typeof redirect === 'string') {
-          //aborted
-        }
-        else if(redirect) {
-
-        }
-      },
+      location,
       onError: (err) => {
         ctx.emit('error', err);
       }
