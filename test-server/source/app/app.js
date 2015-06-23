@@ -1,119 +1,97 @@
+import Application from '../../../build/application';
+import Component from '../../../build/component';
 import React from 'react';
-import RouterStore from '../../../dist/stores/router-store';
+import RouteHandler from '../../../build/components/route-handler';
+import Link from '../../../build/components/link';
+import Store from './store';
+import * as Actions from './actions';
+import path from 'path';
+import css from './base.css!';
+import { AppLoadFailed } from '../../../build/errors';
 
-import test from './something.mp3!asset';
-import 'normalize.css/normalize.css!';
-import './test.css!';
-
-import ActionBase from '../../../dist/action-base';
-import StoreBase from '../../../dist/store-base';
-
-class Action1 extends ActionBase {
-  action() {
-    console.log('action1');
-    return Promise.resolve();
-  }
-}
-class Action2 extends ActionBase {
-  action() {
-    console.log('action2');
-    return Promise.resolve();
-  }
-}
-class Action3 extends ActionBase {
-  action() {
-    console.log('action3');
-    return Promise.resolve();
-  }
-}
-
-class TestStore extends StoreBase {
-  get handlers() {
-    return [{
-      action: Action1,
-      handler: this.handleAction1
-    }, {
-      action: Action2,
-      handler: this.handleAction2
-    },{
-      action: Action3,
-      handler: this.handleAction3
-    }];
-  }
-  handleAction1() {
-    console.log('handleAction1');
-  }
-  handleAction2() {
-    console.log('handleAction2');
-  }
-  handleAction3() {
-    console.log('handleAction3');
-  }
-}
-
-
-
-class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      router: RouterStore.state
+export default class App extends Application {
+  static get routes() {
+    return {
+      'sub': {
+        appPath: './sub-app'
+      },
+      '$default': {
+        appPath: './default-app'
+      },
+      '$notfound': {
+        appPath: './not-found'
+      }
     };
-    this.handleRouteChange = this.handleRouteChange.bind(this);
+  }
+  static title() {
+    return 'Meepworks';
+  }
+  static get stores() {
+    return [
+      Store
+    ];
+  }
+  static get localeSetting() {
+    return {
+      path: './locales',
+      locales: [
+        'en-US',
+        'zh-TW',
+        'fr-FR'
+      ]
+    };
+  }
+  static willTransitionTo(transition, params, query, cb) {
+    this.runAction(new Actions.Test('Hello')).then(cb).catch(cb);
+  }
+  constructor(props, context) {
+    super(props, context);
+
+    this.state = {
+      store: Store.getInstance(this.context.appCtx).state
+    };
+
+    this.changeHandler = () => {
+      this.setState({
+        store: Store.getInstance(this.context.appCtx).state
+      });
+    };
   }
   componentDidMount() {
-    RouterStore.getInstance().subscribe(this.handleRouteChange);
-    new Action2().exec();
+    this.getStore(Store).on(this.changeHandler);
+    this.context.appCtx.on('error', (err) => {
+      console.log('child application load failed', err);
+    });
+    this.runAction(new Actions.Test('Hello World!'));
+
+    setTimeout(() => {
+      //this.setLocale('en-US');
+    }, 2000);
   }
   componentWillUnmount() {
-    RouterStore.getInstance().unsubscribe(this.handleRouteChange);
-  }
-  handleRouteChange() {
-    this.setState({
-      router: RouterStore.state
-    });
+    Store.getInstance(this.context.appCtx).off(this.changeHandler);
   }
   render() {
-    let Content = RouterStore.getChildComponent(App);
-    let rootUrl = RouterStore.rootUrl;
-
-    if(!Content) {
-      Content = Home;
-    }
-
-    return <div>
-      <a href={`${rootUrl}/`}>Home</a><br />
-      <a href={`${rootUrl}/modules`}>Modules</a><br />
-      <Content />
-    </div>;
-
+    return (
+      <div><ShowRoute />
+        Msg: { this.state.store.get('msg') }<br />
+        <Link to={`${this.context.appURL}`}>Home</Link><br />
+        <Link to={`${this.context.appURL}/sub`}>Sub</Link><br />
+        <RouteHandler />
+      </div>
+    );
   }
 }
 
 
-class Home extends React.Component {
+class ShowRoute extends Component {
   render() {
-    return <div>Welcome to Meepworks!</div>;
+    return (
+      <div>Current Route: { this.context.currentPath }<br />
+        { this.tmpl('content', {name: 'Jack'}) }
+      </div>
+    );
   }
 }
-export default {
-  component: App,
-  stores: [
-    TestStore
-  ],
-  routes: {
-    '/': {
-      name: 'Home',
-      title: 'Meepworks'
-    },
-    '/modules': {
-      name: 'Modules',
-      app: './modules',
-      title: function () {
-        return 'moDules';
-      }
-    }
-  }
-};
 
 

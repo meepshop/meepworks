@@ -9,20 +9,25 @@ import sourcemaps from 'gulp-sourcemaps';
 import babel from 'gulp-babel';
 
 
-gulp.task('build', ['clean:build'], (cb) => {
-  gulp.src('source/**/*.js')
+gulp.task('server-build', ['server-copy', 'clean:server-build'], (cb) => {
+  gulp.src('test-server/source/**/*.js')
   .pipe(plumber({
     errorHandler: cb
   }))
   .pipe(sourcemaps.init())
   .pipe(babel(config.babelOptions))
   .pipe(sourcemaps.write('.'))
-  .pipe(gulp.dest('build'))
+  .pipe(gulp.dest('test-server/build'))
   .on('end', cb);
 });
 
-gulp.task('clean:build', (cb) => {
-  gb.rm(path.resolve(__dirname, '../build'))
+gulp.task('server-copy', ['clean:server-build'], () => {
+  return gulp.src([ 'test-server/source/**/*.json', 'test-server/source/**/*.css' ])
+    .pipe(gulp.dest('test-server/build'));
+});
+
+gulp.task('clean:server-build', (cb) => {
+  gb.rm(path.resolve(__dirname, '../test-server/build'))
     .then(cb)
     .catch(cb);
 });

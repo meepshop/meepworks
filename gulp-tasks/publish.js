@@ -20,9 +20,9 @@ gulp.task('publish', ['build'], (cb) => {
     if(semver.gt(manifest.version, latest)) {
       delete manifest.jspm.directories;
       manifest.jspm.registry = "jspm";
-      yield cofs.writeFile(path.resolve(__dirname, '../dist/package.json'), JSON.stringify(manifest, null, 2));
+      yield cofs.writeFile(path.resolve(__dirname, '../build/package.json'), JSON.stringify(manifest, null, 2));
       console.log( yield exec('npm publish', {
-        cwd: path.resolve(__dirname, '../dist')
+        cwd: path.resolve(__dirname, '../build')
       }));
     } else {
       console.log(`Trying to publish version: ${chalk.green( manifest.version )}, but latest npm version is ${chalk.green( latest )}.`);

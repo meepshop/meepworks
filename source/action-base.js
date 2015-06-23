@@ -2,7 +2,7 @@ import Instance from './instance';
 import Dispatcher from './dispatcher';
 import co from 'co';
 
-const PAYLOAD = Symbol();
+export const PAYLOAD = Symbol();
 const CTX = Symbol();
 
 
@@ -29,20 +29,6 @@ export default class ActionBase {
   action() {
     //allow actions to be used as events by defaulting to resolved promise
     return Promise.resolve();
-  }
-  /**
-   *  @function
-   *    Starts the execution of the action.
-   */
-  exec() {
-    let self = this;
-    return co(function *() {
-      Dispatcher.getInstance(self[CTX]).dispatch({
-        action: self.constructor,
-        payload: yield self.action(...self[PAYLOAD])
-      });
-
-    });
   }
 
   get ctx() {

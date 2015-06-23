@@ -1,10 +1,16 @@
 import gulp from 'gulp';
 
 export const paths = {
-  server: 'test-server/build',
   source: 'source',
-  dist: 'dist',
-  serverSource: 'test-server/source'
+  build: 'build',
+  serverSource: 'test-server/source',
+  serverBuild: 'test-server/build'
+};
+
+export const babelOptions = {
+  modules: 'common',
+  optional: ['runtime'],
+  stage: 0
 };
 
 gulp.task('config', () => {

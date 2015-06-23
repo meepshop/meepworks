@@ -1,6 +1,5 @@
 import Flux from 'flux';
 import Instance from './instance';
-import co from 'co';
 import { ACTION_HANDLER } from './store-base';
 
 const DISPATCH_TOKEN = Symbol();
@@ -37,7 +36,7 @@ export default class Dispatcher extends Instance {
    *  @param {Array<StoreBase>} stores - array of stores to wait for.
    */
   waitFor(stores) {
-    if(Array.isArray(stores)) {
+    if(!Array.isArray(stores)) {
       stores = [stores];
     }
     this[DISPATCHER].waitFor(stores.map((s) => {

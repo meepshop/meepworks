@@ -1,501 +1,289 @@
-import Router from 'koa-router';
-
+import Router, {Route, NotFoundRoute, DefaultRoute } from 'react-router';
 import React from 'react';
-import HtmlPage from './components/html-page';
-import Viewport from './components/viewport';
-
-
-import Builder from 'systemjs-builder';
 import path from 'path';
 import url from 'url';
-import foreach from 'greasebox/co-foreach';
-import map from 'greasebox/co-map';
-import Tmpl from './tmpl';
-
-import appLoader from './app-loader';
-import {PROMOTE, DEMOTE} from './instance';
-import Navigate from './actions/navigate';
+import AppRoot from './app-root';
+import AppLoader from './app-loader';
+import NotFound from './components/not-found';
+import AppContext, { APP_INIT, STATE } from './app-context';
 import Dispatcher from './dispatcher';
-import { INIT_STORE, INIT } from './store-base';
-import RouterStore from './stores/router-store';
-import RouteTable from './stores/route-table';
-import SetRoutes from './actions/set-routes';
-import ExposeContext from './actions/expose-context';
-import SetApproot from './actions/set-approot';
-import DetectIntl from './actions/detect-intl';
-import LocaleStore from './stores/locale-store';
-import LoadLocales from './actions/load-locales';
-import { LOCALE_CACHE as LC } from './locale';
-
-
-const OK = Symbol();
-const CSS_PRELOAD = Symbol();
-const ROUTER = Symbol();
+import Tmpl from './tmpl';
+import HtmlPage from './components/html-page';
+import Viewport from './components/viewport';
+import bootstrap from './bootstrap';
+import Builder from 'systemjs-builder';
+import { LOCALE, ACCEPTLANG } from './locale';
+import * as errors from './errors';
 
 
 const DOCTYPE = '<!DOCTYPE html>';
 
+const CssCache = new Map();
 
-let _CssCache = {};
 
-/**
- * @exports default
- * @class AppDriver
- *  Wraps around router as an application driver.
- */
+
 export default class AppDriver {
-  /**
-   * @constructor
-   * @param {Object} App - The application manifest object.
-   * @param {String} appPath - The relative path to the ClientApp
-   *  from the server's position.
-   */
-  constructor(App, config) {
-    var driver = this;
-    driver[ROUTER] = new Router();
-    driver.app = App;
-    driver.config = config;
-    driver.rootUrl = config.rootUrl || '/';
-    driver.routeTable = {
-      app: driver.config.appPath,
-      title: App.title
-    };
+  constructor(config) {
 
-    //let glStore = LocaleStore.getInstance();
-    //if(!glStore[INIT]) {
-    //  glStore[INIT_STORE]();
-    //  Dispatcher.getInstance().register(glStore);
-    //}
+    //get canonical appPath
+    let appPath = path.join(config.dirname, config.appPath);
+    this.config = config;
+    //console.time('traceTable');
+    //tracing css is async, so wrap traceRoutes with async so
+    //requests could wait for this to complete before starting
+    this.ready = (async () => {
+      this.routeTable = await this::traceRoutes({
+        appPath: config.appPath
+      }, appPath);
+      //console.timeEnd('traceTable');
+    }());
+  }
+  get router() {
+
+    let driver = this;
 
 
+    return function * (next) {
+
+      //wait for driver to be ready
+      yield driver.ready;
+
+      //create new application context per request;
+      let ctx = new AppContext(this);
+      //APP_INIT controls whether willTransitionTo will be triggered
+      ctx[APP_INIT] = true;
 
 
-
-    //server logic entry point
-    driver[ROUTER].use(function * (next) {
-
-      var ctx = this;
-      //create instance specific dispatcher and store set
-      ctx.dispatcher = Dispatcher.getInstance(ctx);
-      ctx.stores = new Set([RouterStore, RouteTable, LocaleStore]);
-
-      //init router store
-      let rStore = RouterStore.getInstance(ctx);
-      rStore[INIT_STORE]();
-      ctx.dispatcher.register(rStore);
-      {
-        let sa = new SetApproot(driver.rootUrl);
-        sa.ctx = ctx;
-        yield sa.exec();
+      //detect locale settings of the browser
+      let list = this.get('accept-language');
+      if(list) {
+        list = list.split(',').map((l) => {
+          return normalizeLocaleCode(l.split(';').shift());
+        });
+      } else {
+        list = [];
       }
+      if(list.length === 0) {
+        list.push('en-US');
+      }
+      let locale = this.locale;
+      if(!locale) {
+        locale = list[0];
+      }
+      //set the detected locale settings to application context;
+      ctx[LOCALE] = locale;
+      ctx[ACCEPTLANG] = list;
 
-      //init route table store
-      let rTable = RouteTable.getInstance(ctx);
-      rTable[INIT_STORE]();
-      ctx.dispatcher.register(rTable);
+      //wraps routing in promise because it's asynchronous
+      yield new Promise((resolve, reject) => {
+        //console.time('generateRoutes');
+        let routes = (
+          <Route handler={new AppLoader(AppRoot, ctx)}>
+            {driver::generateRoutes(driver.routeTable, ctx, '', path.join(driver.config.dirname, driver.config.appPath))}
+            <NotFoundRoute handler={NotFound} />
+          </Route>
+        );
+        //console.timeEnd('generateRoutes');
 
-
-      let lStore = LocaleStore.getInstance(ctx);
-      lStore[INIT_STORE]();
-      ctx.dispatcher.register(lStore);
-
-      //yields routing logic
-      yield next;
-
-
-
-
-      //application init is done, ready to render
-      if(ctx[OK]) {
-
-        {
-          let di = new DetectIntl();
-          di.ctx = ctx;
-          yield di.exec();
-        }
-        {
-          let ll = new LoadLocales();
-          ll.ctx = ctx;
-          yield ll.exec();
-        }
-
-
-        //promote dispatcher and stores
-        ctx.dispatcher[PROMOTE]();
-        let stores = [];
-        ctx.stores.forEach((s) => {
-          let tmp = s.getInstance(ctx);
-          tmp[PROMOTE]();
-          stores.push(tmp);
-        });
-
-        //render app to string
-        let RootComponent = RouterStore.getInstance(ctx).getRootComponent();
-        let appString = React.renderToString(<RootComponent />);
-
-        //dehydrate stores
-        let data = stores.map((s) =>  {
-          return s.dehydrate();
-        });
-
-        //generate css preload list
-        //this scans for css imports and loads them in html's head tag
-        //which allows the server-side render result to be properly styled.
-        //If this is not done, some styles will only appear after client applicaiton loads.
-        let cssPreloads = [];
-        if(ctx[CSS_PRELOAD]) {
-          for(let css of ctx[CSS_PRELOAD]) {
-            cssPreloads.push(<link rel="stylesheet" href={css} />);
+        //console.time('createRouter');
+        let r = Router.create({
+          routes,
+          location: this.req.url,
+          onAbort: (redirect) => {
+            if(typeof redirect === 'string') {
+              //aborted
+              this.redirect(driver.config.abortPath || '/');
+              resolve();
+            }
+            else if(redirect) {
+              this.redirect(redirect.to);
+              resolve();
+            }
+          },
+          onError: (err) => {
+            console.log(err, err.stack);
           }
-        }
-        let jsVer = config.version ? `?${config.version}` : '';
-
-        let transpilerRuntime;
-        if(config.transpiler === 'traceur') {
-          transpilerRuntime = [
-            <script key="traceur-runtime" src={ `/${config.jspm.path}/traceur-runtime.js${jsVer}` }></script>
-          ];
-        } else {
-          transpilerRuntime = [
-            //<script key="babel-runtime" src={`/${config.jspm.path}/babel-polyfill.js${jsVer}`}></script>
-          ];
-        }
-
-        let Html = driver.config.htmlComponent || HtmlPage;
-        let View = driver.config.viewportComponent || Viewport;
-        //generate html container
-        let htmlOut = React.renderToStaticMarkup(<Html
-          scripts={[
-            transpilerRuntime,
-            <script key="sys" src={ `/${config.jspm.path}/system.js${jsVer}` }></script>,
-            <script key="config" src={ `/${config.jspm.config}${jsVer}` }></script>,
-              cssPreloads,
-            yield appLoader(config, '#viewport', data)
-          ]}
-          body={<View
-            innerHTML={appString}
-          />}
-        />);
-
-        ctx.body = DOCTYPE + htmlOut;
-        ctx.status = 200;
-        ctx.type = 'text/html';
-
-        //demote stores and dispatcher from global status
-        stores.forEach((s) => {
-          s[DEMOTE]();
         });
-        ctx.dispatcher[DEMOTE]();
+        //console.timeEnd('createRouter');
+        //console.time('RouterRun');
+        r.run(async (Root, state) => {
+          //console.timeEnd('RouterRun');
+
+          //get document title from context
+          try {
+            let title = ctx.title[ctx.title.length - 1];
+            if(title !== void 0) {
+              title = Tmpl.format(title, state.params);
+            }
+
+
+            //gather route table and dehydrate stores
+            let data = {
+              table: driver.routeTable,
+              stores: [],
+              baseURL: driver.config.baseURL || '',
+              context: ctx[STATE]
+            };
+            ctx.stores.forEach(s => {
+              data.stores.push(s.dehydrate());
+            });
+
+
+            //render application to string
+            let appHtml = React.renderToString(<Root />);
+
+            let cssPreloads = [];
+            //console.time('traceCss');
+            //trace files for imported css files
+            for(let src of ctx.files) {
+              let preloads = await driver::traceCss(src);
+              cssPreloads.push(preloads.map(css => {
+                return <link rel="stylesheet" href={css} />;
+              }));
+
+            }
+
+            let Html = driver.config.htmlComponent || HtmlPage;
+            let View = driver.config.viewportComponent || Viewport;
+
+
+            let body = React.renderToStaticMarkup(<Html
+              scripts={[
+                driver::bootstrap('#viewport', data)
+              ]}
+              styles={cssPreloads}
+              body={<View
+                innerHTML={appHtml}
+              />}
+              title={title}
+            />);
+
+            this.body = DOCTYPE + body;
+            this.status = 200;
+            this.type = 'text/html';
+            resolve();
+
+          } catch (err) {
+            reject(err);
+          }
+        });
+
+      });
+
+    }
+  }
+}
+
+
+
+async function traceRoutes(table, appPath) {
+  let App = require(appPath);
+  let routes = App.routes;
+
+  //pre trace the css files imported in apps
+  await this::traceCss(appPath);
+
+  table.App = App;
+  table.routes = routes;
+
+  for(let p in routes) {
+    if(routes[p].appPath) {
+      await this::traceRoutes(routes[p], path.join(path.dirname(appPath), routes[p].appPath));
+    }
+  }
+  return table;
+}
+
+function generateRoutes(table, ctx, currentPath, appPath) {
+
+  let children = [];
+  if(table.routes) {
+    for(let p in table.routes) {
+      if(p === '$default') {
+        children.push(
+          <DefaultRoute
+            key={p}
+            handler={ new AppLoader(
+              table.routes[p].App,
+              ctx,
+              currentPath,
+              this.config.baseURL,
+              path.join(path.dirname(appPath), table.routes[p].appPath)
+            )}/>
+        );
+      } else if (p === '$notfound') {
+        children.push(
+          <NotFoundRoute
+            key={p}
+            handler={ new AppLoader(
+              table.routes[p].App,
+              ctx,
+              currentPath,
+              this.config.baseURL,
+              path.join(path.dirname(appPath), table.routes[p].appPath)
+            )} />
+        );
+      } else {
+        children.push(
+          this::generateRoutes(
+            table.routes[p],
+            ctx,
+            currentPath === '' ? p : `${currentPath}/${p}`,
+            path.join(path.dirname(appPath), table.routes[p].appPath)
+          )
+        );
       }
-
-    });
-
-    //add routing to the driver
-
-
-    //start binding routes
-    bindRoutes.call(this, driver.routeTable, '/');
-    //driver.localeLoaded = new LoadLocales(glStore).exec();
-
+    }
   }
-
-  routes() {
-    return this[ROUTER].routes();
-  }
+  return (
+    <Route path={`/${currentPath}`} key={`/${currentPath}`} handler={new AppLoader(table.App, ctx, currentPath, this.config.baseURL, appPath)}>
+      {children}
+    </Route>
+  );
 
 }
 
-/**
-   * @function
-   * @param {Object} route - route description
-   * @param {String} urlPath - current url path path
-   * @param {String} filePath - canonical server side file path of the module
-   * @param {Array<String>} files - list of client side paths to all the parent module paths
-   * @param {Array<Object>} parents - array of parent app manifests
-   *    Bind all the routing logic to the application driver.
-   */
-  function bindRoutes(route, urlPath, filePath, files, table, parents = []) {
-    let driver = this;
+async function traceCss(appPath) {
+  let src = path.relative(this.config.root, appPath);
 
-    if(!table) {
-      table = route;
-    }
-
-    if(route.app) {
-      let App = route.app;
-
-      if(!filePath) {
-        //assume appPath for root application
-        filePath = path.resolve(this.config.fileRoot, this.config.appPath);
-        App = require(filePath);
-      }
-      if(!files) {
-        // traceCss uses url style path
-        files = [this.config.distPath.internal + '/' + this.config.appPath];
-      }
-
-      if(typeof App === 'string') {
-        //locate the App file path
-        filePath = path.resolve(filePath, '..', App);
-
-        let parentUrl = files[files.length - 1];
-        files = files.concat(url.resolve(parentUrl, App));
-
-        //Set app to the actual manifest
-        App = require(filePath);
-      }
-
-      //client driver needs to know if App contains component before actually loading them.
-      if(App.component) {
-        table.hasComponent = true;
-      }
-      //if component is defined, and the urlPath is not delegated to child application
-      if(App.component && !(App.routes&&App.routes[urlPath])) {
+  let css;
+  if(!CssCache.has(src)) {
+    //trace app for all module imports
+    let builder = new Builder();
+    await builder.loadConfig(this.config.jspm.config);
 
 
-        this[ROUTER].get(urlPath, function * (next) {
-          var ctx = this;
-          //populate components list
-          let compList = [];
-          parents.forEach((p) => {
-            if(p.component) {
-              compList.push(p.component);
-            }
-            //init stores
-            if(Array.isArray(p.stores)) {
-              p.stores.forEach((s) => {
-                ctx.stores.add(s);
-                let tmp = s.getInstance(ctx);
-                if(!tmp[INIT]) {
-                  tmp[INIT_STORE]();
-                  ctx.dispatcher.register(tmp);
-                }
-              });
-            }
-          });
-          compList.push(App.component);
-          if(Array.isArray(App.stores)) {
-              App.stores.forEach((s) => {
-                ctx.stores.add(s);
-                let tmp = s.getInstance(ctx);
-                if(!tmp[INIT]) {
-                  tmp[INIT_STORE]();
-                  ctx.dispatcher.register(tmp);
-                }
-              });
+    var trace = await builder.trace(src);
 
-          }
-          //expose the context
-          //this helps to allow middlewares to pass information into the stores
-          //for the root application
-          {
-            let ec = new ExposeContext(ctx);
-            ec.ctx = ctx;
-            yield ec.exec();
-          }
+    let result = Object.keys(trace).filter((item) => {
+      //filter imports to only css entries
+      return /\.css/i.test(trace[item].address);
+    }).map((item)=> {
+      //normalize server-side address to client side relative address
+      if(trace[item].address.indexOf(this.config.jspm.path) > -1) {
+        return '/' + path.relative(path.dirname(this.config.jspm.path), trace[item].address.replace(/file:/i, '')).replace(/\\\\/g, '/');
+      } else {
+        item = item.split('!')[0].replace(this.config.buildPath, this.config.buildURL);
 
-          //set routing information
-          {
-            let sr = new SetRoutes({
-            srcRoot: driver.config.distPath.external,
-            routes: driver.routeTable
-            });
-            sr.ctx = ctx;
-            yield sr.exec();
-          }
-
-          //trigger navigate action
-          {
-            let title = () => {
-              let t = route.title || driver.app.title || '';
-              if('function' === typeof t) {
-                t = t();
-              }
-              return Tmpl.format(t, ctx.params);
-            };
-            let n = new Navigate({
-            params: ctx.params,
-            title,
-            route: urlPath,
-            url: ctx.req.url,
-            components: compList
-            });
-            n.ctx = ctx;
-            yield n.exec();
-          }
-
-          //exec parent Apps' initial actions & routeActions
-          yield execParentActions.call(driver, parents, ctx);
-
-          //exec ctx App's initial actions
-          if(Array.isArray(App.initialActions)) {
-            yield foreach(App.initialActions, function * (initialAction) {
-              let ia = new initialAction.action(initialAction.payload);
-              ia.ctx = ctx;
-              yield ia.exec();
-            });
-          }
-
-          if(Array.isArray(App.routeActions)) {
-            yield foreach(App.routeActions, function * (routeAction) {
-              let ra = new routeAction.action(routeAction.payload);
-              ra.ctx = ctx;
-              yield ra.exec();
-            });
-          }
-
-          //trace css
-          ctx[CSS_PRELOAD] = new Set();
-
-          (yield map(files, (f)=> {
-            return traceCss.call(driver, f);
-          })).forEach((list) => {
-            list.forEach((css) => {
-              ctx[CSS_PRELOAD].add(css);
-            });
-          });
-
-          ctx[OK] = true;
-        });
-      }
-      if(App.routes) {
-        table.routes = App.routes;
-        for( let p in App.routes) {
-          if(urlPath === '/') {
-            urlPath = '';
-          }
-          bindRoutes.call(this, App.routes[p], urlPath + p, filePath, files, table.routes[p], parents.concat(App));
-        }
-      }
-    } else {
-      //if app is not defined, then use the current app
-      let App = parents[parents.length - 1];
-      if(App.component) {
-        table.hasComponent = true;
-      }
-      //if component is defined
-      if(App.component) {
-
-
-        this[ROUTER].get(urlPath, function * (next) {
-          var ctx = this;
-          //populate components list
-          let compList = [];
-          parents.forEach((p) => {
-            if(p.component) {
-              compList.push(p.component);
-            }
-            //init stores
-            if(Array.isArray(p.stores)) {
-              p.stores.forEach((s) => {
-                ctx.stores.add(s);
-                let tmp = s.getInstance(ctx);
-                if(!tmp[INIT]) {
-                  tmp[INIT_STORE]();
-                  ctx.dispatcher.register(tmp);
-                }
-              });
-            }
-          });
-
-          {
-            let ec = new ExposeContext(ctx);
-            ec.ctx = ctx;
-            yield ec.exec();
-          }
-          //set routing information
-          {
-            let sr = new SetRoutes({
-            srcRoot: driver.config.distPath.external,
-            routes: driver.routeTable
-            });
-            sr.ctx = ctx;
-            yield sr.exec();
-          }
-
-          //trigger navigate action
-          {
-            let title = () => {
-              let t = route.title || driver.app.title || '';
-              if('function' === typeof t) {
-                t = t();
-              }
-              return Tmpl.format(t, ctx.params);
-            };
-            let n = new Navigate({
-            params: ctx.params,
-            title,
-            route: urlPath,
-            url: ctx.req.url,
-            components: compList
-            });
-            n.ctx = ctx;
-            yield n.exec();
-          }
-
-          //exec parent Apps' initial actions
-          yield execParentActions.call(driver, parents, ctx);
-
-          //trace css
-          ctx[CSS_PRELOAD] = new Set();
-
-          (yield map(files, (f)=> {
-            return traceCss.call(driver, f);
-          })).forEach((list) => {
-            list.forEach((css) => {
-              ctx[CSS_PRELOAD].add(css);
-            });
-          });
-
-          ctx[OK] = true;
-        });
-      }
-    }
-  }
-
-  function *execParentActions(parents, ctx) {
-    yield foreach(parents, function * (Mod) {
-      if(Array.isArray(Mod.initialActions)) {
-        yield foreach(Mod.initialActions, function * (initialAction) {
-          let ia = new initialAction.action(initialAction.payload);
-          ia.ctx = ctx;
-          yield ia.exec();
-        });
-      }
-      if(Array.isArray(Mod.routeActions)) {
-        yield foreach(Mod.routeActions, function * (routeAction) {
-          let ra = new routeAction.action(routeAction.payload);
-          ra.ctx = ctx;
-          yield ra.exec();
-        });
+        let ver =  this.config.version ? `?${ this.config.version }` : '';
+        return `/${item}${ver}`;
       }
     });
 
+    CssCache.set(src, result);
+    builder.reset();
+
   }
-  function *traceCss(src, jspm) {
-    var css;
-    if(!_CssCache[src]) {
-      //trace app for all module imports
-      let builder = new Builder();
-      yield builder.loadConfig(this.config.jspm.config);
+  return CssCache.get(src);
+}
 
-      var trace = yield builder.trace(src);
-
-      _CssCache[src] = Object.keys(trace).filter((item) => {
-        //filter imports to only css entries
-        return /\.css/i.test(trace[item].address);
-      }).map((item)=> {
-        //normalize server-side address to client side relative address
-        if(trace[item].address.indexOf(this.config.jspm.path) > -1) {
-          return '/' + path.relative(path.dirname(this.config.jspm.path), trace[item].address.replace(/file:/i, '')).replace(/\\\\/g, '/');
-        } else {
-          let ver =  this.config.version ? `?${ this.config.version }` : '';
-          return `/${item.split('!')[0]}${ver}`;
-        }
-      });
-
-      builder.reset();
-
-    }
-    return _CssCache[src];
+const UNDERSCORE = /_/;
+function normalizeLocaleCode(code) {
+  code = code.replace(UNDERSCORE, '-');
+  code = code.split('-');
+  code[0] = code[0].toLowerCase();
+  if(code.length > 1) {
+    code[1] = code[1].toUpperCase();
   }
+  return code.join('-');
+}

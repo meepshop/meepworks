@@ -1,5 +1,10 @@
 import React from 'react';
 
+/**
+ * @class Viewport
+ * @description The default Viewport component
+ * @property innerHTML
+ */
 export default class Viewport extends React.Component {
   render() {
     if(this.props.innerHTML) {

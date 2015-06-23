@@ -1,169 +1,192 @@
-import LocaleStore from './stores/locale-store';
-import LoadLocales from './actions/load-locales';
-import SetLocale from './actions/set-locale';
-import RouterStore from './stores/router-store';
+import IntlPolyfill from 'intl';
 import Tmpl from './tmpl';
-import Im from 'immutable';
-import co from 'co';
-import url from 'url';
+import { APPROOT } from './app-root';
+import { LocaleLoadFailed } from './errors';
 
-export const LOCALE_CACHE = new Map();
 
+//const Intl = global.Intl || IntlPolyfill;
+const Intl = IntlPolyfill;
+const Cache = new Map();
+const NumberFormatters = new Map();
+const DateFormatters = new Map();
+const DefaultLocale = 'en-US';
+
+const CTX = Symbol();
 const PATH = Symbol();
-const OVERRIDES = Symbol();
-const FORMAT = Symbol();
 
-const NUMBER_FORMATTERS = new Map();
-const DATE_FORMATTERS = new Map();
+export const LOCALE = Symbol();
+export const ACCEPTLANG = Symbol();
+export const LOCALEMAPPING = Symbol();
 
 export default class Locale {
-  constructor(p) {
-    /**
-     * When adopting latest jspm version, the __dirname implementation seems
-     * to have breaking changes.
-     * The following code works for the current implementation, but doesn't not consider
-     * rootUrl settings.
-     */
-    if(typeof System !== 'undefined' && typeof window !== 'undefined') {
-      p.path = '.' + p.path;
-    }
-
-    if(!p.preload) {
-      p.preload = {};
-    } else {
-      p.locales = [];
-      for(let l in p.preload) {
-        p.locales.push(l);
+  constructor(ctx, setting) {
+    //load files and create mappings
+    let self = (key, params) => {
+      let p = self[PATH];
+      if(!p) {
+        return key;
       }
-    }
+      let m = self[CTX][LOCALEMAPPING][p];
+      let res = Cache.get(self[PATH]).preload[m][key];
+      if(typeof res === 'undefined') {
+        return key;
+      }
 
-    if(!LOCALE_CACHE.has(p.path)) {
-      LOCALE_CACHE.set(p.path, {
-        locales: new Set(p.locales),
-        preload: p.preload
-      });
-    } else {
-      let c = LOCALE_CACHE.get(p.path);
-      p.locales.forEach((l) => {
-        c.locales.add(l);
-      });
-      if(p.preload) {
-        for(let l in p.preload) {
-          if(!c.preload[l]) {
-            c.preload[l] = p.preload[l];
+      if(typeof params !== 'undefined') {
+        res = Tmpl.format(res, params);
+      }
+      return res;
+    };
+
+    self[CTX] = ctx;
+
+    if(typeof setting !== 'undefined') {
+
+      self[PATH] = setting.path;
+      if(!setting.preload) {
+        setting.preload = {};
+      } else {
+        setting.locales = [];
+        for(let l in setting.preload) {
+          setting.locales.push(l);
+        }
+      }
+
+      if(!Cache.has(setting.path)) {
+        Cache.set(setting.path, {
+          locales: new Set(setting.locales),
+          preload: setting.preload
+        });
+      } else {
+        let c = Cache.get(setting.path);
+        setting.locales.forEach((l) => {
+          c.locales.add(l);
+        });
+        if(setting.preload) {
+          for(let l in setting.preload) {
+            if(!c.preload[l]) {
+              c.preload[l] = setting.preload[l];
+            }
           }
         }
       }
     }
-    this[PATH] = p.path;
-    this[OVERRIDES] = [];
-  }
-  get paths() {
-    return this[PATH];
+
+    self.__proto__ = this.__proto__;
+    return self;
   }
 
-  addOverride(l) {
-    this[OVERRIDES].unshift(l);
-  }
+  async loadLocales() {
 
-  format(key, params) {
-    let res;
-    if(this[OVERRIDES].every((o) => {
-      res = o[FORMAT](key, params);
-      return !res;
-    })) {
-      res = this[FORMAT](key, params);
-      if(!res) {
-        res = key;
+    let mapping = this[CTX][LOCALEMAPPING];
+    let locale = this[CTX][LOCALE];
+    let acceptedLanguagees = this[CTX][ACCEPTLANG];
+    //check if path exists in Cache
+    for(let [p, c] of Cache) {
+      let match = findMatch(locale, c.locales);
+
+      //find a match from accepted languages current locale isn't available
+      if(!match) {
+        if(acceptedLanguages.every((l) => {
+          match = findMatch(l, c.locales);
+          return !match;
+        })) {
+          match = c.locales.entries().next().value.shift();
+        }
       }
+      if(!c.preload[match]) {
+        if(typeof window !== 'undefined' && typeof System !== 'undefined') {
+          c.preload[match] = await System.import(`${p}/${match}.json!`);
+        } else {
+          c.preload[match] = require(`${p}/${match}.json`);
+        }
+      }
+      mapping[p] = match;
     }
-    return res;
   }
-  static get locale() {
-    return LocaleStore.locale;
-  }
+
   get locale() {
-    return LocaleStore.locale;
-  }
-  static setLocale(l) {
-    return co(function * () {
-      yield new SetLocale(l).exec();
-      yield new LoadLocales().exec();
-    });
-  }
-  setLocale(l) {
-    return Locale.setLocale(l);
+    return this[CTX][LOCALE];
   }
 
-  static formatDecimal() {
-    return Locale.formatNumber(value);
-  }
-  formatDecimal(value) {
-    return Locale.formatNumber(value);
-  }
-
-
-  static formatCurrency(value, currency) {
-    currency = currency.toUpperCase();
-    return this.formatNumber(value, {
-      style: 'currency',
-      currency
-    });
-  }
-  formatCurrency(value, currency) {
-    return Locale.formatCurrency(value, currency);
-  }
-
-
-  static formatNumber(value, opts) {
-    let l = Locale.locale;
-    let key = `${l}:${JSON.stringify(opts)}`;
-    if(!NUMBER_FORMATTERS.has(key)) {
-      NUMBER_FORMATTERS.set(key, LocaleStore.intl.NumberFormat(l, opts));
+  async setLocale(l) {
+    let previousLocale = this[CTX][LOCALE];
+    this[CTX][LOCALE] = l;
+    try {
+      await this.loadLocales();
+      if(typeof this[CTX][APPROOT] === 'function') {
+        this[CTX][APPROOT](l);
+      }
+    } catch (err) {
+      this[CTX][LOCALE] = previousLocale;
+      await this.loadLocales();
+      this[CTX].emit('error', new LocaleLoadFailed(err));
     }
-    let f = NUMBER_FORMATTERS.get(key);
+
+  }
+
+
+  static formatNumber(locale, value, opts) {
+    let key = `${locale}:${JSON.stringify(opts)}`;
+    if(!NumberFormatters.has(key)) {
+      NumberFormatters.set(key, Intl.NumberFormat(locale, opts));
+    }
+    let f = NumberFormatters.get(key);
     return f.format(value);
   }
-  formatNumber(value, opts) {
-    return Locale.formatNumber(value, opts);
+  formatNumber(...args) {
+    let locale = this[CTX][LOCALE];
+    return Locale.formatNumber(Locale, ...args);
   }
 
 
-  static formatDateTime(t, opts) {
-    let l = Locale.locale;
-    let key = `${l}:${JSON.stringify(opts)}`;
-    if(!DATE_FORMATTERS.has(key)) {
-      DATE_FORMATTERS.set(key, LocaleStore.intl.DateTimeFormat(l, opts));
+  static formatDateTime(locale, t, opts) {
+    let key = `${locale}:${JSON.stringify(opts)}`;
+    if(!DateFormatters.has(key)) {
+      DateFormatters.set(key, Intl.DateTimeFormat(locale, opts));
     }
-    let f = DATE_FORMATTERS.get(key);
+    let f = DateFormatters.get(key);
     return f.format(t);
+  }
+  formatDateTime(...args) {
+    let locale = this[CTX][LOCALE];
+    return Locale.formatDateTime(locale, ...args);
+  }
 
+  static formatCurrency(locale, value, currency, fixed) {
+    currency = currency.toUpperCase();
+    let opts = {
+      style: 'currency',
+      currency: currency.toUpperCase()
+    };
+    if(typeof fixed === 'number') {
+      fixed = ~~fixed;
+      opts.minimumFractionDigits = fixed;
+      opts.maximumFractionDigits = fixed;
+    }
+    return this.formatNumber(locale, value, opts);
   }
-  formatDateTime(t, opts) {
-    return Locale.formatDate(t, opts);
-  }
-
-
-  static subscribe(f) {
-    LocaleStore.getInstance().subscribe(f);
-  }
-  subscribe(f) {
-    LocaleStore.getInstance().subscribe(f);
-  }
-  static unsubscribe(f) {
-    LocaleStore.getInstance().unsubscribe(f);
-  }
-  unsubscribe(f) {
-    LocaleStore.getInstance().unsubscribe(f);
+  formatCurrency(...args) {
+    let locale = this[CTX][LOCALE];
+    return Locale.formatCurrency(locale, ...args);
   }
 }
 
-Locale.prototype[FORMAT] = function (key, params) {
-  let res;
-  let l = LocaleStore.locale;
-  let tmpl = LocaleStore.getTmpl(this[PATH], key);
-  if(tmpl) {
-    res = Tmpl.format(tmpl, params);
+function findMatch(locale, list) {
+  if(list.has(locale)) {
+    return locale;
+  } else {
+    let ln = locale.split('-').shift();
+    if(list.has(ln)) {
+      //locale = zh-TW, list has zh
+      return ln;
+    } else {
+    //locale = zh, list has zh-TW
+      for(let entry of list) {
+        if(entry.split('-').shift() === ln) {
+          return entry;
+        }
+      }
+    }
   }
-  return res;
 }

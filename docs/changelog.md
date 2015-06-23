@@ -1,6 +1,13 @@
 Change Log
 ===
 
+#v0.10.4
+**2015 Jun 23**
+
+1. Redesign the framework to use react-router for routing.
+2. Introduced the use of contexts.
+3. Unified Application component and application manifest.
+
 
 #v0.9.0
 **2015 Jun. 04**

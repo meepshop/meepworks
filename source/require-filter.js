@@ -1,5 +1,4 @@
 import Module from 'module';
-import Instance from './instance';
 import path from 'path';
 import url from 'url';
 import escapeRegExp from 'greasebox/escape-reg-exp';
@@ -12,24 +11,23 @@ const FILEROOT = Symbol();
 const URLROOT = Symbol();
 const VERSION = Symbol();
 
-export default class RequireFilter extends Instance {
+export default class RequireFilter {
   constructor(param) {
-    super();
     this[ENABLED] = true;
     this[FILTERS] = new Map();
     this[LOADERS] = new Map();
     this[ORIGINAL_REQUIRE] = Module.prototype.require;
 
-    if(param.fileRoot[param.fileRoot.length - 1] === '/') {
-      this[FILEROOT] = param.fileRoot.substr(0, param.fileRoot.length - 1);
+    if(param.root[param.root.length - 1] === '/') {
+      this[FILEROOT] = param.root.substr(0, param.root.length - 1);
     } else {
-      this[FILEROOT] = param.fileRoot;
+      this[FILEROOT] = param.root;
     }
 
-    if(param.urlRoot[param.urlRoot.length - 1] === '/') {
-      this[URLROOT] = param.urlRoot.substr(0, param.urlRoot.length - 1);
+    if(param.baseURL[param.baseURL.length - 1] === '/') {
+      this[URLROOT] = param.baseURL.substr(0, param.baseURL.length - 1);
     } else {
-      this[URLROOT] = param.urlRoot;
+      this[URLROOT] = param.baseURL;
     }
     this[VERSION] =  param.version ? `?${param.version}` : '';
 

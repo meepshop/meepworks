@@ -1,98 +1,65 @@
 import koa from 'koa';
+import serve from 'koa-static-cache';
 import mount from 'koa-mount';
-import serve from 'koa-static';
-import router from 'koa-router';
 import favicon from 'koa-favicon';
 import path from 'path';
-import fs from 'fs';
-import './filter';
+import AppDriver from '../../build/server-app-driver';
+
 import React from 'react';
-import dedent from '../../dist/dedent';
+import Router, {Route, RouteHandler} from 'react-router';
 
-const version = new Date().getTime();
+import RequireFilter from '../../build/require-filter';
+//console.log('start');
+//console.time('setFilter');
+const requireFilter = new RequireFilter({
+  root: path.resolve(__dirname, '../..'),
+  baseURL: 'test-server',
+  //version: version
+});
+requireFilter.filter('.css!');
+//console.timeEnd('setFilter');
 
+//console.time('koa-mount');
+const server = new koa();
 
-
-import TestApp from './app/app';
-import AppDriver from '../../dist/server-app-driver';
-
-let server = koa();
 server.use(favicon());
 
-server.use(mount('/jspm_packages', serve(path.resolve(__dirname, '../../jspm_packages/'), {
-  maxage: 2*60*1000
+
+server.use(mount('/jspm_packages', serve(path.resolve(__dirname, '../../jspm_packages'), {
 })));
-server.use(mount('/dist', serve(path.resolve(__dirname, '../../dist'), {
-  maxage: 2*60*1000
+server.use(mount('/build', serve(path.resolve(__dirname, '../../build'), {
 })));
-server.use(mount('/test-server/build', serve(path.resolve(__dirname, '../../test-server/build'), {
-  maxage: 2*60*1000
+server.use(mount('/test-server', serve(__dirname, {
 })));
+//console.timeEnd('koa-mount');
 
 
-server.use(function * timer(next) {
-  let start = new Date().getTime();
+server.use(function * (next) {
+  console.log('req start: ', this.req.url);
+  //console.time('req');
   yield next;
-  console.log(`${this.req.url}, ${new Date().getTime() - start}ms.`);
+  //console.timeEnd('req');
 });
 
-//standalone server
-
-
-//server.use(router(server));
-//function *standaloneHandler (next) {
-//    this.body = '<!DOCTYPE html>' +
-//      React.renderToStaticMarkup(
-//        <html>
-//          <head>
-//            <title></title>
-//            <script key="sys" src="/jspm_packages/system.src.js"></script>
-//            <script key="config" src="/jspm_packages/config.js"></script>
-//            {
-//              // <script key="stand-alone" src={`/test-server/node/standalone.js?${version}`}></script>
-//            }
-//            <script key="bootstrap" dangerouslySetInnerHTML={{
-//              __html: dedent `
-//              System.baseURL='/';
-//              System.import('dist/standalone-driver')
-//              .then(function (m) {
-//              new m('test-server/build/app/app', '/', 'test-server/build');
-//              }).catch(console.log);
-//              `
-//            }}></script>
-//        </head>
-//        <body>
-//        </body>
-//      </html>
-//    );
-//}
-//
-////server.get(/.*/, standaloneHandler);
-//
-//server.use(mount('/', )));
-
-let testApp = new AppDriver(TestApp, {
+//console.time('mountApp');
+const app = new AppDriver({
   appPath: 'app/app',
   jspm: {
     path: 'jspm_packages',
     config: 'jspm_packages/config.js'
   },
-  distPath: {
-    external: 'test-server/build',
-    internal: 'test-server/build'
-  },
-  fileRoot: __dirname,
+  dirname: __dirname,
+  root: path.resolve(__dirname, '../..'),
   localtest: true,
-  //version: version,
-  rootUrl: '/'
+  buildPath: 'test-server/build',
+  buildURL: 'test-server',
+  abortPath: '/my-app/sub',
+  baseURL: 'my-app'
 });
+server.use(mount('/my-app', app.router));
+//console.timeEnd('mountApp');
 
-server.use(testApp.routes());
+server.listen(18881);
+console.log('listening to 18881');
 
 
-
-
-
-server.listen('15551', () => {
-  console.log('server listening to 15551');
-});
