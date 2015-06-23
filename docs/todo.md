@@ -1,9 +1,6 @@
 Todo List
 =========
 
-1. Locale System
-  a. dehydrate locale mapping to client side
-  b. browser locale detection
-
-2. Performance profiling
+1. Performance profiling
+2. Logging support
 
