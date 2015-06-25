@@ -1,6 +1,8 @@
 import React from 'react';
 import Application from '../../../build/application';
 
+
+
 export default class SubApp extends Application {
   static willTransitionFrom(transition) {
   }
@@ -23,15 +25,21 @@ export default class SubApp extends Application {
       ]
     };
   }
-  static willTransitionTo(transition) {
-    if(Math.random() > 0.5) {
-    } else if(Math.random() > 0.3) {
-      transition.abort('reject');
-    } else {
-      transition.redirect(this.context.baseURL + '/not-found');
-    }
-  }
+  //static willTransitionTo(transition) {
+  //  if(Math.random() > 0.5) {
+  //  } else if(Math.random() > 0.3) {
+  //    transition.abort('reject');
+  //  } else {
+  //    transition.redirect(this.context.baseURL + '/not-found');
+  //  }
+  //}
   render() {
+
+    //let t = new Date().getTime();
+    //let i = 0;
+    //while(new Date().getTime() - t < 30000) {
+    //  console.log('loop', i++);
+    //}
     return (
       <div>SubApp @ {this.context.currentPath}<br />
         <button onClick={() => {

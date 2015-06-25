@@ -9,6 +9,12 @@ import path from 'path';
 import css from './base.css!';
 import { AppLoadFailed } from '../../../build/errors';
 
+
+//export default class App extends Application {
+//  render() {
+//    return <div>Hello World!</div>;
+//  }
+//}
 export default class App extends Application {
   static get routes() {
     return {
@@ -75,7 +81,7 @@ export default class App extends Application {
     return (
       <div><ShowRoute />
         Msg: { this.state.store.get('msg') }<br />
-        <Link to={`${this.context.appURL}`}>Home</Link><br />
+        <Link to={`${this.context.appURL}/`}>Home</Link><br />
         <Link to={`${this.context.appURL}/sub`}>Sub</Link><br />
         <RouteHandler />
       </div>

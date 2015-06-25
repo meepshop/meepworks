@@ -28,7 +28,7 @@ export default class AppLoader {
     this.App = App;
     this.context = {
       appCtx,
-      baseURL: '/' + baseURL,
+      baseURL: baseURL,
       appURL: resolveAppURL(baseURL, currentPath)
     };
     this.resolvedPath = resolvedPath;
@@ -231,11 +231,11 @@ function loaded()  {
 function resolveAppURL(baseURL = '', currentPath = '') {
 
   if(baseURL === '') {
-    return '/' + currentPath;
+    return currentPath;
   } else if(currentPath === '') {
-    return '/' + baseURL;
+    return baseURL;
   } else {
-    return `/${baseURL}/${currentPath}`;
+    return `${baseURL}/${currentPath}`;
   }
 
 }

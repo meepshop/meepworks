@@ -1,6 +1,11 @@
 Change Log
 ===
 
+#v0.10.5
+**2015 Jun 25**
+
+1. Fixed context.baseURL and context.appURL bugs
+
 #v0.10.4
 **2015 Jun 23**
 
