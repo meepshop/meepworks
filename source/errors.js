@@ -29,7 +29,6 @@ export class AppLoadFailed extends GenericError {
 
 export class LocaleLoadFailed extends GenericError {
   constructor(err) {
-    window.err = err;
     super();
     this.name = this.constructor.name;
     this.msg = 'Failed to import an locale file';

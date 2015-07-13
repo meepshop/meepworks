@@ -80,7 +80,7 @@ export default class Locale {
 
     let mapping = this[CTX][LOCALEMAPPING];
     let locale = this[CTX][LOCALE];
-    let acceptedLanguagees = this[CTX][ACCEPTLANG];
+    let acceptedLanguages = this[CTX][ACCEPTLANG];
     //check if path exists in Cache
     for(let [p, c] of Cache) {
       let match = findMatch(locale, c.locales);
