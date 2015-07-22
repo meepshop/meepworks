@@ -36,7 +36,7 @@ export default class AppDriver {
         appPath: config.appPath
       }, appPath);
       //console.timeEnd('traceTable');
-    }());
+    })();
   }
   get router() {
 

@@ -221,7 +221,7 @@ function loaded()  {
 
       }
       this.initStores();
-    }());
+    })();
     return this[LOADED];
   }
   return Promise.resolve();

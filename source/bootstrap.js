@@ -55,7 +55,7 @@ class Loader extends Component {
             new m('${this.props.config.buildURL}/${this.props.config.appPath}', '${this.props.target}'${dataId});
           })
           .catch(console.log);
-        }());`
+        })();`
       }} />
     );
   }
