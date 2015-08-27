@@ -6,6 +6,9 @@ import path from 'path';
 import url from 'url';
 import AppRoot from './app-root';
 import { AppLoadFailed, LocaleLoadFailed } from './errors';
+import Application from './application';
+
+const CACHE = new Map();
 
 const LOADED = Symbol();
 
@@ -24,108 +27,114 @@ const LOADED = Symbol();
  */
 export default class AppLoader {
   constructor(App, appCtx, currentPath, baseURL = '', resolvedPath) {
-    const loader = this;
-    this.App = App;
-    this.context = {
-      appCtx,
-      baseURL: baseURL,
-      appURL: resolveAppURL(baseURL, currentPath)
-    };
-    this.resolvedPath = resolvedPath;
+    if(CACHE.has(App)) {
+      return CACHE.get(App);
+    } else {
+      const loader = this;
+      this.App = App;
+      this.context = {
+        appCtx,
+        baseURL: baseURL,
+        appURL: resolveAppURL(baseURL, currentPath)
+      };
+      this.resolvedPath = resolvedPath;
 
-    return class K extends Component {
-      static get contextTypes() {
-        return {
-          router: PropTypes.func,
-          appCtx: PropTypes.object,
-          baseURL: PropTypes.string,
-          appURL: PropTypes.string,
-          currentPath: PropTypes.string,
-          locale: PropTypes.func
-        };
-      }
-      getChildContext() {
-        let res = {
-          appCtx,
-          baseURL: loader.context.baseURL,
-          appURL: loader.context.appURL
-        };
-        //if the application has defined locale settings
-        //override the locale object in the context
-        if(loader.context.locale !== void 0) {
-          res.locale = loader.context.locale;
+      return class K extends Component {
+        static get contextTypes() {
+          return {
+            router: PropTypes.func,
+            appCtx: PropTypes.object,
+            baseURL: PropTypes.string,
+            appURL: PropTypes.string,
+            currentPath: PropTypes.string,
+            locale: PropTypes.func
+          };
         }
-        return res;
-      }
-      static willTransitionTo(transition, params, query, cb) {
-        //if on server side, accumulate the imported files for css scans
-        if(loader.resolvedPath) {
-          appCtx.files.push(loader.resolvedPath);
-        }
-
-        loader.context.currentPath = transition.path;
-
-        loader::loaded().then(() => {
-          //if app has title defined, push to title stack
-          let title = loader::loader.App.title();
-          if(title !== void 0) {
-            appCtx.title.push(title);
+        getChildContext() {
+          let res = {
+            appCtx,
+            baseURL: loader.context.baseURL,
+            appURL: loader.context.appURL
+          };
+          //if the application has defined locale settings
+          //override the locale object in the context
+          if(loader.context.locale !== void 0) {
+            res.locale = loader.context.locale;
           }
-          if(appCtx[APP_INIT] && typeof loader.App.willTransitionTo === 'function') {
-            //bind to Application's willTransitionTo functions to loader to provide
-            //uniform context access
-            loader::(loader.App.willTransitionTo)(transition, params, query, cb);
-            //call cb if Application's willTransitionTo function does not handle cb
-            if(loader.App.willTransitionTo.length < 4) {
+          return res;
+        }
+        static willTransitionTo(transition, params, query, cb) {
+          //if on server side, accumulate the imported files for css scans
+          if(loader.resolvedPath) {
+            appCtx.files.push(loader.resolvedPath);
+          }
+
+          loader.context.currentPath = transition.path;
+
+          loader::loaded().then(() => {
+            //if app has title defined, push to title stack
+            //let title = loader::loader.App.title();
+            if(loader.App.title !== Application.title) {
+
+              appCtx.title.push((currentPath) => {
+                loader.context.currentPath = currentPath;
+                return loader::loader.App.title();
+              });
+            }
+            if(appCtx[APP_INIT] && typeof loader.App.willTransitionTo === 'function') {
+              //bind to Application's willTransitionTo functions to loader to provide
+              //uniform context access
+              loader::(loader.App.willTransitionTo)(transition, params, query, cb);
+              //call cb if Application's willTransitionTo function does not handle cb
+              if(loader.App.willTransitionTo.length < 4) {
+                cb();
+              }
+            } else {
+              cb();
+            }
+
+          }).catch((err) => {
+            //abort transition if there's loading error
+            loader[LOADED] = false;
+            //console.log(err, err.stack);
+            transition.abort('error');
+            cb(err);
+
+          });
+        }
+        static willTransitionFrom(transition, component, cb) {
+          //provide similar context interface
+          loader.context.currentPath = transition.path;
+
+          //remove title from title stack if defined
+          if(loader.App.title !== Application.title) {
+            appCtx.title.pop();
+          }
+
+          if(typeof loader.App.willTransitionFrom === 'function') {
+            //pass the correct component
+            loader::(loader.App.willTransitionFrom)(transition, component.refs.app, cb);
+            if(loader.App.willTransitionFrom.length < 3) {
               cb();
             }
           } else {
             cb();
           }
-
-        }).catch((err) => {
-          //abort transition if there's loading error
-          loader[LOADED] = false;
-          //console.log(err, err.stack);
-          transition.abort('error');
-          cb(err);
-
-        });
-      }
-      static willTransitionFrom(transition, component, cb) {
-        //provide similar context interface
-        loader.context.currentPath = transition.path;
-
-        //remove title from title stack if defined
-        let title = loader::loader.App.title();
-        if(title !== void 0) {
-          //because all the apps that is dismounting will trigger willTransitionFrom,
-          //so the total number of titles to be popped will be correct regardless of
-          //the order of execution of willTransitionFrom function.
-          appCtx.title.pop();
         }
-
-        if(typeof loader.App.willTransitionFrom === 'function') {
-          loader::(loader.App.willTransitionFrom)(transition, component, cb);
-          if(loader.App.willTransitionFrom.length < 3) {
-            cb();
+        static get childContextTypes () {
+          return {
+            appCtx: PropTypes.object,
+            baseURL: PropTypes.string,
+            appURL: PropTypes.string,
+            currentPath: PropTypes.string,
+            locale: PropTypes.func
           }
-        } else {
-          cb();
         }
-      }
-      static get childContextTypes () {
-        return {
-          appCtx: PropTypes.object,
-          baseURL: PropTypes.string,
-          appURL: PropTypes.string,
-          currentPath: PropTypes.string,
-          locale: PropTypes.func
+        render () {
+          let App = loader.App;
+          return <App ref="app"/>;
         }
-      }
-      render () {
-        let App = loader.App;
-        return <App />;
+
       }
 
     }
@@ -231,11 +240,13 @@ function loaded()  {
 function resolveAppURL(baseURL = '', currentPath = '') {
 
   if(baseURL === '') {
-    return currentPath;
-  } else if(currentPath === '') {
-    return baseURL;
-  } else {
-    return `${baseURL}/${currentPath}`;
+    if(currentPath === '') {
+      return '';
+    }
+    return `/${currentPath}`;
   }
-
+  if(currentPath ==='') {
+    return baseURL;
+  }
+  return `${BaseURL}/${currentPath}`;
 }

@@ -48,18 +48,20 @@ export default class App extends Application {
     };
   }
   static willTransitionTo(transition, params, query, cb) {
-    this.runAction(new Actions.Test('Hello')).then(cb).catch(cb);
+    this.runAction(new Actions.Test('</script><script>alert("test")</script>')).then(cb).catch(cb);
   }
   constructor(props, context) {
     super(props, context);
 
     this.state = {
-      store: Store.getInstance(this.context.appCtx).state
+      store: Store.getInstance(this.context.appCtx).state,
+      locale: this.locale
     };
 
     this.changeHandler = () => {
       this.setState({
-        store: Store.getInstance(this.context.appCtx).state
+        store: Store.getInstance(this.context.appCtx).state,
+        locale: this.locale
       });
     };
   }
@@ -68,10 +70,15 @@ export default class App extends Application {
     this.context.appCtx.on('error', (err) => {
       console.log('child application load failed', err);
     });
+    this.context.appCtx.on('locale-change', (l) => {
+      this.setState({
+        locale: l
+      });
+    });
     this.runAction(new Actions.Test('Hello World!'));
 
     setTimeout(() => {
-      //this.setLocale('en-US');
+      this.setLocale('en-US');
     }, 2000);
   }
   componentWillUnmount() {

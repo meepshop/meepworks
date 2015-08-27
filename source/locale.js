@@ -114,6 +114,7 @@ export default class Locale {
     this[CTX][LOCALE] = l;
     try {
       await this.loadLocales();
+      this[CTX].emit('locale-change', l);
       if(typeof this[CTX][APPROOT] === 'function') {
         this[CTX][APPROOT](l);
       }

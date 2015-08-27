@@ -26,9 +26,6 @@ export default class Application extends Component {
   static get routes() {
     return {};
   }
-  static get locales() {
-    return {};
-  }
   static title() {
     return void 0;
   }

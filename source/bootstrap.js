@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import uuid from 'uuid';
 import dedent from 'greasebox/dedent';
+import htmlEscape from 'html-escape';
 
 
 
@@ -11,12 +12,14 @@ import dedent from 'greasebox/dedent';
 class Data extends Component {
   render() {
     //convert data to base64 string avoid html injection
+    //let res = new Buffer(JSON.stringify(this.props.data)).toString('base64');
+    let res = htmlEscape(JSON.stringify(this.props.data));
     return (
       <script
         id={this.props.dataId}
         type='application/json'
         dangerouslySetInnerHTML={{
-          __html: (new Buffer(JSON.stringify(this.props.data))).toString('base64')
+          __html: res
         }}
       />
     );
