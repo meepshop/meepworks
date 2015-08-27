@@ -1,6 +1,11 @@
 Change Log
 ===
 
+#v0.10.27
+**2015 Aug 28**
+
+1. Bump versions. Especially to make meepworks compatible with jspm 0.16.x
+
 #v0.10.26
 **2015 Aug 28**
 
