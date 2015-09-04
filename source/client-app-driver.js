@@ -10,6 +10,23 @@ import Tmpl from './tmpl';
 import Location from './location';
 import AppRoot from './app-root';
 import * as errors from './errors';
+import NullApp from './components/null-app';
+
+
+const rAm = /&amp;/g;
+const rLt = /&lt;/g;
+const rGt = /&gt;/g;
+const rAp = /&#39;/g;
+const rQu = /&quot;/g;
+
+function unescapeHTML(str) {
+  return str
+    .replace(rLt, '<')
+    .replace(rGt, '>')
+    .replace(rAp, "'")
+    .replace(rQu, '"')
+    .replace(rAm, '&');
+}
 
 
 export default class AppDriver {
@@ -18,10 +35,9 @@ export default class AppDriver {
     driver.target = document.querySelector(target);
     driver.appSrc = src;
 
-
-
     let dataScript = document.querySelector(`script[id="${dataId}"]`);
-    let data = JSON.parse(atob(dataScript.innerHTML));
+    let data = JSON.parse(unescapeHTML(dataScript.innerHTML));
+
 
     driver.routeTable = driver::traceRoutes(data.table);
 
@@ -43,13 +59,17 @@ export default class AppDriver {
       routes,
       location,
       onError: (err) => {
+        debugger;
         ctx.emit('error', err);
       }
     });
     r.run((Root, state) => {
         //rehydrate stores
         if(ctx[APP_INIT]) {
-          let title = ctx.title[ctx.title.length - 1];
+          let title;
+          if(ctx.title.length > 0) {
+            title = ctx.title[ctx.title.length - 1](location.getCurrentPath());
+          }
           if(title !== void 0) {
             title = Tmpl.format(title, state.params);
             document.title = title;
@@ -76,7 +96,9 @@ function traceRoutes(table, src) {
 
   if(table.routes) {
     for(let p in table.routes) {
-      this::traceRoutes(table.routes[p], url.resolve(src, table.routes[p].appPath));
+      if(table.routes[p].appPath) {
+        this::traceRoutes(table.routes[p], url.resolve(src, table.routes[p].appPath));
+      }
     }
   }
   return table;
@@ -87,23 +109,42 @@ function generateRoutes(table, ctx, baseURL = '', currentPath = '') {
   let children = [];
   if(table.routes) {
     for(let p in table.routes) {
+      let handler = table.routes[p].appPath ?
+        new AppLoader(
+          table.routes[p].appPath,
+          ctx,
+          currentPath,
+          baseURL
+        ) :
+        NullApp;
       if(p === '$default') {
         children.push(
-          <DefaultRoute key={p} handler={new AppLoader(table.routes[p].appPath, ctx, currentPath, baseURL)}/>
+          <DefaultRoute key={p} handler={handler}/>
         );
       } else if (p === '$notfound') {
         children.push(
-          <NotFoundRoute key={p} handler={new AppLoader(table.routes[p].appPath, ctx, currentPath, baseURL)} />
+          <NotFoundRoute key={p} handler={handler} />
         );
       } else {
-        children.push(this::generateRoutes(table.routes[p],  ctx, baseURL, currentPath === '' ? p : `${currentPath}/${p}`));
+        children.push(
+          this::generateRoutes(
+            table.routes[p],
+            ctx,
+            baseURL,
+            currentPath === '' ? p : `${currentPath}/${p}`
+          )
+        );
       }
     }
   }
+  let handler = table.appPath ?
+    new AppLoader(table.appPath, ctx, currentPath, baseURL) :
+    NullApp;
   return (
-    <Route path={`/${currentPath}`} key={`/${currentPath}`} handler={new AppLoader(table.appPath, ctx, currentPath, baseURL)}>
+    <Route path={`/${currentPath}`} key={`/${currentPath}`} handler={handler}>
       {children}
     </Route>
   );
 
 }
+

@@ -1,3 +1,4 @@
 {
-  "content": "Hi ${name}!"
+  "content": "Hi ${name}!",
+  "title": "meepworks-test-server"
 }

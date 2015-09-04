@@ -9,6 +9,12 @@ import path from 'path';
 import css from './base.css!';
 import { AppLoadFailed } from '../../../build/errors';
 
+
+//export default class App extends Application {
+//  render() {
+//    return <div>Hello World!</div>;
+//  }
+//}
 export default class App extends Application {
   static get routes() {
     return {
@@ -42,18 +48,20 @@ export default class App extends Application {
     };
   }
   static willTransitionTo(transition, params, query, cb) {
-    this.runAction(new Actions.Test('Hello')).then(cb).catch(cb);
+    this.runAction(new Actions.Test('</script><script>alert("test")</script>')).then(cb).catch(cb);
   }
   constructor(props, context) {
     super(props, context);
 
     this.state = {
-      store: Store.getInstance(this.context.appCtx).state
+      store: Store.getInstance(this.context.appCtx).state,
+      locale: this.locale
     };
 
     this.changeHandler = () => {
       this.setState({
-        store: Store.getInstance(this.context.appCtx).state
+        store: Store.getInstance(this.context.appCtx).state,
+        locale: this.locale
       });
     };
   }
@@ -62,10 +70,15 @@ export default class App extends Application {
     this.context.appCtx.on('error', (err) => {
       console.log('child application load failed', err);
     });
+    this.context.appCtx.on('locale-change', (l) => {
+      this.setState({
+        locale: l
+      });
+    });
     this.runAction(new Actions.Test('Hello World!'));
 
     setTimeout(() => {
-      //this.setLocale('en-US');
+      this.setLocale('en-US');
     }, 2000);
   }
   componentWillUnmount() {
@@ -75,7 +88,7 @@ export default class App extends Application {
     return (
       <div><ShowRoute />
         Msg: { this.state.store.get('msg') }<br />
-        <Link to={`${this.context.appURL}`}>Home</Link><br />
+        <Link to={`${this.context.appURL}/`}>Home</Link><br />
         <Link to={`${this.context.appURL}/sub`}>Sub</Link><br />
         <RouteHandler />
       </div>

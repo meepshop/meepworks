@@ -52,6 +52,15 @@ export default class AppContext {
     });
   }
   /**
+   * @function
+   * @description helper function to get store instance with this context.
+   * @param {Store} store - The constructor of the store.
+   * @return {Store}
+   */
+  getStore(store) {
+    return store.getInstance(this);
+  }
+  /**
    * @property {Array} title
    * @description Used by the framework to determine the appropriate document title.
    */

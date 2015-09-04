@@ -1,6 +1,37 @@
 Change Log
 ===
 
+#v0.10.27
+**2015 Aug 28**
+
+1. Bump versions. Especially to make meepworks compatible with jspm 0.16.x
+
+#v0.10.26
+**2015 Aug 28**
+
+1. Add PureRenderComponent that automatically check props and state for shouldComponentUpdate.
+
+#v0.10.18
+**2015 Jul 29**
+
+1. Revert setLocale changes.
+
+#v0.10.17
+**2015 Jul 29**
+
+1. setLocale no longer forceUpdate the root. It will now emit a 'locale-change' event via appContext. Apps that should respond to such event should implement handlers for it.
+
+#v0.10.15
+**2015 Jul 28**
+
+1. Allow route's appPath to be undefined, this is useful for apps that should handle multiple routes.
+2. Changed the internal handling for getting titles, titles should now update on navigation even if the handler is the same component.
+
+#v0.10.5
+**2015 Jun 25**
+
+1. Fixed context.baseURL and context.appURL bugs
+
 #v0.10.4
 **2015 Jun 23**
 

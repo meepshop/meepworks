@@ -42,6 +42,23 @@ server.use(function * (next) {
 });
 
 //console.time('mountApp');
+//const app = new AppDriver({
+//  appPath: 'app/app',
+//  jspm: {
+//    path: 'jspm_packages',
+//    config: 'jspm_packages/config.js'
+//  },
+//  dirname: __dirname,
+//  root: path.resolve(__dirname, '../..'),
+//  localtest: true,
+//  buildPath: 'test-server/build',
+//  buildURL: 'test-server',
+//  abortPath: '/my-app/sub',
+//  baseURL: 'my-app'
+//});
+//server.use(mount('/my-app', app.router));
+//console.timeEnd('mountApp');
+
 const app = new AppDriver({
   appPath: 'app/app',
   jspm: {
@@ -53,11 +70,10 @@ const app = new AppDriver({
   localtest: true,
   buildPath: 'test-server/build',
   buildURL: 'test-server',
-  abortPath: '/my-app/sub',
-  baseURL: 'my-app'
+  abortPath: '/',
+  baseURL: ''
 });
-server.use(mount('/my-app', app.router));
-//console.timeEnd('mountApp');
+server.use(app.router);
 
 server.listen(18881);
 console.log('listening to 18881');

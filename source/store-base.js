@@ -8,6 +8,7 @@ import Dispatcher from './dispatcher';
 const EMITTER = Symbol();
 const REGISTERED = Symbol();
 const SYMBOLS = Symbol();
+const CTX = Symbol();
 
 
 /**
@@ -55,6 +56,7 @@ export default class StoreBase extends Instance {
     if(!self[REGISTERED]) {
       ctx.stores.add(self);
       Dispatcher.getInstance(ctx).register(self);
+      self[CTX] = ctx;
       self[REGISTERED] = true;
     }
     return self;
@@ -86,6 +88,9 @@ export default class StoreBase extends Instance {
   }
   off(fn) {
     this[EMITTER].off('change', fn);
+  }
+  get ctx() {
+    return this[CTX];
   }
 }
 

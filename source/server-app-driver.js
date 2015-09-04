@@ -14,6 +14,7 @@ import bootstrap from './bootstrap';
 import Builder from 'systemjs-builder';
 import { LOCALE, ACCEPTLANG } from './locale';
 import * as errors from './errors';
+import NullApp from './components/null-app';
 
 
 const DOCTYPE = '<!DOCTYPE html>';
@@ -36,7 +37,7 @@ export default class AppDriver {
         appPath: config.appPath
       }, appPath);
       //console.timeEnd('traceTable');
-    }());
+    })();
   }
   get router() {
 
@@ -111,7 +112,10 @@ export default class AppDriver {
 
           //get document title from context
           try {
-            let title = ctx.title[ctx.title.length - 1];
+            let title;
+            if(ctx.title.length > 0) {
+              title = ctx.title[ctx.title.length - 1](this.req.url);
+            }
             if(title !== void 0) {
               title = Tmpl.format(title, state.params);
             }
@@ -177,18 +181,20 @@ export default class AppDriver {
 
 
 async function traceRoutes(table, appPath) {
-  let App = require(appPath);
-  let routes = App.routes;
+  if(appPath !== void 0) {
+    let App = require(appPath);
+    let routes = App.routes;
 
-  //pre trace the css files imported in apps
-  await this::traceCss(appPath);
+    //pre trace the css files imported in apps
+    await this::traceCss(appPath);
 
-  table.App = App;
-  table.routes = routes;
+    table.App = App;
+    table.routes = routes;
 
-  for(let p in routes) {
-    if(routes[p].appPath) {
-      await this::traceRoutes(routes[p], path.join(path.dirname(appPath), routes[p].appPath));
+    for(let p in routes) {
+      if(routes[p].appPath) {
+        await this::traceRoutes(routes[p], path.join(path.dirname(appPath), routes[p].appPath));
+      }
     }
   }
   return table;
@@ -199,29 +205,29 @@ function generateRoutes(table, ctx, currentPath, appPath) {
   let children = [];
   if(table.routes) {
     for(let p in table.routes) {
+      let handler = table.routes[p].App ?
+        new AppLoader(
+          table.routes[p].App,
+          ctx,
+          currentPath,
+          this.config.baseURL,
+          path.join(
+            path.dirname(appPath),
+            table.routes[p].appPath
+          )
+        ) :
+        NullApp;
       if(p === '$default') {
         children.push(
           <DefaultRoute
             key={p}
-            handler={ new AppLoader(
-              table.routes[p].App,
-              ctx,
-              currentPath,
-              this.config.baseURL,
-              path.join(path.dirname(appPath), table.routes[p].appPath)
-            )}/>
+            handler={ handler }/>
         );
       } else if (p === '$notfound') {
         children.push(
           <NotFoundRoute
             key={p}
-            handler={ new AppLoader(
-              table.routes[p].App,
-              ctx,
-              currentPath,
-              this.config.baseURL,
-              path.join(path.dirname(appPath), table.routes[p].appPath)
-            )} />
+            handler={ handler } />
         );
       } else {
         children.push(
@@ -229,14 +235,23 @@ function generateRoutes(table, ctx, currentPath, appPath) {
             table.routes[p],
             ctx,
             currentPath === '' ? p : `${currentPath}/${p}`,
-            path.join(path.dirname(appPath), table.routes[p].appPath)
+            table.routes[p].appPath != null && path.join(path.dirname(appPath), table.routes[p].appPath)
           )
         );
       }
     }
   }
+  let handler = table.App ?
+    new AppLoader(
+      table.App,
+      ctx,
+      currentPath,
+      this.config.baseURL,
+      appPath
+    ) :
+    NullApp;
   return (
-    <Route path={`/${currentPath}`} key={`/${currentPath}`} handler={new AppLoader(table.App, ctx, currentPath, this.config.baseURL, appPath)}>
+    <Route path={`/${currentPath}`} key={`/${currentPath}`} handler={handler}>
       {children}
     </Route>
   );
