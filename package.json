@@ -23,14 +23,24 @@
     "gulp-plumber": "^1.0.1",
     "gulp-sourcemaps": "^1.5.2",
     "jspm": "^0.16.10",
+    "koa": "^1.0.0",
+    "koa-favicon": "^1.2.0",
+    "koa-mount": "^1.3.0",
+    "koa-static-cache": "^3.1.2",
     "react": "^0.14.0-rc1",
     "react-dom": "^0.14.0-rc1"
   },
   "dependencies": {
+    "component-emitter": "^1.2.0",
     "fetch": "u9520107/fetch#v0.9.0-meepshop-1",
+    "flux": "^2.1.1",
     "greasebox": "^0.13.3",
+    "immutable": "^3.7.5",
     "intl": "^1.0.0",
-    "react-router": "^1.0.0-rc1"
+    "react-router": "^1.0.0-rc1",
+    "transit-immutable-js": "^0.4.0",
+    "transit-js": "^0.8.837",
+    "uuid": "^2.0.1"
   },
   "peerDependencies": {
     "react": "^0.14.0-rc1",
@@ -39,12 +49,20 @@
   "jspm": {
     "configFile": "jspm_packages/config.js",
     "dependencies": {
+      "component-emitter": "npm:component-emitter@^1.2.0",
       "fetch": "github:u9520107/fetch@0.9.0-meepshop-1",
+      "flux": "npm:flux@^2.1.1",
       "greasebox": "npm:greasebox@^0.13.3",
+      "immutable": "npm:immutable@^3.7.5",
       "intl": "npm:intl@^1.0.0",
+      "path": "github:jspm/nodelibs-path@^0.1.0",
       "react": "npm:react@0.14.0-rc1",
       "react-dom": "npm:react-dom@0.14.0-rc1",
-      "react-router": "npm:react-router@1.0.0-rc1"
+      "react-router": "npm:react-router@1.0.0-rc1",
+      "transit-immutable-js": "npm:transit-immutable-js@^0.4.0",
+      "transit-js": "npm:transit-js@^0.8.837",
+      "url": "github:jspm/nodelibs-url@^0.1.0",
+      "uuid": "npm:uuid@^2.0.1"
     },
     "devDependencies": {
       "babel": "npm:babel-core@^5.8.24",
