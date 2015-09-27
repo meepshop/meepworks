@@ -19,6 +19,11 @@ export default class TestApp extends Application {
   get component() {
     return './app-view';
   }
+  get childRoutes() {
+    return [
+      '../sub/sub'
+    ];
+  }
   get locale() {
     return {
       path: '../locale',

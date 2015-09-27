@@ -20,6 +20,7 @@ export default class Application {
   constructor(ctx) {
     this[CTX] = ctx;
     this[CHILDROUTES] = this.childRoutes.map(r => path.resolve(this.dirname, r));
+    console.log(this[CHILDROUTES])
     this[COMPONENT_PATH] = path.resolve(this.dirname, this.component);
     this[LOCALE] = new Locale(ctx, this::processLocaleSetting());
     this[CTX] = {
@@ -56,10 +57,21 @@ export default class Application {
       getChildRoutes: async (location, cb) => {
         if(isClient) {
           cb(null, await asyncMap(this[CHILDROUTES], async r => {
-            return await System.import(r);
+            try {
+              let ChildApp = await System.import(r);
+              let child = new ChildApp(this[CTX].context.ctx);
+              return child.routes;
+            } catch (err) {
+              return null;
+            }
+
           }));
         } else {
-          cb(null, this[CHILDROUTES].map(r => require(r)));
+          cb(null, this[CHILDROUTES].map(r => {
+            let ChildApp = require(r);
+            let child = new ChildApp(this[CTX].context.ctx);
+            return child.routes;
+          }))
         }
       },
       onEnter: async (nextState, replaceState, cb) => {
