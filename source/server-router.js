@@ -6,7 +6,14 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import path from 'path';
 import HtmlPage from './html-page';
 
+import Tmpl from './tmpl';
+
+import ApplicationContext from './application-context';
+
 const doctype = '<!DOCTYPE html>';
+
+const _ErrorTransport = Symbol();
+const _Underscore = /_/;
 
 
 export default class ServerRouter {
@@ -20,10 +27,17 @@ export default class ServerRouter {
     //buildURL,
     //abortPath = '/',
     //baseURL = '',
-    meepdev = false
+    meepdev = false,
+    defaultLocale = 'en_US'
   }) {
     this.app = app;
     this.dirname = dirname;
+    this.defaultLocale = defaultLocale;
+
+
+    this[_ErrorTransport] = (err) => {
+      this.emit('error', err);
+    };
 
 
 
@@ -36,32 +50,71 @@ export default class ServerRouter {
 
       let location = createLocation(this.req.url);
 
-      let ctx;
+      //process locale list from browser
+      let list = this.get('accept-language');
+      if(list) {
+        list = list.split(',').map((l) => {
+          return normalizeLocaleCode(l.split(';').shift());
+        });
+      } else {
+        list = [];
+      }
+      if(list.length === 0) {
+        list.push(router.defaultLocale);
+      }
+      let locale = this.locale;
+      if(!locale) {
+        locale = list[0];
+      }
+
+      let ctx = new ApplicationContext(locale, list);
+      ctx.on('error', router[_ErrorTransport]);
 
       match({ routes: new App(ctx).routes, location }, (error, redirectLocation, renderProps) => {
         if(redirectLocation) {
           this.redirect(redirectLocation.pathname + redirectLocation.search);
         } else if(error) {
           this.status = 500;
-          console.log(err.stack);
+          router.emit('error', error);
         }
 
         if(renderProps) {
           try {
+            let title = ctx.title;
+            if(title) {
+              title = Tmpl.format(title, this.params);
+            }
             this.body = doctype + renderToStaticMarkup(
-              <HtmlPage>
+              <HtmlPage
+                title={title}
+                >
                 <RoutingContext {...renderProps} />
               </HtmlPage>
             );
           } catch(err) {
             this.status = 500;
-            console.log('@renderError', err.stack);
+            router.emit('error', err);
           }
         }
+        ctx.off('error', router[_ErrorTransport]);
 
       });
     };
   }
+}
+
+Emitter(ServerRouter.prototype);
+
+
+
+function normalizeLocaleCode(code) {
+  code = code.replace(_Underscore, '-');
+  code = code.split('-');
+  code[0] = code[0].toLowerCase();
+  if(code.length > 1) {
+    code[1] = code[1].toUpperCase();
+  }
+  return code.join('-');
 }
 
 /*****************************
@@ -386,9 +439,9 @@ export default class ServerRouter {
  *      return CssCache.get(src);
  *    }
  *
- *    const UNDERSCORE = /_/;
+ *    const _Underscore = /_/;
  *    function normalizeLocaleCode(code) {
- *      code = code.replace(UNDERSCORE, '-');
+ *      code = code.replace(_Underscore, '-');
  *      code = code.split('-');
  *      code[0] = code[0].toLowerCase();
  *      if(code.length > 1) {

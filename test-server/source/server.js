@@ -46,6 +46,11 @@ const app = new Router({
   meepdev: true,
 });
 
+app.on('error', (err) => {
+  console.log(err);
+  console.log(err.stack);
+});
+
 server.use(app.routes);
 
 server.listen(18881);

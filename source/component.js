@@ -5,11 +5,8 @@ export default class Component extends React.Component {
   static get contextTypes() {
     return {
       ctx: PropTypes.object,
-      locale: PropTypes.func
+      locale: PropTypes.func,
     };
-  }
-  static get locale() {
-    return void 0;
   }
   runAction(action) {
     return this.context.ctx.runAction(action);

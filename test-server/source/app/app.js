@@ -22,10 +22,13 @@ export default class TestApp extends Application {
   get locale() {
     return {
       path: '../locale',
-      availableLocales: [
+      locales: [
         'en_US'
       ]
     }
+  }
+  title() {
+    return 'meepworks';
   }
   get dirname() {
     return __dirname;
