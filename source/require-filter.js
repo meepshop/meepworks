@@ -23,28 +23,28 @@ export default class RequireFilter {
    * }
    */
 
-  constructor(param) {
+  constructor({ root, baseURL = '', version}) {
     this[ENABLED] = true;
     this[FILTERS] = new Map();
     this[LOADERS] = new Map();
     this[ORIGINAL_REQUIRE] = Module.prototype.require;
 
     //skip trailing '/'
-    if(param.root[param.root.length - 1] === '/') {
-      this[FILEROOT] = param.root.substr(0, param.root.length - 1);
+    if(root[root.length - 1] === '/') {
+      this[FILEROOT] = root.substr(0, root.length - 1);
     } else {
-      this[FILEROOT] = param.root;
+      this[FILEROOT] = root;
     }
 
     //skip trailing '/'
-    if(param.baseURL[param.baseURL.length - 1] === '/') {
-      this[URLROOT] = param.baseURL.substr(0, param.baseURL.length - 1);
+    if(baseURL[baseURL.length - 1] === '/') {
+      this[URLROOT] = baseURL.substr(0, baseURL.length - 1);
     } else {
-      this[URLROOT] = param.baseURL;
+      this[URLROOT] = baseURL;
     }
 
     //prepare version string
-    this[VERSION] =  param.version ? `?${param.version}` : '';
+    this[VERSION] =  version ? `?${version}` : '';
 
     let instance = this;
 

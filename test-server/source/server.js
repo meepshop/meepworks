@@ -7,9 +7,12 @@ import path from 'path';
 
 import RequireFilter from '../../build/require-filter';
 
+import Router from '../../build/server-router';
+
+
 const requireFilter = new RequireFilter({
   root: path.resolve(__dirname, '../../'),
-  baseURL: '/',
+  //baseURL: '',
   //version: Date.now
 });
 
@@ -19,72 +22,31 @@ const server = new Koa();
 
 server.use(favicon());
 
+server.use(mount('/jspm_packages', serve(path.resolve(__dirname, '../../jspm_packages'), {
+})));
+server.use(mount('/build', serve(path.resolve(__dirname, '../../build'), {
+})));
+server.use(mount('/test-server/build', serve(__dirname, {
+})));
+
+server.use(function * (next) {
+  console.log('req start: ', this.req.url);
+  console.time('req');
+  yield next;
+  console.timeEnd('req');
+});
+
+const app = new Router({
+  app: './app/app',
+  jspm_config: 'jspm_packages/config.js',
+  dirname: __dirname,
+  root: path.resolve(__dirname, '../..'),
+  buildPath: 'test-server/build',
+  buildURL: 'test-server',
+  meepdev: true,
+});
+
+server.use(app.routes);
 
 server.listen(18881);
 console.log('listening to 18881...');
-
-
-/*   backup
- *
- *
- *      //console.time('koa-mount');
- *      const server = new koa();
- *
- *      server.use(favicon());
- *
- *
- *      server.use(mount('/jspm_packages', serve(path.resolve(__dirname, '../../jspm_packages'), {
- *      })));
- *      server.use(mount('/build', serve(path.resolve(__dirname, '../../build'), {
- *      })));
- *      server.use(mount('/test-server', serve(__dirname, {
- *      })));
- *      //console.timeEnd('koa-mount');
- *
- *
- *      server.use(function * (next) {
- *        console.log('req start: ', this.req.url);
- *        //console.time('req');
- *        yield next;
- *        //console.timeEnd('req');
- *      });
- *
- *      //console.time('mountApp');
- *      //const app = new AppDriver({
- *      //  appPath: 'app/app',
- *      //  jspm: {
- *      //    path: 'jspm_packages',
- *      //    config: 'jspm_packages/config.js'
- *      //  },
- *      //  dirname: __dirname,
- *      //  root: path.resolve(__dirname, '../..'),
- *      //  localtest: true,
- *      //  buildPath: 'test-server/build',
- *      //  buildURL: 'test-server',
- *      //  abortPath: '/my-app/sub',
- *      //  baseURL: 'my-app'
- *      //});
- *      //server.use(mount('/my-app', app.router));
- *      //console.timeEnd('mountApp');
- *
- *      const app = new AppDriver({
- *        appPath: 'app/app',
- *        jspm: {
- *          path: 'jspm_packages',
- *          config: 'jspm_packages/config.js'
- *        },
- *        dirname: __dirname,
- *        root: path.resolve(__dirname, '../..'),
- *        localtest: true,
- *        buildPath: 'test-server/build',
- *        buildURL: 'test-server',
- *        abortPath: '/',
- *        baseURL: ''
- *      });
- *      server.use(app.router);
- *
- *      server.listen(18881);
- *      console.log('listening to 18881');
- *
- *
- */

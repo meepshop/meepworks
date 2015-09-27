@@ -7,7 +7,7 @@ import babel from 'gulp-babel';
 import rm from 'greasebox/rm';
 
 gulp.task('build-server', ['build', 'clean-server', 'copy-server'], () => {
-  gulp.src('test-server/source/**/*.js')
+  return gulp.src('test-server/source/**/*.js')
     .pipe(sourcemaps.init())
     .pipe(babel(babelOptions))
     .pipe(sourcemaps.write('.'))
