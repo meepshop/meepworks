@@ -38,7 +38,7 @@ export default class ServerRouter {
 
       let ctx;
 
-      match({ routes: App.routes, location }, (error, redirectLocation, renderProps) => {
+      match({ routes: new App(ctx).routes, location }, (error, redirectLocation, renderProps) => {
         if(redirectLocation) {
           this.redirect(redirectLocation.pathname + redirectLocation.search);
         } else if(error) {
