@@ -9,6 +9,8 @@ import HtmlPage from './html-page';
 import Tmpl from './tmpl';
 
 import ApplicationContext from './application-context';
+import bootstrap from './bootstrap';
+import url from 'url';
 
 const doctype = '<!DOCTYPE html>';
 
@@ -19,20 +21,22 @@ const _Underscore = /_/;
 export default class ServerRouter {
   constructor({
     app,
-    //jspm_path = 'jspm_packages',
-    //jspm_config = 'jspm_config.js',
+    jspmPath = 'jspm_packages',
+      jspmConfig = 'jspm_config.js',
+      version,
     dirname,
-    //root,
-    //buildPath,
-    //buildURL,
-    //abortPath = '/',
-    //baseURL = '',
+    fileURL,
     meepdev = false,
     defaultLocale = 'en_US'
   }) {
     this.app = app;
     this.dirname = dirname;
     this.defaultLocale = defaultLocale;
+    this.meepdev = meepdev === true;
+    this.version = version;
+    this.jspmPath = jspmPath;
+    this.jspmConfig = jspmConfig;
+    this.fileURL = fileURL;
 
 
     this[_ErrorTransport] = (err) => {
@@ -51,23 +55,23 @@ export default class ServerRouter {
       let location = createLocation(this.req.url);
 
       //process locale list from browser
-      let list = this.get('accept-language');
-      if(list) {
-        list = list.split(',').map((l) => {
+      let acceptLanguage = this.get('accept-language');
+      if(acceptLanguage) {
+        acceptLanguage = acceptLanguage.split(',').map((l) => {
           return normalizeLocaleCode(l.split(';').shift());
         });
       } else {
-        list = [];
+        acceptLanguage = [];
       }
-      if(list.length === 0) {
-        list.push(router.defaultLocale);
+      if(acceptLanguage.length === 0) {
+        acceptLanguage.push(router.defaultLocale);
       }
       let locale = this.locale;
       if(!locale) {
-        locale = list[0];
+        locale = acceptLanguage[0];
       }
 
-      let ctx = new ApplicationContext(locale, list);
+      let ctx = new ApplicationContext(locale, acceptLanguage);
       ctx.on('error', router[_ErrorTransport]);
 
       match({ routes: new App(ctx).routes, location }, (error, redirectLocation, renderProps) => {
@@ -78,15 +82,45 @@ export default class ServerRouter {
           router.emit('error', error);
         }
 
+
+
         if(renderProps) {
           try {
             let title = ctx.title;
             if(title) {
               title = Tmpl.format(title, this.params);
             }
+          let data = {
+            stores: [],
+            acceptLanguage: ctx.acceptLanguage,
+            locale: ctx.locale,
+            localeMapping: ctx.localeMapping
+          };
+
+          ctx.stores.forEach(s => {
+            data.stores.push(s.dehydrate());
+          });
+
+
+/*
+ *                let data = {
+ *                  table: driver.routeTable,
+ *                  stores: [],
+ *                  context: ctx[STATE]
+ *                };
+ *                ctx.stores.forEach(s => {
+ *                  data.stores.push(s.dehydrate());
+ *                });
+ */
+
+
+
             this.body = doctype + renderToStaticMarkup(
               <HtmlPage
                 title={title}
+                scripts={[
+                  router::bootstrap(url.resolve(router.fileURL, router.app), data)
+                ]}
                 >
                 <RoutingContext {...renderProps} />
               </HtmlPage>
@@ -117,57 +151,10 @@ function normalizeLocaleCode(code) {
   return code.join('-');
 }
 
-/*****************************
- * react-router example
- *****************************
- *
- *      import createLocation from 'history/lib/createLocation'
- *      import { RoutingContext, match } from 'react-router'
- *      import routes from './routes'
- *      import { renderToString } from 'react-dom/server'
- *
- *      serve((req, res) => {
- *        let location = createLocation(req.url)
- *
- *        match({ routes, location }, (error, redirectLocation, renderProps) => {
- *          if (redirectLocation)
- *            res.redirect(301, redirectLocation.pathname + redirectLocation.search)
- *          else if (error)
- *            res.send(500, error.message)
- *          else if (renderProps == null)
- *            res.send(404, 'Not found')
- *          else
- *            res.send(renderToString(<RoutingContext {...renderProps}/>))
- *        })
- *      })
- */
 
 
 
 /*
- *    import Router, {Route, NotFoundRoute, DefaultRoute } from 'react-router';
- *    import React from 'react';
- *    import path from 'path';
- *    import url from 'url';
- *    import AppRoot from './app-root';
- *    import AppLoader from './app-loader';
- *    import NotFound from './components/not-found';
- *    import AppContext, { APP_INIT, STATE } from './app-context';
- *    import Dispatcher from './dispatcher';
- *    import Tmpl from './tmpl';
- *    import HtmlPage from './components/html-page';
- *    import Viewport from './components/viewport';
- *    import bootstrap from './bootstrap';
- *    import Builder from 'systemjs-builder';
- *    import { LOCALE, ACCEPTLANG } from './locale';
- *    import * as errors from './errors';
- *    import NullApp from './extend.jscomponents/null-app';
- *
- *
- *    const DOCTYPE = '<!DOCTYPE html>';
- *
- *    const CssCache = new Map();
- *
  *
  *
  *    export default class AppDriver {
@@ -327,83 +314,7 @@ function normalizeLocaleCode(code) {
  *
  *
  *
- *    async function traceRoutes(table, appPath) {
- *      if(appPath !== void 0) {
- *        let App = require(appPath);
- *        let routes = App.routes;
  *
- *        //pre trace the css files imported in apps
- *        await this::traceCss(appPath);
- *
- *        table.App = App;
- *        table.routes = routes;
- *
- *        for(let p in routes) {
- *          if(routes[p].appPath) {
- *            await this::traceRoutes(routes[p], path.join(path.dirname(appPath), routes[p].appPath));
- *          }
- *        }
- *      }
- *      return table;
- *    }
- *
- *    function generateRoutes(table, ctx, currentPath, appPath) {
- *
- *      let children = [];
- *      if(table.routes) {
- *        for(let p in table.routes) {
- *          let handler = table.routes[p].App ?
- *            new AppLoader(
- *              table.routes[p].App,
- *              ctx,
- *              currentPath,
- *              this.config.baseURL,
- *              path.join(
- *                path.dirname(appPath),
- *                table.routes[p].appPath
- *              )
- *            ) :
- *            NullApp;
- *          if(p === '$default') {
- *            children.push(
- *              <DefaultRoute
- *                key={p}
- *                handler={ handler }/>
- *            );
- *          } else if (p === '$notfound') {
- *            children.push(
- *              <NotFoundRoute
- *                key={p}
- *                handler={ handler } />
- *            );
- *          } else {
- *            children.push(
- *              this::generateRoutes(
- *                table.routes[p],
- *                ctx,
- *                currentPath === '' ? p : `${currentPath}/${p}`,
- *                table.routes[p].appPath != null && path.join(path.dirname(appPath), table.routes[p].appPath)
- *              )
- *            );
- *          }
- *        }
- *      }
- *      let handler = table.App ?
- *        new AppLoader(
- *          table.App,
- *          ctx,
- *          currentPath,
- *          this.config.baseURL,
- *          appPath
- *        ) :
- *        NullApp;
- *      return (
- *        <Route path={`/${currentPath}`} key={`/${currentPath}`} handler={handler}>
- *          {children}
- *        </Route>
- *      );
- *
- *    }
  *
  *    async function traceCss(appPath) {
  *      let src = path.relative(this.config.root, appPath);

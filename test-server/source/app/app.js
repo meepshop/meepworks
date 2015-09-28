@@ -1,4 +1,5 @@
 import Application from '../../../build/application';
+import AppStore from './app-store';
 
 //export default new Application({
 //  route: '/',
@@ -24,6 +25,13 @@ export default class TestApp extends Application {
       '../sub/sub'
     ];
   }
+
+  get stores() {
+    return [
+      AppStore
+    ];
+  }
+
   get locale() {
     return {
       path: '../locale',

@@ -14,6 +14,7 @@ const COMPONENT = Symbol();
 const COMPONENT_PATH = Symbol();
 const LOCALE = Symbol();
 const CTX = Symbol();
+const CTXOBJ = Symbol();
 
 
 export default class Application {
@@ -22,7 +23,7 @@ export default class Application {
     this[CHILDROUTES] = this.childRoutes.map(r => path.resolve(this.dirname, r));
     this[COMPONENT_PATH] = path.resolve(this.dirname, this.component);
     this[LOCALE] = new Locale(ctx, this::processLocaleSetting());
-    this[CTX] = {
+    this[CTXOBJ] = {
       context: {
         ctx,
         locale: this[LOCALE]
@@ -46,6 +47,10 @@ export default class Application {
     return void 0;
   }
 
+  get stores() {
+    return [];
+  }
+
   title() {
     return void 0;
   }
@@ -58,7 +63,7 @@ export default class Application {
           cb(null, await asyncMap(this[CHILDROUTES], async r => {
             try {
               let ChildApp = await System.import(r);
-              let child = new ChildApp(this[CTX].context.ctx);
+              let child = new ChildApp(this[CTX]);
               return child.routes;
             } catch (err) {
               return null;
@@ -68,7 +73,7 @@ export default class Application {
         } else {
           cb(null, this[CHILDROUTES].map(r => {
             let ChildApp = require(r);
-            let child = new ChildApp(this[CTX].context.ctx);
+            let child = new ChildApp(this[CTX]);
             return child.routes;
           }))
         }
@@ -80,18 +85,24 @@ export default class Application {
           if(!(err instanceof LocaleLoadError)) {
             err = new LocaleLoadError(err);
           }
-          this[CTX].context.ctx.emit('error', err);
+          this[CTX].emit('error', err);
         }
+
+        //stores
+        this.stores.forEach(s => {
+          s.getInstance(this[CTX]);
+        });
+
 
         //title
         if(this.title !== Application.prototype.title) {
-          this[CTX].context.ctx.pushTitle(this[CTX]::this.title());
+          this[CTX].pushTitle(this[CTXOBJ]::this.title());
         }
         if(typeof this.onEnter === 'function') {
           if(this.onEnter.length === 3) {
-            await this[CTX]::this.onEnter(nextState, replaceState, cb);
+            await this[CTXOBJ]::this.onEnter(nextState, replaceState, cb);
           } else {
-            await this[CTX]::this.onEnter(nextState, replaceState);
+            await this[CTXOBJ]::this.onEnter(nextState, replaceState);
             cb();
           }
         } else {
@@ -101,10 +112,10 @@ export default class Application {
       onLeave: () => {
         //title
         if(this.title !== Application.prototype.title) {
-          this[CTX].context.ctx.popTitle();
+          this[CTX].popTitle();
         }
         if(typeof this.onLeave === 'function') {
-          this[CTX]::this.onLeave();
+          this[CTXOBJ]::this.onLeave();
         }
       },
       getComponent: async (location, cb) => {
@@ -132,7 +143,7 @@ export default class Application {
               }
             }
             getChildContext() {
-              return self[CTX].context;
+              return self[CTXOBJ].context;
             }
             render() {
               return (<Comp {...this.props}/>)
@@ -156,5 +167,3 @@ function processLocaleSetting() {
   }
   return settings;
 }
-
-//TODO:  onLeave handling

@@ -47,7 +47,7 @@ export default class ApplicationContext {
     return this[_Title].pop();
   }
   get stores() {
-    return this[_Stores].slice();
+    return this[_Stores];
   }
 
   get locale() {

@@ -40,10 +40,11 @@ const app = new Router({
   app: './app/app',
   jspm_config: 'jspm_packages/config.js',
   dirname: __dirname,
-  root: path.resolve(__dirname, '../..'),
-  buildPath: 'test-server/build',
-  buildURL: 'test-server',
+  //root: path.resolve(__dirname, '../..'),
+  //buildPath: 'test-server/build',
+  fileURL: 'test-server/build/server',
   meepdev: true,
+  //version
 });
 
 app.on('error', (err) => {
