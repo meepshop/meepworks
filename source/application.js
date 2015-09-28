@@ -20,7 +20,6 @@ export default class Application {
   constructor(ctx) {
     this[CTX] = ctx;
     this[CHILDROUTES] = this.childRoutes.map(r => path.resolve(this.dirname, r));
-    console.log(this[CHILDROUTES])
     this[COMPONENT_PATH] = path.resolve(this.dirname, this.component);
     this[LOCALE] = new Locale(ctx, this::processLocaleSetting());
     this[CTX] = {
