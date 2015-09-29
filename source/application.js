@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import { PropTypes as RouterPropTypes } from 'react-router';
 import Component from './component';
 import path from 'path';
 
@@ -62,7 +63,10 @@ export default class Application {
   onLeave() {
     //overload this function to define onLeave hook handlers
   }
-
+  routerWillLeave(nextLocation) {
+    //overload this function to define routerWillLeave lifecycle method.
+    //this allow leave confirmations to be done.
+  }
   get routes() {
 
     return {
@@ -112,7 +116,9 @@ export default class Application {
         if(this.title !== Application.prototype.title) {
           this[_Ctx].pushTitle(this[_CtxObject]::this.title());
         }
-        if(this[_Ctx].init && typeof this.onEnter === 'function' && this.onEnter !== Application.prototype.onEnter) {
+        if(this[_Ctx].init &&
+           this.onEnter !== Application.prototype.onEnter &&
+           typeof this.onEnter === 'function') {
           await this[_CtxObject]::this.onEnter(nextState, replaceState);
           cb();
         } else {
@@ -124,7 +130,8 @@ export default class Application {
         if(this.title !== Application.prototype.title) {
           this[_Ctx].popTitle();
         }
-        if(typeof this.onLeave === 'function' && this.onLeave !== Application.prototype.onLeave) {
+        if(this.onLeave !== Application.prototype.onLeave &&
+          typeof this.onLeave === 'function') {
           this[_CtxObject]::this.onLeave();
         }
       },
@@ -145,13 +152,28 @@ export default class Application {
             static get contextTypes() {
               return {
                 ctx: PropTypes.object,
-                locale: PropTypes.func
+                locale: PropTypes.func,
+                history: RouterPropTypes.history,
+                route: RouterPropTypes.route
               };
             }
             static get childContextTypes () {
               return {
                 ctx: PropTypes.object,
                 locale: PropTypes.func
+              }
+            }
+            componentDidMount() {
+              if(this.routerWillLeave !== Application.prototype.routerWillLeave &&
+                  typeof self.routerWillLeave === 'function') {
+                this._unlistenBeforeLeavingRoute = this.context.history.listenBefore(
+                  self.routerWillLeave
+                );
+              }
+            }
+            componentWillUnmount() {
+              if(this._unlistenBeforeLeavingRoute) {
+                this._unlistenBeforeLeavingRoute();
               }
             }
             getChildContext() {

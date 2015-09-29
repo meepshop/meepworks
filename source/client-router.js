@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Router, { RoutingContext, match } from 'react-router';
+import Tmpl from './tmpl';
 
 import createBrowserHistory from 'history/lib/createBrowserHistory';
 
@@ -54,6 +55,16 @@ export default class ClientRouter {
           <Router
             {...renderProps}
             history={createBrowserHistory()}
+            onError={(err) => {
+              ctx.emit('error', err);
+            }}
+            onUpdate={function () {
+              let title = ctx.title;
+              if(title) {
+                title = Tmpl.format(title, this.state.params);
+                document.title = title;
+              }
+            }}
           />
         , document.getElementById('viewport'));
         ctx.init = true;

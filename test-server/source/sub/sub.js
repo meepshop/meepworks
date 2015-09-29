@@ -20,4 +20,10 @@ export default class SubApp extends Application {
   get dirname() {
     return __dirname;
   }
+  onLeave() {
+    console.log('onLeave');
+  }
+  routerWillLeave() {
+    console.log('routerWillLeave');
+  }
 }

@@ -1,11 +1,13 @@
 import React, { PropTypes } from 'react';
+import { PropTypes as RouterPropTypes} from 'react-router';
 
 
 export default class Component extends React.Component {
   static get contextTypes() {
     return {
+      history: RouterPropTypes.history,
       ctx: PropTypes.object,
-      locale: PropTypes.func,
+      locale: PropTypes.func
     };
   }
   runAction(action) {
