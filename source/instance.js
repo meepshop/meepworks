@@ -7,7 +7,7 @@ const _cache = new WeakMap();
 
 
 
-const CTX = Symbol();
+const _Ctx = Symbol();
 /**
  * @class Instance
  *  simple implementation of instanced objects
@@ -37,7 +37,7 @@ export default class Instance {
 
         cache.set(key, inst);
         //keep a reference to the key for destroy
-        inst[CTX] = key;
+        inst[_Ctx] = key;
       }
       return cache.get(key);
     } else {
@@ -50,7 +50,7 @@ export default class Instance {
   }
 
   get ctx() {
-    return this[CTX];
+    return this[_Ctx];
   }
 
   /**
@@ -60,10 +60,10 @@ export default class Instance {
    */
   destroy() {
     let cache = _cache.get(this.constructor);
-    if(this[CTX]) {
+    if(this[_Ctx]) {
       //use key to clear _cache
-      if(cache.has( this[CTX] )) {
-        cache.delete( this[CTX] );
+      if(cache.has( this[_Ctx] )) {
+        cache.delete( this[_Ctx] );
       }
     } else {
       if(cache.has( this.constructor )) {

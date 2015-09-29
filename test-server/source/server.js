@@ -38,7 +38,7 @@ server.use(function * (next) {
 
 const app = new Router({
   app: './app/app',
-  jspm_config: 'jspm_packages/config.js',
+  jspmConfig: 'jspm_packages/config.js',
   dirname: __dirname,
   //root: path.resolve(__dirname, '../..'),
   //buildPath: 'test-server/build',

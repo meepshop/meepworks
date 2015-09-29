@@ -52,11 +52,11 @@ class Loader extends Component {
             var result = fetch.call(this, load);
             return result;
           };
-        //  System.import('${p}/client-router')
-        //  .then(function (ClientRouter) {
-        //    var router = new ClientRouter('${this.props.appURL}', '${this.props.dataId}');
-        //  })
-        //  .catch(console.log);
+          System.import('${p}/client-router')
+          .then(function (ClientRouter) {
+            var router = new ClientRouter('${this.props.appURL}', '${this.props.dataId}');
+          })
+          .catch(console.log);
         })();`
       }} />
     );

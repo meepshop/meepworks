@@ -72,6 +72,7 @@ export default class ServerRouter {
       }
 
       let ctx = new ApplicationContext(locale, acceptLanguage);
+      ctx.init = true;
       ctx.on('error', router[_ErrorTransport]);
 
       match({ routes: new App(ctx).routes, location }, (error, redirectLocation, renderProps) => {
@@ -90,29 +91,16 @@ export default class ServerRouter {
             if(title) {
               title = Tmpl.format(title, this.params);
             }
-          let data = {
-            stores: [],
-            acceptLanguage: ctx.acceptLanguage,
-            locale: ctx.locale,
-            localeMapping: ctx.localeMapping
-          };
+            let data = {
+              stores: [],
+              acceptLanguage: ctx.acceptLanguage,
+              locale: ctx.locale,
+              localeMapping: ctx.localeMapping
+            };
 
-          ctx.stores.forEach(s => {
-            data.stores.push(s.dehydrate());
-          });
-
-
-/*
- *                let data = {
- *                  table: driver.routeTable,
- *                  stores: [],
- *                  context: ctx[STATE]
- *                };
- *                ctx.stores.forEach(s => {
- *                  data.stores.push(s.dehydrate());
- *                });
- */
-
+            ctx.stores.forEach(s => {
+              data.stores.push(s.dehydrate());
+            });
 
 
             this.body = doctype + renderToStaticMarkup(

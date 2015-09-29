@@ -1,8 +1,8 @@
 import Instance from './instance';
 import Dispatcher from './dispatcher';
 
-const PAYLOAD = Symbol();
-const CTX = Symbol();
+const _Payload = Symbol();
+const _Ctx = Symbol();
 
 
 /**
@@ -16,7 +16,7 @@ export default class Action {
    * @param {any} payload - parameter passed into the action handler
    */
   constructor(payload) {
-    this[PAYLOAD] = payload;
+    this[_Payload] = payload;
   }
   /**
    * @function
@@ -24,17 +24,17 @@ export default class Action {
    */
   async action() {
     //allow actions to be used as events by defaulting to resolved promise
-    return this[PAYLOAD];
+    return this[_Payload];
   }
 
   get payload() {
-    return this[PAYLOAD];
+    return this[_Payload];
   }
   get ctx() {
-    return this[CTX];
+    return this[_Ctx];
   }
   set ctx(ctx) {
-    this[CTX] = ctx;
+    this[_Ctx] = ctx;
   }
 }
 

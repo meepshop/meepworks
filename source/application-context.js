@@ -10,10 +10,11 @@ const _Title = Symbol();
 const _Locale = Symbol();
 const _AcceptLanguage = Symbol();
 const _LocaleMapping = Symbol();
+const _StoreData = Symbol();
 
 
 export default class ApplicationContext {
-  constructor(locale = 'en_US', acceptLanguage = [], localeMapping = {}) {
+  constructor(locale = 'en_US', acceptLanguage = [], localeMapping = {}, storeData = []) {
     this[_Dispatcher] = Dispatcher.getInstance(this);
     this[_Title] = [];
     this[_Stores] = new Set();
@@ -21,6 +22,7 @@ export default class ApplicationContext {
     this[_Locale] = locale;
     this[_AcceptLanguage] = acceptLanguage;
     this[_LocaleMapping] = localeMapping;
+    this[_StoreData] = storeData.reverse();
 
   }
   async runAction(action) {
@@ -63,6 +65,19 @@ export default class ApplicationContext {
 
   get localeMapping() {
     return this[_LocaleMapping];
+  }
+
+  get init() {
+    return this[_Init];
+  }
+  set init(init) {
+    this[_Init] = !!init;
+  }
+
+  get storeData() {
+    if(this[_StoreData].length > 0) {
+      return this[_StoreData].pop();
+    }
   }
 }
 
