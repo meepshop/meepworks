@@ -54,7 +54,7 @@ class Loader extends Component {
           };
           System.import('${p}/client-router')
           .then(function (ClientRouter) {
-            var router = new ClientRouter('${this.props.appURL}', '${this.props.dataId}');
+            var router = new ClientRouter('${this.props.appUrl}', '${this.props.dataId}');
           })
           .catch(console.log);
         })();`
@@ -63,7 +63,9 @@ class Loader extends Component {
   }
 }
 
-export default function bootstrap(appURL, data) {
+export default function bootstrap(data) {
+
+  let appUrl = this.appPath.replace(this.publicPath, this.publicUrl);
   let jsVer = this.version ? `?${this.version}` : '';
    let output = [
      <script key="sys" src={ `/${this.jspmPath}/system.js${jsVer}` }></script>,
@@ -76,7 +78,7 @@ export default function bootstrap(appURL, data) {
        dataId={dataId}
        version={jsVer}
        jspmPath={this.jspmPath}
-       appURL={appURL}
+       appUrl={appUrl}
        meepdev={this.meepdev}
      />
    );

@@ -22,12 +22,19 @@ const server = new Koa();
 
 server.use(favicon());
 
+function * capture(next) {
+  this.status = 404;
+}
+
 server.use(mount('/jspm_packages', serve(path.resolve(__dirname, '../../jspm_packages'), {
 })));
+server.use(mount('/jspm_packages', capture));
 server.use(mount('/build', serve(path.resolve(__dirname, '../../build'), {
 })));
+server.use(mount('/build', capture));
 server.use(mount('/test-server/build', serve(__dirname, {
 })));
+server.use(mount('/test-server/build', capture));
 
 server.use(function * (next) {
   console.log('req start: ', this.req.url);
@@ -37,12 +44,17 @@ server.use(function * (next) {
 });
 
 const app = new Router({
-  app: './app/app',
+  appPath: path.resolve(__dirname, './app/app'),
+  //publicPath points to the public source folder that contains code for client side
+  publicPath: __dirname,
+  //publicUrl is the url path where the public folder is mounted
+  publicUrl: 'test-server/build',
+
   jspmConfig: 'jspm_packages/config.js',
-  dirname: __dirname,
+  //dirname: __dirname,
   //root: path.resolve(__dirname, '../..'),
   //buildPath: 'test-server/build',
-  fileURL: 'test-server/build/server',
+  //fileURL: 'test-server/build/server',
   meepdev: true,
   //version
 });

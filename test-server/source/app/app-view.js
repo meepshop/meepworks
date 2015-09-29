@@ -1,6 +1,7 @@
 import React from 'react';
 import Component from '../../../build/component';
 import Link from '../../../build/link';
+import 'normalize.css/normalize.css!';
 
 export default class AppView extends Component {
   render() {

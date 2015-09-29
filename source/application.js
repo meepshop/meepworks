@@ -81,6 +81,7 @@ export default class Application {
           }));
         } else {
           cb(null, this[_ChildRoutes].map(r => {
+            this[_Ctx].files.add(r);
             let ChildApp = require(r);
             let child = new ChildApp(this[_Ctx]);
             return child.routes;
@@ -133,7 +134,9 @@ export default class Application {
           let Comp;
           if(isClient) {
             Comp = await System.import(this[_ComponentPath]);
+
           } else {
+            this[_Ctx].files.add(this[_ComponentPath]);
             Comp = require(this[_ComponentPath]);
           }
 

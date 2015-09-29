@@ -11,6 +11,7 @@ const _Locale = Symbol();
 const _AcceptLanguage = Symbol();
 const _LocaleMapping = Symbol();
 const _StoreData = Symbol();
+const _Files = Symbol();
 
 
 export default class ApplicationContext {
@@ -23,6 +24,7 @@ export default class ApplicationContext {
     this[_AcceptLanguage] = acceptLanguage;
     this[_LocaleMapping] = localeMapping;
     this[_StoreData] = storeData.reverse();
+    this[_Files] = new Set();
 
   }
   async runAction(action) {
@@ -78,6 +80,10 @@ export default class ApplicationContext {
     if(this[_StoreData].length > 0) {
       return this[_StoreData].pop();
     }
+  }
+
+  get files() {
+    return this[_Files];
   }
 }
 
