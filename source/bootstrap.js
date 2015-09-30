@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import uuid from 'uuid';
 import dedent from 'greasebox/dedent';
 import htmlEscape from 'html-escape';
+import transit from 'transit-immutable-js';
 
 
 
@@ -12,8 +13,7 @@ import htmlEscape from 'html-escape';
 class Data extends Component {
   render() {
     //convert data to base64 string avoid html injection
-    //let res = new Buffer(JSON.stringify(this.props.data)).toString('base64');
-    let res = htmlEscape(JSON.stringify(this.props.data));
+    let res = htmlEscape(transit.toJSON(this.props.data));
     return (
       <script
         id={this.props.dataId}

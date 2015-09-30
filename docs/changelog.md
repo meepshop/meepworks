@@ -1,6 +1,15 @@
 Change Log
 ===
 
+#v0.11.0
+**2015 Sep 30**
+
+1. Rewrote to use React 0.14.x and React-router 1.0.x.
+2. Separate Application with Application view component.
+3. Rely mostly on react-router's async features to do dynamic loading.
+
+
+
 #v0.10.27
 **2015 Aug 28**
 

@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Router, { RoutingContext, match } from 'react-router';
 import Tmpl from './tmpl';
+import transit from 'transit-immutable-js';
 
 import createBrowserHistory from 'history/lib/createBrowserHistory';
 
@@ -37,18 +38,12 @@ export default class ClientRouter {
         locale,
         localeMapping,
         acceptLanguage
-      } = JSON.parse(unescapeHTML(dataScript.innerHTML));
+      } = transit.fromJSON(unescapeHTML(dataScript.innerHTML));
 
       let ctx = new ApplicationContext(locale, acceptLanguage, localeMapping, stores);
 
-
-      ctx.on('error', (err) => {
-        console.log(err);
-        console.log(err.stack);
-      })
       let routes = new App(ctx).routes;
       let location = window.location;
-
 
       match({ routes, location }, (error, redirectLocation, renderProps) => {
         ReactDOM.render(
