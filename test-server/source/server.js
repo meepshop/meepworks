@@ -39,8 +39,10 @@ server.use(mount('/test-server/build', capture));
 server.use(function * (next) {
   console.log('req start: ', this.req.url);
   console.time('req');
+  this.initialData = {test: 'test-data'};
   yield next;
   console.timeEnd('req');
+
 });
 
 const app = new Router({

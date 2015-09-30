@@ -28,17 +28,16 @@ export default class ServerRouter {
     jspmPath = 'jspm_packages',
     jspmConfig = 'jspm_config.js',
     version,
-    meepdev = false,
-    defaultLocale = 'en_US'
+    meepdev = false
   }) {
     this.appPath = appPath;
     this.publicPath = publicPath;
     this.publicUrl = publicUrl;
-    this.defaultLocale = defaultLocale;
     this.meepdev = meepdev === true;
     this.version = version;
     this.jspmPath = jspmPath;
     this.jspmConfig = jspmConfig;
+
 
 
     this[_ErrorTransport] = (err) => {
@@ -68,12 +67,13 @@ export default class ServerRouter {
       if(acceptLanguage.length === 0) {
         acceptLanguage.push(router.defaultLocale);
       }
-      let locale = this.locale;
-      if(!locale) {
-        locale = acceptLanguage[0];
-      }
+      let locale = acceptLanguage[0];
 
-      let ctx = new ApplicationContext(locale, acceptLanguage);
+      let ctx = new ApplicationContext({
+        locale,
+        acceptLanguage,
+        initialData: this.initialData
+      });
       ctx.files.add(router.appPath);
       ctx.init = true;
       ctx.on('error', router[_ErrorTransport]);
@@ -98,7 +98,8 @@ export default class ServerRouter {
                 stores: [],
                 acceptLanguage: ctx.acceptLanguage,
                 locale: ctx.locale,
-                localeMapping: ctx.localeMapping
+                localeMapping: ctx.localeMapping,
+                initialData: ctx.initialData,
               };
 
               ctx.stores.forEach(s => {
@@ -143,7 +144,6 @@ export default class ServerRouter {
 }
 
 Emitter(ServerRouter.prototype);
-
 
 
 function normalizeLocaleCode(code) {

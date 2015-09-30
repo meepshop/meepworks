@@ -33,14 +33,8 @@ export default class ClientRouter {
     (async () => {
       let App = await System.import(appURL);
       let dataScript = document.querySelector(`script[id="${dataId}"]`);
-      let {
-        stores,
-        locale,
-        localeMapping,
-        acceptLanguage
-      } = transit.fromJSON(unescapeHTML(dataScript.innerHTML));
 
-      let ctx = new ApplicationContext(locale, acceptLanguage, localeMapping, stores);
+      let ctx = new ApplicationContext(transit.fromJSON(unescapeHTML(dataScript.innerHTML)));
 
       let routes = new App(ctx).routes;
       let location = window.location;

@@ -1,6 +1,13 @@
 Change Log
 ===
 
+
+#v0.11.1
+**2015 Sep 30**
+
+1. Initialize application context with browser's locale settings. Ignore koa context's locale property.
+2. Put koa context's initialData into application context.
+
 #v0.11.0
 **2015 Sep 30**
 

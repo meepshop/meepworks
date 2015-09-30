@@ -12,10 +12,17 @@ const _AcceptLanguage = Symbol();
 const _LocaleMapping = Symbol();
 const _StoreData = Symbol();
 const _Files = Symbol();
+const _InitialData = Symbol();
 
 
 export default class ApplicationContext {
-  constructor(locale = 'en_US', acceptLanguage = [], localeMapping = {}, storeData = []) {
+  constructor({
+    initialData,
+    locale = 'en_US',
+    acceptLanguage = [],
+    localeMapping = {},
+    storeData = []
+  }) {
     this[_Dispatcher] = Dispatcher.getInstance(this);
     this[_Title] = [];
     this[_Stores] = new Set();
@@ -25,7 +32,7 @@ export default class ApplicationContext {
     this[_LocaleMapping] = localeMapping;
     this[_StoreData] = storeData.reverse();
     this[_Files] = new Set();
-
+    this[_InitialData] = initialData;
   }
   async runAction(action) {
     action.ctx = this;
@@ -84,6 +91,10 @@ export default class ApplicationContext {
 
   get files() {
     return this[_Files];
+  }
+
+  get initialData() {
+    return this[_InitialData];
   }
 }
 
