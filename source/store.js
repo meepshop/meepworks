@@ -4,11 +4,11 @@ import Emitter from 'component-emitter';
 
 import Dispatcher from './dispatcher';
 
-const ACTION_HANDLER = Symbol();
-const EMITTER = Symbol();
-const REGISTERED = Symbol();
-const SYMBOLS = Symbol();
-const CTX = Symbol();
+const _ActionHandler = Symbol();
+const _Emitter = Symbol();
+const _Registered = Symbol();
+const _Symbols = Symbol();
+const _Ctx = Symbol();
 
 
 /**
@@ -21,34 +21,38 @@ const CTX = Symbol();
 export default class Store extends Instance {
   constructor() {
     super();
-    this[EMITTER] = new Emitter();
-    this[SYMBOLS] = new Map();
+    this[_Emitter] = new Emitter();
+    this[_Symbols] = new Map();
 
     //bind main action handler with bounded this in the scope
-    this[ACTION_HANDLER] = payload => {
-       //run the actual action handlers using the action as the accessor
-       let s = this[SYMBOLS].get(payload.action);
-       if (typeof this[s] === 'function') {
-         this[s](payload.payload);
-       }
-     };
+    this[_ActionHandler] = ( payload ) => {
+      //run the actual action handlers using the action as the accessor
+      let s = this[_Symbols].get(payload.action);
+      if (typeof this[s] === 'function') {
+        this[s](payload.payload);
+      }
+    };
 
   }
   bindHandler(action, handler) {
-    if(!this[SYMBOLS].has(action)) {
-      this[SYMBOLS].set(action, Symbol());
+    if(!this[_Symbols].has(action)) {
+      this[_Symbols].set(action, Symbol());
     }
-    this[this[SYMBOLS].get(action)] = handler;
+    this[this[_Symbols].get(action)] = handler;
   }
 
   static getInstance(ctx) {
     let self = super.getInstance(ctx);
 
-    if(!self[REGISTERED]) {
+    if(!self[_Registered]) {
+      if(!ctx.init) {
+        //rehydrate data if ctx has not been initialized
+        self.rehydrate(ctx.storeData);
+      }
       ctx.stores.add(self);
-      Dispatcher.getInstance(ctx).register(self, this[ACTION_HANDLER]);
-      self[CTX] = ctx;
-      self[REGISTERED] = true;
+      Dispatcher.getInstance(ctx).register(self, self[_ActionHandler]);
+      self[_Ctx] = ctx;
+      self[_Registered] = true;
     }
     return self;
   }
@@ -68,16 +72,16 @@ export default class Store extends Instance {
   }
 
   changed() {
-    this[EMITTER].emit('change');
+    this[_Emitter].emit('change');
   }
   on(fn) {
-    this[EMITTER].on('change', fn);
+    this[_Emitter].on('change', fn);
   }
   off(fn) {
-    this[EMITTER].off('change', fn);
+    this[_Emitter].off('change', fn);
   }
   get ctx() {
-    return this[CTX];
+    return this[_Ctx];
   }
 }
 

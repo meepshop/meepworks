@@ -1,7 +1,10 @@
 import Application from '../../../build/application';
+
+import TestAction from './action';
+
 export default class SubApp extends Application {
   get path() {
-    return 'sub';
+    return '/sub';
   }
   get component() {
     return './sub-view';
@@ -19,6 +22,9 @@ export default class SubApp extends Application {
   }
   get dirname() {
     return __dirname;
+  }
+  async onEnter() {
+    console.log(await this.runAction(new TestAction()));
   }
   onLeave() {
     //console.log('onLeave');

@@ -7,7 +7,7 @@ export default class Component extends React.Component {
     return {
       history: RouterPropTypes.history,
       ctx: PropTypes.object,
-      locale: PropTypes.func
+      locale: PropTypes.func,
     };
   }
   runAction(action) {

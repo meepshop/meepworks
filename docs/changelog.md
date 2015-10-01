@@ -1,6 +1,37 @@
 Change Log
 ===
 
+#v0.11.14
+**2015 Oct 1**
+
+1. Fix error where stores are not rehydrated on client-side
+2. Fix error when some css would have multiple links in the header
+
+#v0.11.7
+**2015 Sep 30**
+
+1. Allow setting preload css to false to speed up dev process.
+
+#v0.11.4
+**2015 Sep 30**
+
+1. Allow application to have undefined path.
+
+
+#v0.11.4
+**2015 Sep 30**
+
+1. Fix bug where onEnter gets triggered on client-side before app init.
+
+#v0.11.3
+**2015 Sep 30**
+
+1. Add try catch around onEnter, onLeave, and title.
+
+#v0.11.2
+**2015 Sep 30**
+
+1. Properly provide helper functions for onEnter, onLeave, title().
 
 #v0.11.1
 **2015 Sep 30**

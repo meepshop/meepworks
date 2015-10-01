@@ -39,7 +39,7 @@ export default class ApplicationContext {
     try {
       this[_Dispatcher].dispatch({
         action: action.constructor,
-        payload: await action.action(...action.payload)
+        payload: await action.action(action.payload)
       });
     } catch(err) {
       this.emit('error', new ActionError(err));

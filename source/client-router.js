@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Router, { RoutingContext, match } from 'react-router';
+import Router from 'react-router';
 import Tmpl from './tmpl';
 import transit from 'transit-immutable-js';
 
@@ -26,23 +26,20 @@ function unescapeHTML(str) {
   .replace(rAm, '&');
 }
 
-
-
 export default class ClientRouter {
   constructor(appURL, dataId) {
     (async () => {
       let App = await System.import(appURL);
       let dataScript = document.querySelector(`script[id="${dataId}"]`);
 
-      let ctx = new ApplicationContext(transit.fromJSON(unescapeHTML(dataScript.innerHTML)));
+      let data = transit.fromJSON(unescapeHTML(dataScript.innerHTML));
+      let ctx = new ApplicationContext(data);
 
       let routes = new App(ctx).routes;
-      let location = window.location;
 
-      match({ routes, location }, (error, redirectLocation, renderProps) => {
         ReactDOM.render(
           <Router
-            {...renderProps}
+            routes={routes}
             history={createBrowserHistory()}
             onError={(err) => {
               ctx.emit('error', err);
@@ -53,11 +50,10 @@ export default class ClientRouter {
                 title = Tmpl.format(title, this.state.params);
                 document.title = title;
               }
+              ctx.init = true;
             }}
           />
         , document.getElementById('viewport'));
-        ctx.init = true;
-      });
 
     })();
   }

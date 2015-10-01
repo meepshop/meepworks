@@ -9,6 +9,7 @@ export default class AppStore extends Store {
     };
   }
   rehydrate(data) {
+    console.log('@rehydrate', data);
     this._data = data;
   }
   dehydrate() {

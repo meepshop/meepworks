@@ -28,6 +28,7 @@ export default class ServerRouter {
     jspmPath = 'jspm_packages',
     jspmConfig = 'jspm_config.js',
     version,
+    preloadCss = true,
     meepdev = false
   }) {
     this.appPath = appPath;
@@ -37,6 +38,7 @@ export default class ServerRouter {
     this.version = version;
     this.jspmPath = jspmPath;
     this.jspmConfig = jspmConfig;
+    this.preloadCss = preloadCss !== false;
 
 
 
@@ -95,7 +97,7 @@ export default class ServerRouter {
                 title = Tmpl.format(title, this.params);
               }
               let data = {
-                stores: [],
+                storeData: [],
                 acceptLanguage: ctx.acceptLanguage,
                 locale: ctx.locale,
                 localeMapping: ctx.localeMapping,
@@ -103,20 +105,31 @@ export default class ServerRouter {
               };
 
               ctx.stores.forEach(s => {
-                data.stores.push(s.dehydrate());
+                data.storeData.push(s.dehydrate());
               });
 
-              let cssPreloads = [];
+              let cssPreloads = new Set();
               //trace files for imported css files
               for(let src of ctx.files) {
-                let preloads = await router::traceCss(src);
-                cssPreloads.push(
-                  preloads.map(css => (
-                    <link rel="stylesheet" href={css} />
-                  ))
-                );
-
+                if(!CssCache.has(src)) {
+                  if(router.preloadCss) {
+                    await router::traceCss(src);
+                  } else {
+                    router::traceCss(src);
+                  }
+                }
+                if(CssCache.has(src)) {
+                  CssCache.get(src).forEach(css => {
+                    cssPreloads.add(css);
+                  });
+                }
               }
+              let styles = [];
+              cssPreloads.forEach(css => {
+                styles.push(
+                  <link rel="stylesheet" href={css} />
+                );
+              });
 
               this.body = doctype + renderToStaticMarkup(
                 <HtmlPage
@@ -124,7 +137,7 @@ export default class ServerRouter {
                   scripts={[
                     router::bootstrap(data)
                   ]}
-                  styles={cssPreloads}
+                  styles={styles}
                   >
                   <RoutingContext {...renderProps} />
                 </HtmlPage>
@@ -159,8 +172,6 @@ function normalizeLocaleCode(code) {
 const cssCheck = /\.css$/i;
 
 async function traceCss(appPath) {
-
-  if(!CssCache.has(appPath)) {
     let builder = new Builder();
     await builder.loadConfig(this.jspmConfig);
 
@@ -178,8 +189,6 @@ async function traceCss(appPath) {
           (this.version ? `?${this.version}` : '');
       }
     });
-    CssCache.set(appPath, preloads);
     builder.reset();
-  }
-  return CssCache.get(appPath);
+    CssCache.set(appPath, preloads);
 }

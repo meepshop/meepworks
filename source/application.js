@@ -28,11 +28,35 @@ export default class Application {
       context: {
         ctx,
         locale: this[_Locale]
+      },
+      runAction(action) {
+        return this.context.ctx.runAction(action);
+      },
+      getStore(Store) {
+        return Store.getInstance(this.context.ctx);
+      },
+      get locale() {
+        return this.context.locale.locale;
+      },
+      setLocale(l) {
+        return this.context.locale.setLocale(l);
+      },
+      tmpl(key, params) {
+        return this.context.locale(key, params);
+      },
+      formatNumber(...args) {
+        return this.context.locale.formatNumber(...args);
+      },
+      formatCurrency(...args) {
+        return this.context.locale.formatCurrency(...args);
+      },
+      formatDateTime(...args) {
+        return this.context.locale.formatDateTime(...args);
       }
     };
   }
   get path() {
-    return '/';
+    return void 0;
   }
   get childRoutes() {
     return [];
@@ -72,25 +96,31 @@ export default class Application {
     return {
       path: this.path,
       getChildRoutes: async (location, cb) => {
+        let childRoutes = [];
         if(isClient) {
-          cb(null, await asyncMap(this[_ChildRoutes], async r => {
+          childRoutes = await asyncMap(this[_ChildRoutes], async r => {
             try {
               let ChildApp = await System.import(r);
               let child = new ChildApp(this[_Ctx]);
               return child.routes;
             } catch (err) {
+              this[_Ctx].emit('error', err);
               return null;
             }
-
-          }));
+          });
         } else {
-          cb(null, this[_ChildRoutes].map(r => {
-            this[_Ctx].files.add(r);
-            let ChildApp = require(r);
-            let child = new ChildApp(this[_Ctx]);
-            return child.routes;
-          }))
+          childRoutes = this[_ChildRoutes].map(r => {
+            try {
+              let ChildApp = require(r);
+              let child = new ChildApp(this[_Ctx]);
+              this[_Ctx].files.add(r);
+              return child.routes;
+            } catch(err) {
+              this[_Ctx].emit('error', err);
+            }
+          });
         }
+        cb(null, childRoutes.filter(r => !!r));
       },
       onEnter: async (nextState, replaceState, cb) => {
         try {
@@ -105,22 +135,30 @@ export default class Application {
         //stores
         this.stores.forEach(s => {
           let store = s.getInstance(this[_Ctx]);
-          if(!this[_Ctx].init) {
-            store.rehydrate(this[_Ctx].storeData);
-          }
           return store;
         });
 
 
         //title
         if(this.title !== Application.prototype.title) {
-          this[_Ctx].pushTitle(this[_CtxObject]::this.title());
+          try {
+            let title = this[_CtxObject]::this.title();
+            if(title) {
+              this[_Ctx].pushTitle(title);
+            }
+          } catch(err) {
+            this[_Ctx].emit('error', err);
+          }
         }
         if(this[_Ctx].init &&
            this.onEnter !== Application.prototype.onEnter &&
-           typeof this.onEnter === 'function') {
-          await this[_CtxObject]::this.onEnter(nextState, replaceState);
-          cb();
+             typeof this.onEnter === 'function') {
+          try {
+            await this[_CtxObject]::this.onEnter(nextState, replaceState);
+            cb();
+          } catch(err) {
+            cb(err);
+          }
         } else {
           cb();
         }
@@ -128,7 +166,14 @@ export default class Application {
       onLeave: () => {
         //title
         if(this.title !== Application.prototype.title) {
-          this[_Ctx].popTitle();
+          try {
+            let title = this[_CtxObject]::this.title();
+            if(title) {
+              this[_Ctx].popTitle();
+            }
+          } catch(err) {
+            this[_Ctx].emit('error', err);
+          }
         }
         if(this.onLeave !== Application.prototype.onLeave &&
           typeof this.onLeave === 'function') {
@@ -140,11 +185,21 @@ export default class Application {
         if(!this[_Component]) {
           let Comp;
           if(isClient) {
-            Comp = await System.import(this[_ComponentPath]);
+            try {
+              Comp = await System.import(this[_ComponentPath]);
+            } catch(err) {
+              this[_Ctx].emit('error', err);
+              cb(err);
+            }
 
           } else {
             this[_Ctx].files.add(this[_ComponentPath]);
-            Comp = require(this[_ComponentPath]);
+            try {
+              Comp = require(this[_ComponentPath]);
+            } catch(err) {
+              this[_Ctx].emit('error', err);
+              cb(err);
+            }
           }
 
           //extends the Comp with contexts

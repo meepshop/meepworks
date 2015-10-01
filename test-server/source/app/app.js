@@ -14,11 +14,11 @@ import AppStore from './app-store';
 //});
 //
 export default class TestApp extends Application {
-  get path() {
-    return '/';
-  }
   get component() {
     return './app-view';
+  }
+  get path() {
+    return '/';
   }
   get childRoutes() {
     return [
