@@ -120,6 +120,7 @@ export default class Locale {
 
 
   static formatNumber(locale, value, opts) {
+    locale = locale.replace('_', '-');
     let key = `${locale}:${JSON.stringify(opts)}`;
     if(!NumberFormatters.has(key)) {
       NumberFormatters.set(key, Intl.NumberFormat(locale, opts));
@@ -134,6 +135,7 @@ export default class Locale {
 
 
   static formatDateTime(locale, t, opts) {
+    locale = locale.replace('_', '-');
     let key = `${locale}:${JSON.stringify(opts)}`;
     if(!DateFormatters.has(key)) {
       DateFormatters.set(key, Intl.DateTimeFormat(locale, opts));

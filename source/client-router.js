@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Router from 'react-router';
+import Router, { match } from 'react-router';
 import Tmpl from './tmpl';
 import transit from 'transit-immutable-js';
 
@@ -36,6 +36,26 @@ export default class ClientRouter {
       let ctx = new ApplicationContext(data);
 
       let routes = new App(ctx).routes;
+
+      //match({ routes, location: window.location }, (error, redirectLocation, renderProps) => {
+        //ReactDOM.render(
+          //<Router
+            //routes={routes}
+            //history={createBrowserHistory()}
+            //onError={(err) => {
+              //ctx.emit('error', err);
+            //}}
+            //onUpdate={function () {
+              //let title = ctx.title;
+              //if(title) {
+                //title = Tmpl.format(title, this.state.params);
+                //document.title = title;
+              //}
+              //ctx.init = true;
+            //}}
+          ///>
+        //, document.getElementById('viewport'));
+      //});
 
         ReactDOM.render(
           <Router

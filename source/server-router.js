@@ -16,7 +16,6 @@ import url from 'url';
 const doctype = '<!DOCTYPE html>';
 
 const _ErrorTransport = Symbol();
-const _Underscore = /_/;
 const CssCache = new Map();
 
 
@@ -127,7 +126,7 @@ export default class ServerRouter {
               let styles = [];
               cssPreloads.forEach(css => {
                 styles.push(
-                  <link rel="stylesheet" href={css} />
+                  <link key={css} rel="stylesheet" href={css} />
                 );
               });
 
@@ -160,13 +159,13 @@ Emitter(ServerRouter.prototype);
 
 
 function normalizeLocaleCode(code) {
-  code = code.replace(_Underscore, '-');
-  code = code.split('-');
+  code = code.replace('-', '_');
+  code = code.split('_');
   code[0] = code[0].toLowerCase();
   if(code.length > 1) {
     code[1] = code[1].toUpperCase();
   }
-  return code.join('-');
+  return code.join('_');
 }
 
 const cssCheck = /\.css$/i;
