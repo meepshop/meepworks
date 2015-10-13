@@ -7,6 +7,7 @@ export default class AppView extends Component {
     return (
       <div>
         <div>{ this.tmpl('hello') }</div>
+        <div>{this.formatNumber(1365.2363)}</div>
         <div><Link to="/sub">Link to Sub</Link></div>
         {this.props.children}
       </div>

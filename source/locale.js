@@ -12,6 +12,9 @@ const DateFormatters = new Map();
 const _Ctx = Symbol();
 const _Path = Symbol();
 
+let localeDataLoaded = false;
+const isClient = typeof window !== 'undefined';
+
 
 export default class Locale {
   constructor(ctx, setting) {
@@ -73,6 +76,10 @@ export default class Locale {
 
   async loadLocales() {
 
+    if(isClient && !localeDataLoaded) {
+      await System.import('intl/locale-data/complete');
+    }
+
     let mapping = this[_Ctx].localeMapping;
     let locale = this[_Ctx].locale;
     let acceptLanguage = this[_Ctx].acceptLanguage;
@@ -130,7 +137,7 @@ export default class Locale {
   }
   formatNumber(...args) {
     let locale = this[_Ctx].locale;
-    return Locale.formatNumber(Locale, ...args);
+    return Locale.formatNumber(locale, ...args);
   }
 
 
