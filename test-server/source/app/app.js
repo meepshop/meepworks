@@ -31,7 +31,9 @@ export default class TestApp extends Application {
       AppStore
     ];
   }
-
+  async onEnter() {
+    console.log('@onEnter');
+  }
   get locale() {
     return {
       path: '../locale',

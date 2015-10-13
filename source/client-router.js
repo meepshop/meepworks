@@ -37,26 +37,7 @@ export default class ClientRouter {
 
       let routes = new App(ctx).routes;
 
-      //match({ routes, location: window.location }, (error, redirectLocation, renderProps) => {
-        //ReactDOM.render(
-          //<Router
-            //routes={routes}
-            //history={createBrowserHistory()}
-            //onError={(err) => {
-              //ctx.emit('error', err);
-            //}}
-            //onUpdate={function () {
-              //let title = ctx.title;
-              //if(title) {
-                //title = Tmpl.format(title, this.state.params);
-                //document.title = title;
-              //}
-              //ctx.init = true;
-            //}}
-          ///>
-        //, document.getElementById('viewport'));
-      //});
-
+      match({ routes, location: window.location }, (error, redirectLocation, renderProps) => {
         ReactDOM.render(
           <Router
             routes={routes}
@@ -74,6 +55,27 @@ export default class ClientRouter {
             }}
           />
         , document.getElementById('viewport'));
+      });
+
+        /*
+         *ReactDOM.render(
+         *  <Router
+         *    routes={routes}
+         *    history={createBrowserHistory()}
+         *    onError={(err) => {
+         *      ctx.emit('error', err);
+         *    }}
+         *    onUpdate={function () {
+         *      let title = ctx.title;
+         *      if(title) {
+         *        title = Tmpl.format(title, this.state.params);
+         *        document.title = title;
+         *      }
+         *      ctx.init = true;
+         *    }}
+         *  />
+         *, document.getElementById('viewport'));
+         */
 
     })();
   }

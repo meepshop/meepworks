@@ -16,6 +16,7 @@ const _ComponentPath = Symbol();
 const _Locale = Symbol();
 const _Ctx = Symbol();
 const _CtxObject = Symbol();
+const _Routes = Symbol();
 
 
 export default class Application {
@@ -92,160 +93,164 @@ export default class Application {
     //this allow leave confirmations to be done.
   }
   get routes() {
+      return {
+        path: this.path,
+        getChildRoutes: async (location, cb) => {
+          if(!this[_Routes]) {
 
-    return {
-      path: this.path,
-      getChildRoutes: async (location, cb) => {
-        let childRoutes = [];
-        if(isClient) {
-          childRoutes = await asyncMap(this[_ChildRoutes], async r => {
-            try {
-              let ChildApp = await System.import(r);
-              let child = new ChildApp(this[_Ctx]);
-              return child.routes;
-            } catch (err) {
-              this[_Ctx].emit('error', err);
-              return null;
+            let childRoutes = [];
+            if(isClient) {
+              childRoutes = await asyncMap(this[_ChildRoutes], async r => {
+                try {
+                  let ChildApp = await System.import(r);
+                  let child = new ChildApp(this[_Ctx]);
+                  return child.routes;
+                } catch (err) {
+                  this[_Ctx].emit('error', err);
+                  return null;
+                }
+              });
+            } else {
+              childRoutes = this[_ChildRoutes].map(r => {
+                try {
+                  let ChildApp = require(r);
+                  let child = new ChildApp(this[_Ctx]);
+                  this[_Ctx].files.add(r);
+                  return child.routes;
+                } catch(err) {
+                  this[_Ctx].emit('error', err);
+                }
+              });
             }
+            this[_Routes] = childRoutes.filter(r => !!r);
+          }
+
+          cb(null, this[_Routes]);
+        },
+        onEnter: async (nextState, replaceState, cb) => {
+          try {
+            await this[_Locale].loadLocales();
+          } catch (err) {
+            if(!(err instanceof LocaleLoadError)) {
+              err = new LocaleLoadError(err);
+            }
+            this[_Ctx].emit('error', err);
+          }
+
+          //stores
+          this.stores.forEach(s => {
+            let store = s.getInstance(this[_Ctx]);
+            return store;
           });
-        } else {
-          childRoutes = this[_ChildRoutes].map(r => {
+
+
+          //title
+          if(this.title !== Application.prototype.title) {
             try {
-              let ChildApp = require(r);
-              let child = new ChildApp(this[_Ctx]);
-              this[_Ctx].files.add(r);
-              return child.routes;
+              let title = this[_CtxObject]::this.title();
+              if(title) {
+                this[_Ctx].pushTitle(title);
+              }
             } catch(err) {
               this[_Ctx].emit('error', err);
             }
-          });
-        }
-        cb(null, childRoutes.filter(r => !!r));
-      },
-      onEnter: async (nextState, replaceState, cb) => {
-        try {
-          await this[_Locale].loadLocales();
-        } catch (err) {
-          if(!(err instanceof LocaleLoadError)) {
-            err = new LocaleLoadError(err);
           }
-          this[_Ctx].emit('error', err);
-        }
-
-        //stores
-        this.stores.forEach(s => {
-          let store = s.getInstance(this[_Ctx]);
-          return store;
-        });
-
-
-        //title
-        if(this.title !== Application.prototype.title) {
-          try {
-            let title = this[_CtxObject]::this.title();
-            if(title) {
-              this[_Ctx].pushTitle(title);
-            }
-          } catch(err) {
-            this[_Ctx].emit('error', err);
-          }
-        }
-        if(this[_Ctx].init &&
-           this.onEnter !== Application.prototype.onEnter &&
-             typeof this.onEnter === 'function') {
-          try {
-            await this[_CtxObject]::this.onEnter(nextState, replaceState);
-            cb();
-          } catch(err) {
-            cb(err);
-          }
-        } else {
-          cb();
-        }
-      },
-      onLeave: () => {
-        //title
-        if(this.title !== Application.prototype.title) {
-          try {
-            let title = this[_CtxObject]::this.title();
-            if(title) {
-              this[_Ctx].popTitle();
-            }
-          } catch(err) {
-            this[_Ctx].emit('error', err);
-          }
-        }
-        if(this.onLeave !== Application.prototype.onLeave &&
-          typeof this.onLeave === 'function') {
-          this[_CtxObject]::this.onLeave();
-        }
-      },
-      getComponent: async (location, cb) => {
-        let self = this;
-        if(!this[_Component]) {
-          let Comp;
-          if(isClient) {
+          if(this[_Ctx].init &&
+             this.onEnter !== Application.prototype.onEnter &&
+               typeof this.onEnter === 'function') {
             try {
-              Comp = await System.import(this[_ComponentPath]);
+              await this[_CtxObject]::this.onEnter(nextState, replaceState);
+              cb();
             } catch(err) {
-              this[_Ctx].emit('error', err);
               cb(err);
             }
-
           } else {
-            this[_Ctx].files.add(this[_ComponentPath]);
+            cb();
+          }
+        },
+        onLeave: () => {
+          //title
+          if(this.title !== Application.prototype.title) {
             try {
-              Comp = require(this[_ComponentPath]);
+              let title = this[_CtxObject]::this.title();
+              if(title) {
+                this[_Ctx].popTitle();
+              }
             } catch(err) {
               this[_Ctx].emit('error', err);
-              cb(err);
             }
           }
+          if(this.onLeave !== Application.prototype.onLeave &&
+             typeof this.onLeave === 'function') {
+            this[_CtxObject]::this.onLeave();
+          }
+        },
+        getComponent: async (location, cb) => {
+          let self = this;
+          if(!this[_Component]) {
+            let Comp;
+            if(isClient) {
+              try {
+                Comp = await System.import(this[_ComponentPath]);
+              } catch(err) {
+                this[_Ctx].emit('error', err);
+                cb(err);
+              }
 
-          //extends the Comp with contexts
-          this[_Component] = class K extends Component {
-            static get contextTypes() {
-              return {
-                ctx: PropTypes.object,
-                locale: PropTypes.func,
-                history: RouterPropTypes.history,
-                route: RouterPropTypes.route
-              };
-            }
-            static get childContextTypes () {
-              return {
-                ctx: PropTypes.object,
-                locale: PropTypes.func
+            } else {
+              this[_Ctx].files.add(this[_ComponentPath]);
+              try {
+                Comp = require(this[_ComponentPath]);
+              } catch(err) {
+                this[_Ctx].emit('error', err);
+                cb(err);
               }
             }
-            componentDidMount() {
-              if(this.routerWillLeave !== Application.prototype.routerWillLeave &&
-                  typeof self.routerWillLeave === 'function') {
-                this._unlistenBeforeLeavingRoute = this.context.history.listenBefore(
-                  self.routerWillLeave
-                );
-              }
-            }
-            componentWillUnmount() {
-              if(this._unlistenBeforeLeavingRoute) {
-                this._unlistenBeforeLeavingRoute();
-              }
-            }
-            getChildContext() {
-              return self[_CtxObject].context;
-            }
-            render() {
-              return (<Comp {...this.props}/>)
-            }
 
-          };
+            //extends the Comp with contexts
+            this[_Component] = class K extends Component {
+              static get contextTypes() {
+                return {
+                  ctx: PropTypes.object,
+                  locale: PropTypes.func,
+                  history: RouterPropTypes.history,
+                  route: RouterPropTypes.route
+                };
+              }
+              static get childContextTypes () {
+                return {
+                  ctx: PropTypes.object,
+                  locale: PropTypes.func
+                }
+              }
+              componentDidMount() {
+                if(this.routerWillLeave !== Application.prototype.routerWillLeave &&
+                   typeof self.routerWillLeave === 'function') {
+                  this._unlistenBeforeLeavingRoute = this.context.history.listenBefore(
+                    self.routerWillLeave
+                  );
+                }
+              }
+              componentWillUnmount() {
+                if(this._unlistenBeforeLeavingRoute) {
+                  this._unlistenBeforeLeavingRoute();
+                }
+              }
+              getChildContext() {
+                return self[_CtxObject].context;
+              }
+              render() {
+                return (<Comp {...this.props}/>)
+              }
 
+            };
+
+          }
+
+          cb(null, this[_Component]);
         }
 
-        cb(null, this[_Component]);
-      }
-
-    }
+      };
   }
 }
 
