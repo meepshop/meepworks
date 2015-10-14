@@ -28,7 +28,8 @@ export default class ServerRouter {
     jspmConfig = 'jspm_config.js',
     version,
     preloadCss = true,
-    meepdev = false
+      meepdev = false,
+      root,
   }) {
     this.appPath = appPath;
     this.publicPath = publicPath;
@@ -38,6 +39,7 @@ export default class ServerRouter {
     this.jspmPath = jspmPath;
     this.jspmConfig = jspmConfig;
     this.preloadCss = preloadCss !== false;
+    this.root = root;
 
 
 
@@ -124,9 +126,9 @@ export default class ServerRouter {
                 }
               }
               let styles = [];
-              cssPreloads.forEach(css => {
+              cssPreloads.forEach((css, idx) => {
                 styles.push(
-                  <link key={css} rel="stylesheet" href={css} />
+                  <link key={'css:' +idx} rel="stylesheet" href={css} />
                 );
               });
 
@@ -171,8 +173,11 @@ function normalizeLocaleCode(code) {
 const cssCheck = /\.css$/i;
 
 async function traceCss(appPath) {
-    let builder = new Builder();
-    await builder.loadConfig(this.jspmConfig);
+  try {
+
+    let builder = new Builder(this.root, this.jspmConfig);
+    //await builder.loadConfig(this.jspmConfig);
+
 
     let trace = await builder.trace(appPath);
     let preloads = Object.keys(trace)
@@ -190,4 +195,7 @@ async function traceCss(appPath) {
     });
     builder.reset();
     CssCache.set(appPath, preloads);
+    } catch(err) {
+      console.log(err, err.stack);
+    }
 }

@@ -1,4 +1,4 @@
-import Application from '../../../build/application';
+import Application from 'meepworks/application';
 
 
 export default class Child1 extends Application {

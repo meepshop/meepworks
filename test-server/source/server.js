@@ -10,12 +10,15 @@ import RequireFilter from '../../build/require-filter';
 import Router from '../../build/server-router';
 
 
+const checkMeepworks = /^meepworks\//;
+  const meepworksPath = path.resolve(__dirname, '../../build') + '/';
+
 const requireFilter = new RequireFilter({
   root: path.resolve(__dirname, '../../'),
+  meepdev: true,
   //baseURL: '',
   //version: Date.now
 });
-
 requireFilter.filter('.css!');
 
 const server = new Koa();
@@ -54,7 +57,7 @@ const app = new Router({
 
   jspmConfig: 'jspm_packages/config.js',
   //dirname: __dirname,
-  //root: path.resolve(__dirname, '../..'),
+  root: path.resolve(__dirname, '../..'),
   //buildPath: 'test-server/build',
   //fileURL: 'test-server/build/server',
   meepdev: true,

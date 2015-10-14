@@ -1,6 +1,6 @@
 import React from 'react';
-import Component from '../../../build/component';
-import Link from '../../../build/link';
+import Component from 'meepworks/component';
+import Link from 'meepworks/link';
 
 export default class AppView extends Component {
   render() {

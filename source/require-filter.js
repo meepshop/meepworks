@@ -12,6 +12,10 @@ const _Loaders = Symbol();
 const _FileRoot = Symbol();
 const _UrlRoot = Symbol();
 const _Version = Symbol();
+const _Dev = Symbol();
+
+const meepworksCheck = /^meepworks\//;
+
 
 export default class RequireFilter {
   /**
@@ -23,10 +27,11 @@ export default class RequireFilter {
    * }
    */
 
-  constructor({ root, baseURL = '', version}) {
+  constructor({ root, baseURL = '', version, meepdev}) {
     this[_Enabled] = true;
     this[_Filters] = new Map();
     this[_Loaders] = new Map();
+    this[_Dev] = meepdev === true;
     this[_OriginalRequire] = Module.prototype.require;
 
     //skip trailing '/'
@@ -50,16 +55,24 @@ export default class RequireFilter {
 
     //don't use arrow function, cannot bind this here
     Module.prototype.require = function require(p) {
+      if(instance[_Dev] && meepworksCheck.test(p)) {
+        p = p.replace(meepworksCheck, __dirname + '/');
+        return this::instance[_OriginalRequire](p);
+      }
       if(instance[_Enabled]) {
         for(let [f, reg] of instance[_Filters]) {
           //f = filtername, reg = regex
           if(reg.test(p)) {
-            p = p.split('!')[0];
-            let target = path.resolve(path.dirname(this.filename), p);
             if(instance[_Loaders].has(f)) {
               let l = instance[_Loaders].get(f);
-              return instance[_Loaders].get(f)(target);
+              return this::l(p, (p) => {
+                p = p.split('!')[0];
+                let target = path.resolve(path.dirname(this.filename), p);
+                return this::instance[_OriginalRequire](target);
+              });
             } else {
+              p = p.split('!')[0];
+              let target = path.resolve(path.dirname(this.filename), p);
               let relToRoot = path.relative(instance[_FileRoot], target);
               return `${instance[_UrlRoot]}/${relToRoot}${instance[_Version]}`;
             }

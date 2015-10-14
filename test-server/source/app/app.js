@@ -1,4 +1,4 @@
-import Application from '../../../build/application';
+import Application from 'meepworks/application';
 import AppStore from './app-store';
 
 //export default new Application({

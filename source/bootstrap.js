@@ -38,7 +38,6 @@ class Loader extends Component {
       <script dangerouslySetInnerHTML={{
         __html: dedent`
         (function () {
-          System.baseURL = '/';
           System.meepworks = {
           appVersion: '${this.props.version}',
           jspmPath: '${this.props.jspmPath}'

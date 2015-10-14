@@ -1,4 +1,4 @@
-import Store from '../../../build/store';
+import Store from 'meepworks/store';
 
 
 export default class AppStore extends Store {
