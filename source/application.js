@@ -93,11 +93,13 @@ export default class Application {
     //this allow leave confirmations to be done.
   }
   get routes() {
-      return {
-        path: this.path,
-        getChildRoutes: async (location, cb) => {
-          if(!this[_Routes]) {
-
+    return {
+      path: this.path,
+      getChildRoutes: (location, cb) => {
+        if(this[_Routes]) {
+          cb(null, this[_Routes]);
+        } else {
+          (async () => {
             let childRoutes = [];
             if(isClient) {
               childRoutes = await asyncMap(this[_ChildRoutes], async r => {
@@ -123,9 +125,9 @@ export default class Application {
               });
             }
             this[_Routes] = childRoutes.filter(r => !!r);
+            cb(null, this[_Routes]);
+          })();
           }
-
-          cb(null, this[_Routes]);
         },
         onEnter: async (nextState, replaceState, cb) => {
           try {
@@ -185,69 +187,73 @@ export default class Application {
             this[_CtxObject]::this.onLeave();
           }
         },
-        getComponent: async (location, cb) => {
+        getComponent: (location, cb) => {
           let self = this;
           if(!this[_Component]) {
-            let Comp;
-            if(isClient) {
-              try {
-                Comp = await System.import(this[_ComponentPath]);
-              } catch(err) {
-                this[_Ctx].emit('error', err);
-                cb(err);
-              }
+            (async () => {
+              let Comp;
+              if(isClient) {
+                try {
+                  Comp = await System.import(this[_ComponentPath]);
+                } catch(err) {
+                  this[_Ctx].emit('error', err);
+                  cb(err);
+                }
 
-            } else {
-              this[_Ctx].files.add(this[_ComponentPath]);
-              try {
-                Comp = require(this[_ComponentPath]);
-              } catch(err) {
-                this[_Ctx].emit('error', err);
-                cb(err);
-              }
-            }
-
-            //extends the Comp with contexts
-            this[_Component] = class K extends Component {
-              static get contextTypes() {
-                return {
-                  ctx: PropTypes.object,
-                  locale: PropTypes.func,
-                  history: RouterPropTypes.history,
-                  route: RouterPropTypes.route
-                };
-              }
-              static get childContextTypes () {
-                return {
-                  ctx: PropTypes.object,
-                  locale: PropTypes.func
+              } else {
+                this[_Ctx].files.add(this[_ComponentPath]);
+                try {
+                  Comp = require(this[_ComponentPath]);
+                } catch(err) {
+                  this[_Ctx].emit('error', err);
+                  cb(err);
                 }
               }
-              componentDidMount() {
-                if(this.routerWillLeave !== Application.prototype.routerWillLeave &&
-                   typeof self.routerWillLeave === 'function') {
-                  this._unlistenBeforeLeavingRoute = this.context.history.listenBefore(
-                    self.routerWillLeave
-                  );
-                }
-              }
-              componentWillUnmount() {
-                if(this._unlistenBeforeLeavingRoute) {
-                  this._unlistenBeforeLeavingRoute();
-                }
-              }
-              getChildContext() {
-                return self[_CtxObject].context;
-              }
-              render() {
-                return (<Comp {...this.props}/>)
-              }
 
-            };
+              //extends the Comp with contexts
+              this[_Component] = class K extends Component {
+                static get contextTypes() {
+                  return {
+                    ctx: PropTypes.object,
+                    locale: PropTypes.func,
+                    history: RouterPropTypes.history,
+                    route: RouterPropTypes.route
+                  };
+                }
+                static get childContextTypes () {
+                  return {
+                    ctx: PropTypes.object,
+                    locale: PropTypes.func
+                  }
+                }
+                componentDidMount() {
+                  if(this.routerWillLeave !== Application.prototype.routerWillLeave &&
+                     typeof self.routerWillLeave === 'function') {
+                    this._unlistenBeforeLeavingRoute = this.context.history.listenBefore(
+                      self.routerWillLeave
+                    );
+                  }
+                }
+                componentWillUnmount() {
+                  if(this._unlistenBeforeLeavingRoute) {
+                    this._unlistenBeforeLeavingRoute();
+                  }
+                }
+                getChildContext() {
+                  return self[_CtxObject].context;
+                }
+                render() {
+                  return (<Comp {...this.props}/>)
+                }
 
+              };
+              cb(null, this[_Component]);
+
+            })();
+
+          } else {
+            cb(null, this[_Component]);
           }
-
-          cb(null, this[_Component]);
         }
 
       };

@@ -28,13 +28,11 @@ export default class ServerRouter {
     jspmConfig = 'jspm_config.js',
     version,
     preloadCss = true,
-      meepdev = false,
       root,
   }) {
     this.appPath = appPath;
     this.publicPath = publicPath;
     this.publicUrl = publicUrl;
-    this.meepdev = meepdev === true;
     this.version = version;
     this.jspmPath = jspmPath;
     this.jspmConfig = jspmConfig;

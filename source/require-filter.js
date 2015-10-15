@@ -12,7 +12,6 @@ const _Loaders = Symbol();
 const _FileRoot = Symbol();
 const _UrlRoot = Symbol();
 const _Version = Symbol();
-const _Dev = Symbol();
 
 const meepworksCheck = /^meepworks\//;
 
@@ -27,11 +26,10 @@ export default class RequireFilter {
    * }
    */
 
-  constructor({ root, baseURL = '', version, meepdev}) {
+  constructor({ root, baseURL = '', version}) {
     this[_Enabled] = true;
     this[_Filters] = new Map();
     this[_Loaders] = new Map();
-    this[_Dev] = meepdev === true;
     this[_OriginalRequire] = Module.prototype.require;
 
     //skip trailing '/'
@@ -55,10 +53,6 @@ export default class RequireFilter {
 
     //don't use arrow function, cannot bind this here
     Module.prototype.require = function require(p) {
-      if(instance[_Dev] && meepworksCheck.test(p)) {
-        p = p.replace(meepworksCheck, __dirname + '/');
-        return this::instance[_OriginalRequire](p);
-      }
       if(instance[_Enabled]) {
         for(let [f, reg] of instance[_Filters]) {
           //f = filtername, reg = regex
@@ -85,7 +79,11 @@ export default class RequireFilter {
 
   filter(f, loader) {
     if(!this[_Filters].has(f)) {
-      this[_Filters].set(f, new RegExp(`${asterickToAny(escapeRegExp(f))}$`, 'i'));
+      if(f instanceof RegExp) {
+        this[_Filters].set(f, f);
+      } else {
+        this[_Filters].set(f, new RegExp(`${asterickToAny(escapeRegExp(f))}$`, 'i'));
+      }
       if(typeof loader === 'function') {
         this[_Loaders].set(f, loader);
       }

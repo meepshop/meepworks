@@ -14,10 +14,14 @@ const checkMeepworks = /^meepworks\//;
   const meepworksPath = path.resolve(__dirname, '../../build') + '/';
 
 const requireFilter = new RequireFilter({
-  root: path.resolve(__dirname, '../../'),
-  meepdev: true,
+  root: path.resolve(__dirname, '../../')
   //baseURL: '',
   //version: Date.now
+});
+requireFilter.filter(/^meepworks\/.*/, (target, originalRequire) => {
+  target = target.replace(/^meepworks/, path.resolve(__dirname, '../../build'));
+  return originalRequire(target);
+
 });
 requireFilter.filter('.css!');
 
@@ -57,10 +61,9 @@ const app = new Router({
 
   jspmConfig: 'jspm_packages/config.js',
   //dirname: __dirname,
-  root: path.resolve(__dirname, '../..'),
+  root: path.resolve(__dirname, '../../'),
   //buildPath: 'test-server/build',
   //fileURL: 'test-server/build/server',
-  meepdev: true,
   //version
 });
 

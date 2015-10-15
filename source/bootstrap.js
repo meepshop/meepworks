@@ -32,8 +32,6 @@ class Data extends Component {
  */
 class Loader extends Component {
   render () {
-    let p = this.props.meepdev ? 'build' : 'meepworks';
-
     return (
       <script dangerouslySetInnerHTML={{
         __html: dedent`
@@ -51,7 +49,7 @@ class Loader extends Component {
             var result = fetch.call(this, load);
             return result;
           };
-          System.import('${p}/client-router')
+          System.import('meepworks/client-router')
           .then(function (ClientRouter) {
             var router = new ClientRouter('${this.props.appUrl}', '${this.props.dataId}');
           })
@@ -78,7 +76,6 @@ export default function bootstrap(data) {
        version={jsVer}
        jspmPath={this.jspmPath}
        appUrl={appUrl}
-       meepdev={this.meepdev}
      />
    );
 
