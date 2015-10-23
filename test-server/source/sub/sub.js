@@ -1,4 +1,5 @@
 import Application from 'meepworks/application';
+import sleep from 'greasebox/sleep';
 
 import TestAction from './action';
 
@@ -32,6 +33,7 @@ export default class SubApp extends Application {
   async onEnter() {
     console.log('@onEnter');
     console.log(await this.runAction(new TestAction()));
+    await sleep(300)
   }
   onLeave() {
     //console.log('onLeave');

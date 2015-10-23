@@ -12,11 +12,14 @@ const isClient = typeof window !== 'undefined';
 
 const _ChildRoutes = Symbol();
 const _Component = Symbol();
+const _LoadingComponent = Symbol();
 const _ComponentPath = Symbol();
 const _Locale = Symbol();
 const _Ctx = Symbol();
 const _CtxObject = Symbol();
 const _Routes = Symbol();
+const _LoadingRoutes = Symbol();
+const _RouteObject = Symbol();
 
 
 export default class Application {
@@ -93,40 +96,45 @@ export default class Application {
     //this allow leave confirmations to be done.
   }
   get routes() {
-    return {
-      path: this.path,
-      getChildRoutes: (location, cb) => {
-        if(this[_Routes]) {
-          cb(null, this[_Routes]);
-        } else {
-          (async () => {
-            let childRoutes = [];
-            if(isClient) {
-              childRoutes = await asyncMap(this[_ChildRoutes], async r => {
-                try {
-                  let ChildApp = await System.import(r);
-                  let child = new ChildApp(this[_Ctx]);
-                  return child.routes;
-                } catch (err) {
-                  this[_Ctx].emit('error', err);
-                  return null;
-                }
-              });
-            } else {
-              childRoutes = this[_ChildRoutes].map(r => {
-                try {
-                  let ChildApp = require(r);
-                  let child = new ChildApp(this[_Ctx]);
-                  this[_Ctx].files.add(r);
-                  return child.routes;
-                } catch(err) {
-                  this[_Ctx].emit('error', err);
-                }
-              });
-            }
-            this[_Routes] = childRoutes.filter(r => !!r);
+    if(!this[_RouteObject]) {
+      this[_RouteObject] = {
+        path: this.path,
+        getChildRoutes: (location, cb) => {
+          if(this[_Routes]) {
             cb(null, this[_Routes]);
-          })();
+          } else if(this[_LoadingRoutes]) {
+            (async () => {
+              await this[_LoadingRoutes];
+              cb(null, this[_Routes]);
+            })();
+          } else {
+            this[_LoadingRoutes] = (async () => {
+              let childRoutes = [];
+              if(isClient) {
+                childRoutes = await asyncMap(this[_ChildRoutes], async r => {
+                  try {
+                    let ChildApp = await System.import(r);
+                    let child = new ChildApp(this[_Ctx]);
+                    return child.routes;
+                  } catch (err) {
+                    this[_Ctx].emit('error', err);
+                  }
+                });
+              } else {
+                childRoutes = this[_ChildRoutes].map(r => {
+                  try {
+                    let ChildApp = require(r);
+                    let child = new ChildApp(this[_Ctx]);
+                    this[_Ctx].files.add(r);
+                    return child.routes;
+                  } catch(err) {
+                    this[_Ctx].emit('error', err);
+                  }
+                });
+              }
+              this[_Routes] = childRoutes.filter(r => !!r);
+              cb(null, this[_Routes]);
+            })();
           }
         },
         onEnter: async (nextState, replaceState, cb) => {
@@ -189,8 +197,15 @@ export default class Application {
         },
         getComponent: (location, cb) => {
           let self = this;
-          if(!this[_Component]) {
+          if(this[_Component]) {
+            cb(null, this[_Component]);
+          } else if(this[_LoadingComponent]) {
             (async () => {
+              await this[_LoadingComponent];
+              cb(null, this[_Component]);
+            })();
+          } else {
+            this[_LoadingComponent] = (async () => {
               let Comp;
               if(isClient) {
                 try {
@@ -250,13 +265,12 @@ export default class Application {
               cb(null, this[_Component]);
 
             })();
-
-          } else {
-            cb(null, this[_Component]);
           }
         }
 
       };
+    }
+    return this[_RouteObject];
   }
 }
 

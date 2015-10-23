@@ -40,7 +40,7 @@ export default class ClientRouter {
       match({ routes, location: window.location }, (error, redirectLocation, renderProps) => {
         ReactDOM.render(
           <Router
-            routes={routes}
+            {...renderProps}
             history={createBrowserHistory()}
             onError={(err) => {
               ctx.emit('error', err);
