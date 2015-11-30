@@ -42,7 +42,7 @@ export default class ApplicationContext {
         payload: await action.action(action.payload)
       });
     } catch(err) {
-      let err = new ActionError(err);
+      err = new ActionError(err);
       this.emit('error', err);
       throw err;
     }

@@ -245,7 +245,7 @@ export default class Application {
                   if(this.routerWillLeave !== Application.prototype.routerWillLeave &&
                      typeof self.routerWillLeave === 'function') {
                     this._unlistenBeforeLeavingRoute = this.context.history.listenBefore(
-                      self.routerWillLeave
+                      this::self.routerWillLeave
                     );
                   }
                 }

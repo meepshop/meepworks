@@ -27,13 +27,16 @@ function unescapeHTML(str) {
 }
 
 export default class ClientRouter {
-  constructor(appURL, dataId) {
+  constructor(appURL, dataId, init = false) {
     (async () => {
       let App = await System.import(appURL);
       let dataScript = document.querySelector(`script[id="${dataId}"]`);
 
       let data = transit.fromJSON(unescapeHTML(dataScript.innerHTML));
       let ctx = new ApplicationContext(data);
+      if(init) {
+        ctx.init = true;
+      }
 
       let routes = new App(ctx).routes;
 

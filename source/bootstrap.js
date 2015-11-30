@@ -51,7 +51,7 @@ class Loader extends Component {
           };
           System.import('meepworks/client-router')
           .then(function (ClientRouter) {
-            var router = new ClientRouter('${this.props.appUrl}', '${this.props.dataId}');
+            var router = new ClientRouter('${this.props.appUrl}', '${this.props.dataId}', ${this.props.clientRender});
           })
           .catch(console.log);
         })();`
@@ -76,6 +76,7 @@ export default function bootstrap(data) {
        version={jsVer}
        jspmPath={this.jspmPath}
        appUrl={appUrl}
+       clientRender={this.clientRender}
      />
    );
 

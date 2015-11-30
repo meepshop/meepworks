@@ -29,6 +29,7 @@ export default class ServerRouter {
     version,
     preloadCss = true,
       root,
+    clientRender = false
   }) {
     this.appPath = appPath;
     this.publicPath = publicPath;
@@ -38,6 +39,7 @@ export default class ServerRouter {
     this.jspmConfig = jspmConfig;
     this.preloadCss = preloadCss !== false;
     this.root = root;
+    this.clientRender = !!clientRender;
 
 
 
@@ -53,110 +55,159 @@ export default class ServerRouter {
 
 
     return function * (next) {
-
-      let location = createLocation(this.req.url);
-
-      //process locale list from browser
-      let acceptLanguage = this.get('accept-language');
-      if(acceptLanguage) {
-        acceptLanguage = acceptLanguage.split(',').map((l) => {
-          return normalizeLocaleCode(l.split(';').shift());
-        });
+      if(router.clientRender) {
+        yield this::clientRenderer(router, App);
       } else {
-        acceptLanguage = [];
+        yield this::serverRenderer(router, App);
       }
-      if(acceptLanguage.length === 0) {
-        acceptLanguage.push(router.defaultLocale);
-      }
-      let locale = acceptLanguage[0];
-
-      let ctx = new ApplicationContext({
-        locale,
-        acceptLanguage,
-        initialData: this.initialData
-      });
-      ctx.files.add(router.appPath);
-      ctx.init = true;
-      ctx.on('error', router[_ErrorTransport]);
-
-      yield new Promise(resolve => {
-
-        match({ routes: new App(ctx).routes, location }, async (error, redirectLocation, renderProps) => {
-          if(redirectLocation) {
-            this.redirect(redirectLocation.pathname + redirectLocation.search);
-          } else if(error) {
-            this.status = 500;
-            router.emit('error', error);
-          }
-
-          if(renderProps) {
-            try {
-              let title = ctx.title;
-              if(title) {
-                title = Tmpl.format(title, this.params);
-              }
-              let data = {
-                storeData: [],
-                acceptLanguage: ctx.acceptLanguage,
-                locale: ctx.locale,
-                localeMapping: ctx.localeMapping,
-                initialData: ctx.initialData,
-              };
-
-              ctx.stores.forEach(s => {
-                data.storeData.push(s.dehydrate());
-              });
-
-              let cssPreloads = new Set();
-              //trace files for imported css files
-              for(let src of ctx.files) {
-                if(!CssCache.has(src)) {
-                  if(router.preloadCss) {
-                    await router::traceCss(src);
-                  } else {
-                    router::traceCss(src);
-                  }
-                }
-                if(CssCache.has(src)) {
-                  CssCache.get(src).forEach(css => {
-                    cssPreloads.add(css);
-                  });
-                }
-              }
-              let styles = [];
-              cssPreloads.forEach((css, idx) => {
-                styles.push(
-                  <link key={'css:' +idx} rel="stylesheet" href={css} />
-                );
-              });
-
-              this.body = doctype + renderToStaticMarkup(
-                <HtmlPage
-                  title={title}
-                  scripts={[
-                    router::bootstrap(data)
-                  ]}
-                  styles={styles}
-                  >
-                  <RoutingContext {...renderProps} />
-                </HtmlPage>
-              );
-            } catch(err) {
-              this.status = 500;
-              router.emit('error', err);
-            }
-          }
-          ctx.off('error', router[_ErrorTransport]);
-          resolve();
-
-        });
-      });
     };
   }
 }
 
 Emitter(ServerRouter.prototype);
 
+/* Html boyd renderer for rendering content on client side */
+function *clientRenderer(router, App) {
+
+  let acceptLanguage = this.get('accept-language');
+  if(acceptLanguage) {
+    acceptLanguage = acceptLanguage.split(',').map((l) => {
+      return normalizeLocaleCode(l.split(';').shift());
+    });
+  } else {
+    acceptLanguage = [];
+  }
+  if(acceptLanguage.length === 0) {
+    acceptLanguage.push(router.defaultLocale);
+  }
+  let locale = acceptLanguage[0];
+
+  let ctx = new ApplicationContext({
+    locale,
+    acceptLanguage,
+    initialData: this.initialData
+  });
+
+  let data = {
+    storeData: [],
+    acceptLanguage: ctx.acceptLanguage,
+    locale: ctx.locale,
+    localeMapping: ctx.localeMapping,
+    initialData: ctx.initialData,
+  };
+
+  this.body = doctype + renderToStaticMarkup(
+    <HtmlPage
+      scripts={[
+        router::bootstrap(data)
+      ]}
+      >
+    </HtmlPage>
+  );
+}
+
+
+/* Html body renderer for rendering content on server side */
+function *serverRenderer(router, App) {
+
+  let location = createLocation(this.req.url);
+
+  //process locale list from browser
+  let acceptLanguage = this.get('accept-language');
+  if(acceptLanguage) {
+    acceptLanguage = acceptLanguage.split(',').map((l) => {
+      return normalizeLocaleCode(l.split(';').shift());
+    });
+  } else {
+    acceptLanguage = [];
+  }
+  if(acceptLanguage.length === 0) {
+    acceptLanguage.push(router.defaultLocale);
+  }
+  let locale = acceptLanguage[0];
+
+  let ctx = new ApplicationContext({
+    locale,
+    acceptLanguage,
+    initialData: this.initialData
+  });
+  ctx.files.add(router.appPath);
+  ctx.init = true;
+  ctx.on('error', router[_ErrorTransport]);
+
+  yield new Promise(resolve => {
+
+    match({ routes: new App(ctx).routes, location }, async (error, redirectLocation, renderProps) => {
+      if(redirectLocation) {
+        this.redirect(redirectLocation.pathname + redirectLocation.search);
+      } else if(error) {
+        this.status = 500;
+        router.emit('error', error);
+      }
+
+      if(renderProps) {
+        try {
+          let title = ctx.title;
+          if(title) {
+            title = Tmpl.format(title, this.params);
+          }
+          let data = {
+            storeData: [],
+            acceptLanguage: ctx.acceptLanguage,
+            locale: ctx.locale,
+            localeMapping: ctx.localeMapping,
+            initialData: ctx.initialData,
+          };
+
+          ctx.stores.forEach(s => {
+            data.storeData.push(s.dehydrate());
+          });
+
+          let cssPreloads = new Set();
+          //trace files for imported css files
+          for(let src of ctx.files) {
+            if(!CssCache.has(src)) {
+              if(router.preloadCss) {
+                await router::traceCss(src);
+              } else {
+                router::traceCss(src);
+              }
+            }
+            if(CssCache.has(src)) {
+              CssCache.get(src).forEach(css => {
+                cssPreloads.add(css);
+              });
+            }
+          }
+          let styles = [];
+          cssPreloads.forEach((css, idx) => {
+            styles.push(
+              <link key={'css:' +idx} rel="stylesheet" href={css} />
+            );
+          });
+
+          this.body = doctype + renderToStaticMarkup(
+            <HtmlPage
+              title={title}
+              scripts={[
+                router::bootstrap(data)
+              ]}
+              styles={styles}
+              >
+              <RoutingContext {...renderProps} />
+            </HtmlPage>
+          );
+        } catch(err) {
+          this.status = 500;
+          router.emit('error', err);
+        }
+      }
+      ctx.off('error', router[_ErrorTransport]);
+      resolve();
+
+    });
+  });
+}
 
 function normalizeLocaleCode(code) {
   code = code.replace('-', '_');

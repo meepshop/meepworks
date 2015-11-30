@@ -64,7 +64,8 @@ const app = new Router({
   root: path.resolve(__dirname, '../../'),
   //buildPath: 'test-server/build',
   //fileURL: 'test-server/build/server',
-  //version
+  //version,
+  clientRender: true
 });
 
 app.on('error', (err) => {

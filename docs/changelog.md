@@ -1,6 +1,11 @@
 Change Log
 ===
 
+#v0.11.35
+**2015 Oct 23**
+
+1. Rethrow Action errors instead of trapping them.
+
 #v0.11.14
 **2015 Oct 1**
 
