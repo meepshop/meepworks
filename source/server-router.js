@@ -28,8 +28,9 @@ export default class ServerRouter {
     jspmConfig = 'jspm_config.js',
     version,
     preloadCss = true,
-      root,
-    clientRender = false
+    root,
+    clientRender = false,
+    loadingComponent,
   }) {
     this.appPath = appPath;
     this.publicPath = publicPath;
@@ -40,6 +41,7 @@ export default class ServerRouter {
     this.preloadCss = preloadCss !== false;
     this.root = root;
     this.clientRender = !!clientRender;
+    this.loadingComponent = loadingComponent;
 
 
 
@@ -96,12 +98,29 @@ function *clientRenderer(router, App) {
     initialData: ctx.initialData,
   };
 
+  let Loader;
+  let styles = [];
+  if(router.loadingComponent) {
+    Loader = require(router.loadingComponent);
+
+    if(!CssCache.has(router.loadingComponent)) {
+      yield router::traceCss(router.loadingComponent);
+    }
+    CssCache.get(router.loadingComponent).forEach((css, idx) => {
+      styles.push(
+        <link key={'css:' +idx} rel="stylesheet" href={css} />
+      );
+    });
+  }
+
   this.body = doctype + renderToStaticMarkup(
     <HtmlPage
       scripts={[
         router::bootstrap(data)
       ]}
+      styles={styles}
       >
+      <Loader />
     </HtmlPage>
   );
 }

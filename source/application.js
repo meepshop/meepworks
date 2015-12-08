@@ -25,8 +25,10 @@ const _RouteObject = Symbol();
 export default class Application {
   constructor(ctx) {
     this[_Ctx] = ctx;
-    this[_ChildRoutes] = this.childRoutes.map(r => path.resolve(this.dirname, r));
-    this[_ComponentPath] = path.resolve(this.dirname, this.component);
+    //this[_ChildRoutes] = this.childRoutes.map(r => path.resolve(normalizeDirname(this.dirname), r));
+    this[_ChildRoutes] = this.childRoutes.map(r => normalizedResolver(this.dirname, r));
+    //this[_ComponentPath] = path.resolve(normalizeDirname(this.dirname), this.component);
+    this[_ComponentPath] = normalizedResolver(this.dirname, this.component);
     this[_Locale] = new Locale(ctx, this::processLocaleSetting());
     this[_CtxObject] = {
       context: {
@@ -277,7 +279,27 @@ export default class Application {
 function processLocaleSetting() {
   let settings = this.locale;
   if(settings) {
-    settings.path = path.resolve(this.dirname, settings.path);
+    //settings.path = path.resolve(normalizeDirname(this.dirname), settings.path);
+    settings.path = normalizedResolver(this.dirname, settings.path);
   }
   return settings;
+}
+
+const httpCheck = /^http/;
+const httpReplace = /^(http:\/\/.*?)(\/)/;
+
+
+function normalizedResolver(dirname, p) {
+  if(httpCheck.test(dirname)) {
+    let match = dirname.match(httpReplace);
+    dirname = dirname.replace(httpReplace, '/');
+    return match[1] + path.resolve(dirname, p);
+  }
+  return path.resolve(dirname, p);
+}
+function normalizeDirname(dirname) {
+  if(httpCheck.test(dirname)) {
+    return dirname.replace(httpReplace, '');
+  }
+  return dirname;
 }

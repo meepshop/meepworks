@@ -1,6 +1,11 @@
 Change Log
 ===
 
+#v0.11.43
+**2015 Dec 08**
+
+1. Implement loadingComponent render for sererRouter when using clientRender mode.
+
 #v0.11.35
 **2015 Oct 23**
 

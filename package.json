@@ -1,6 +1,6 @@
 {
   "name": "meepworks",
-  "version": "0.11.38",
+  "version": "0.11.43",
   "description": "Isomorphic Framework based on ReactJS & Flux",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -66,8 +66,8 @@
       "intl": "npm:intl@^1.0.0",
       "json": "github:systemjs/plugin-json@^0.1.0",
       "path": "github:jspm/nodelibs-path@^0.1.0",
-      "react": "npm:react@0.14.0",
-      "react-dom": "npm:react-dom@0.14.0",
+      "react": "npm:react@^0.14.0",
+      "react-dom": "npm:react-dom@^0.14.0",
       "react-router": "npm:react-router@1.0.0-rc3",
       "transit-immutable-js": "npm:transit-immutable-js@^0.4.0",
       "transit-js": "npm:transit-js@^0.8.837",

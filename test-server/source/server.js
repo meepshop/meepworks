@@ -65,7 +65,8 @@ const app = new Router({
   //buildPath: 'test-server/build',
   //fileURL: 'test-server/build/server',
   //version,
-  clientRender: true
+  clientRender: true,
+  loadingComponent: path.resolve(__dirname, './loader/loader')
 });
 
 app.on('error', (err) => {
