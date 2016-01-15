@@ -1,4 +1,7 @@
 import React from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
+
+import Viewport from './viewport';
 
 
 /**
@@ -12,15 +15,14 @@ import React from 'react';
  *  @property innerHTML {string} Html string to be rendered. Will ignore body property if provided.
  *
  */
+
 export default class HtmlPage extends React.Component {
   static get defaultProps() {
     return {
       scripts: [],
       styles: [],
       metas: [],
-      title: null,
-      body: null,
-      innerHtml: void 0
+      title: null
     };
   }
   render() {
@@ -34,7 +36,11 @@ export default class HtmlPage extends React.Component {
           {this.props.styles}
           {this.props.scripts}
         </head>
-        {this.props.innerHTML ? <body dangerouslySetInnerHTML={{__html: this.props.innerHTML}}></body> : <body>{this.props.body}</body>}
+        <body>
+          <Viewport>
+            {this.props.children}
+          </Viewport>
+        </body>
       </html>
     );
   }

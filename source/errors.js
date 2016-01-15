@@ -1,14 +1,12 @@
 
 
-class GenericError extends Error {
-  constructor(msg) {
-    super(msg);
+export class GenericError extends Error {
+  constructor(err) {
+    super();
     this.name = this.constructor.name;
-    this.msg = msg;
-    this.message = msg;
-    if(Error.captureStackTrace) {
-      Error.captureStackTrace(this, this);
-    }
+    this.msg = this.message ='GenericError';
+    this.stack = err.stack;
+    this.cause = err;
   }
   static toString() {
     return this.name;
@@ -16,25 +14,24 @@ class GenericError extends Error {
 }
 
 
-export class AppLoadFailed extends GenericError {
+export class AppLoadError extends GenericError {
   constructor(err) {
-    super();
-    this.name = this.constructor.name;
-    this.msg = 'Failed to import an application';
-    this.message = this.msg;
-    this.stack = err.stack;
-    this.cause = err;
+    super(err);
+    this.msg = this.message = 'Error loading application';
   }
 }
 
-export class LocaleLoadFailed extends GenericError {
+export class LocaleLoadError extends GenericError {
   constructor(err) {
-    super();
-    this.name = this.constructor.name;
-    this.msg = 'Failed to import an locale file';
-    this.message = this.msg;
-    this.stack = err.stack;
-    this.cause = err;
+    super(err);
+    this.msg = this.message = 'Error loading locale';
+  }
+}
+
+export class ActionError extends GenericError {
+  constructor(err) {
+    super(err);
+    this.msg = this.message = 'Failed to run action';
   }
 }
 

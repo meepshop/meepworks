@@ -1,4 +1,3 @@
-
 /**
  *  @exports default
  *  @class StyleMap - Represents a map of style definations.
@@ -44,18 +43,4 @@ function traverseDefinition(def) {
 }
 
 
-
-
-/**
- * @exports merge
- * @function
- * @param {StyleDefinition} arguments
- *
- * Merges all the style definitions in the arguments to one resulting object.
- */
-export function merge() {
-  var res = {};
-  Object.assign(res, ...arguments);
-  return res;
-}
 

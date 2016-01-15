@@ -7,10 +7,7 @@ const _cache = new WeakMap();
 
 
 
-const CTX = Symbol();
-export const PROMOTE = Symbol();
-export const DEMOTE = Symbol();
-const BACKUP = {};
+const _Ctx = Symbol();
 /**
  * @class Instance
  *  simple implementation of instanced objects
@@ -37,14 +34,10 @@ export default class Instance {
     if(key) {
       if(!cache.has(key)) {
         let inst = new this();
-        //bind promote/demote functions
-        inst[PROMOTE] = promote;
-        inst[DEMOTE] = demote;
-
 
         cache.set(key, inst);
         //keep a reference to the key for destroy
-        inst[CTX] = key;
+        inst[_Ctx] = key;
       }
       return cache.get(key);
     } else {
@@ -57,7 +50,7 @@ export default class Instance {
   }
 
   get ctx() {
-    return this[CTX];
+    return this[_Ctx];
   }
 
   /**
@@ -67,45 +60,15 @@ export default class Instance {
    */
   destroy() {
     let cache = _cache.get(this.constructor);
-    if(this[CTX]) {
+    if(this[_Ctx]) {
       //use key to clear _cache
-      if(cache.has( this[CTX] )) {
-        cache.delete( this[CTX] );
+      if(cache.has( this[_Ctx] )) {
+        cache.delete( this[_Ctx] );
       }
     } else {
       if(cache.has( this.constructor )) {
         cache.delete( this.constructor );
       }
-    }
-  }
-}
-/**
- * @function
- *    promote an instanced object to be the global instance
- *    that can be accessed via getInstance without passing
- *    the key
- */
-function promote () {
-  let cache = _cache.get(this.constructor);
-  let g = cache.get(this);
-  if(g) {
-    cache.set(BACKUP, g);
-  }
-  cache.set(this.constructor, this);
-}
-/**
- * @function
- *    demote a global instance by removing it from the _cache
- *    with the constructor as the key.
- */
-function demote() {
-  let cache = _cache.get(this.constructor);
-  if(cache.get(this.constructor)=== this) {
-    cache.delete(this.constructor);
-    let g = cache.get(BACKUP);
-    if(g) {
-      cache.set(this.constructor, g);
-      cache.delete(BACKUP);
     }
   }
 }

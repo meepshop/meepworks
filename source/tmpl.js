@@ -1,4 +1,4 @@
-
+import escapeRegExp from 'greasebox/escape-reg-exp';
 
 /**
  * @exports default
@@ -26,9 +26,11 @@ export default class Tmpl {
       return '';
     }
     let res = tmpl;
-    for(let p in params) {
-      let reg = new RegExp(`\\$\\{${escapeRegExp(p)}\\}`, 'g');
-      res = res.replace(reg, params[p]);
+    if(params) {
+      for(let p in params) {
+        let reg = new RegExp(`\\$\\{${escapeRegExp(p)}\\}`, 'g');
+        res = res.replace(reg, params[p]);
+      }
     }
     return res;
   }
@@ -41,8 +43,3 @@ export default class Tmpl {
     return Tmpl.format(this.tmpl, params);
   }
 }
-
-function escapeRegExp(string){
-  return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
-}
-

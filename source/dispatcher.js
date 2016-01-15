@@ -1,9 +1,8 @@
 import Flux from 'flux';
 import Instance from './instance';
-import { ACTION_HANDLER } from './store-base';
 
-const DISPATCH_TOKEN = Symbol();
-const DISPATCHER = Symbol();
+const _DispatchToken = Symbol();
+const _Dispatcher = Symbol();
 /**
  * @exports default
  * @class Dispatcher
@@ -13,22 +12,22 @@ const DISPATCHER = Symbol();
 export default class Dispatcher extends Instance {
   constructor() {
     super();
-    this[DISPATCHER] = new Flux.Dispatcher();
+    this[_Dispatcher] = new Flux.Dispatcher();
   }
   /**
    * @function
    * @param {StoreBase} store - store to be registered
    */
 
-  register(store) {
-    store[DISPATCH_TOKEN] = this[DISPATCHER].register(store[ACTION_HANDLER]);
+  register(store, fn) {
+    store[_DispatchToken] = this[_Dispatcher].register(fn);
   }
   /**
    *  @function
    *  @param {StoreBase} store - store to be unregistered
    */
   unregister(store) {
-    this[DISPATCHER].unregister(store[DISPATCH_TOKEN]);
+    this[_Dispatcher].unregister(store[_DispatchToken]);
   }
 
   /**
@@ -39,15 +38,13 @@ export default class Dispatcher extends Instance {
     if(!Array.isArray(stores)) {
       stores = [stores];
     }
-    this[DISPATCHER].waitFor(stores.map((s) => {
-      return s[DISPATCH_TOKEN];
-    }));
+    this[_Dispatcher].waitFor(stores.map(s => s[_DispatchToken]));
   }
 
   dispatch(payload) {
-    this[DISPATCHER].dispatch(payload);
+    this[_Dispatcher].dispatch(payload);
   }
   isDispatching() {
-    return this[DISPATCHER].isDispatching();
+    return this[_Dispatcher].isDispatching();
   }
 }

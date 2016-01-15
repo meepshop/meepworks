@@ -1,6 +1,63 @@
 Change Log
 ===
 
+#v0.11.43
+**2015 Dec 08**
+
+1. Implement loadingComponent render for sererRouter when using clientRender mode.
+
+#v0.11.35
+**2015 Oct 23**
+
+1. Rethrow Action errors instead of trapping them.
+
+#v0.11.14
+**2015 Oct 1**
+
+1. Fix error where stores are not rehydrated on client-side
+2. Fix error when some css would have multiple links in the header
+
+#v0.11.7
+**2015 Sep 30**
+
+1. Allow setting preload css to false to speed up dev process.
+
+#v0.11.4
+**2015 Sep 30**
+
+1. Allow application to have undefined path.
+
+
+#v0.11.4
+**2015 Sep 30**
+
+1. Fix bug where onEnter gets triggered on client-side before app init.
+
+#v0.11.3
+**2015 Sep 30**
+
+1. Add try catch around onEnter, onLeave, and title.
+
+#v0.11.2
+**2015 Sep 30**
+
+1. Properly provide helper functions for onEnter, onLeave, title().
+
+#v0.11.1
+**2015 Sep 30**
+
+1. Initialize application context with browser's locale settings. Ignore koa context's locale property.
+2. Put koa context's initialData into application context.
+
+#v0.11.0
+**2015 Sep 30**
+
+1. Rewrote to use React 0.14.x and React-router 1.0.x.
+2. Separate Application with Application view component.
+3. Rely mostly on react-router's async features to do dynamic loading.
+
+
+
 #v0.10.27
 **2015 Aug 28**
 

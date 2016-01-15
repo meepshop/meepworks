@@ -3,84 +3,113 @@ import path from 'path';
 import url from 'url';
 import escapeRegExp from 'greasebox/escape-reg-exp';
 
-const ENABLED = Symbol();
-const ORIGINAL_REQUIRE = Symbol();
-const FILTERS = Symbol();
-const LOADERS = Symbol();
-const FILEROOT = Symbol();
-const URLROOT = Symbol();
-const VERSION = Symbol();
+
+
+const _Enabled = Symbol();
+const _OriginalRequire = Symbol();
+const _Filters = Symbol();
+const _Loaders = Symbol();
+const _FileRoot = Symbol();
+const _UrlRoot = Symbol();
+const _Version = Symbol();
+
+const meepworksCheck = /^meepworks\//;
+
 
 export default class RequireFilter {
-  constructor(param) {
-    this[ENABLED] = true;
-    this[FILTERS] = new Map();
-    this[LOADERS] = new Map();
-    this[ORIGINAL_REQUIRE] = Module.prototype.require;
+  /**
+   * @constructor
+   * @param {object} param {
+   *    root: root absolute folder path on the server,
+   *    baseURL: baseURL for the hosted application
+   *    version: version string to append to output
+   * }
+   */
 
-    if(param.root[param.root.length - 1] === '/') {
-      this[FILEROOT] = param.root.substr(0, param.root.length - 1);
+  constructor({ root, baseURL = '', version}) {
+    this[_Enabled] = true;
+    this[_Filters] = new Map();
+    this[_Loaders] = new Map();
+    this[_OriginalRequire] = Module.prototype.require;
+
+    //skip trailing '/'
+    if(root[root.length - 1] === '/') {
+      this[_FileRoot] = root.substr(0, root.length - 1);
     } else {
-      this[FILEROOT] = param.root;
+      this[_FileRoot] = root;
     }
 
-    if(param.baseURL[param.baseURL.length - 1] === '/') {
-      this[URLROOT] = param.baseURL.substr(0, param.baseURL.length - 1);
+    //skip trailing '/'
+    if(baseURL[baseURL.length - 1] === '/') {
+      this[_UrlRoot] = baseURL.substr(0, baseURL.length - 1);
     } else {
-      this[URLROOT] = param.baseURL;
+      this[_UrlRoot] = baseURL;
     }
-    this[VERSION] =  param.version ? `?${param.version}` : '';
+
+    //prepare version string
+    this[_Version] =  version ? `?${version}` : '';
 
     let instance = this;
 
-    Module.prototype.require = function (p) {
-      if(instance[ENABLED]) {
-        for(let [f, reg] of instance[FILTERS]) {
+    //don't use arrow function, cannot bind this here
+    Module.prototype.require = function require(p) {
+      if(instance[_Enabled]) {
+        for(let [f, reg] of instance[_Filters]) {
+          //f = filtername, reg = regex
           if(reg.test(p)) {
-            p = p.split('!')[0];
-            let target = path.resolve(path.dirname(this.filename), p);
-            if(instance[LOADERS].has(f)) {
-              let l = instance[LOADERS].get(f);
-              return instance[LOADERS].get(f)(target);
+            if(instance[_Loaders].has(f)) {
+              let l = instance[_Loaders].get(f);
+              return this::l(p, (p) => {
+                p = p.split('!')[0];
+                let target = path.resolve(path.dirname(this.filename), p);
+                return this::instance[_OriginalRequire](target);
+              });
             } else {
-              let relToRoot = path.relative(instance[FILEROOT], target);
-              return `${instance[URLROOT]}/${relToRoot}${instance[VERSION]}`;
+              p = p.split('!')[0];
+              let target = path.resolve(path.dirname(this.filename), p);
+              let relToRoot = path.relative(instance[_FileRoot], target);
+              return `${instance[_UrlRoot]}/${relToRoot}${instance[_Version]}`;
             }
           }
         }
       }
-      return instance[ORIGINAL_REQUIRE].call(this, p);
+      return this::instance[_OriginalRequire](p);
     };
   }
 
   filter(f, loader) {
-    if(!this[FILTERS].has(f)) {
-      this[FILTERS].set(f, new RegExp(`${asterickToAny(escapeRegExp(f))}$`, 'i'));
+    if(!this[_Filters].has(f)) {
+      if(f instanceof RegExp) {
+        this[_Filters].set(f, f);
+      } else {
+        this[_Filters].set(f, new RegExp(`${asterickToAny(escapeRegExp(f))}$`, 'i'));
+      }
       if(typeof loader === 'function') {
-        this[LOADERS].set(f, loader);
+        this[_Loaders].set(f, loader);
       }
     }
   }
   removeFilter(f) {
-    if(this[FILTERS].has(f)) {
-      this[FILTERS].delete(f);
-      if(this[LOADERS].has(f)) {
-        this[LOADERS].delete(f);
+    if(this[_Filters].has(f)) {
+      this[_Filters].delete(f);
+      if(this[_Loaders].has(f)) {
+        this[_Loaders].delete(f);
       }
     }
   }
   enable() {
-    this[ENABLED] = true;
+    this[_Enabled] = true;
   }
   disable() {
-    this[ENABLED] = false;
+    this[_Enabled] = false;
   }
-  get enabled() {
-    return this[ENABLED];
+  get isEnabled() {
+    return this[_Enabled];
   }
 
 }
 function asterickToAny(str) {
   return str.replace(/\\\*/g, '.*');
 }
+
 

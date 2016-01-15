@@ -1,81 +1,82 @@
-import koa from 'koa';
+import Koa from 'koa';
 import serve from 'koa-static-cache';
 import mount from 'koa-mount';
 import favicon from 'koa-favicon';
 import path from 'path';
-import AppDriver from '../../build/server-app-driver';
 
-import React from 'react';
-import Router, {Route, RouteHandler} from 'react-router';
 
 import RequireFilter from '../../build/require-filter';
-//console.log('start');
-//console.time('setFilter');
+
+import Router from '../../build/server-router';
+
+
+const checkMeepworks = /^meepworks\//;
+  const meepworksPath = path.resolve(__dirname, '../../build') + '/';
+
 const requireFilter = new RequireFilter({
-  root: path.resolve(__dirname, '../..'),
-  baseURL: 'test-server',
-  //version: version
+  root: path.resolve(__dirname, '../../')
+  //baseURL: '',
+  //version: Date.now
+});
+requireFilter.filter(/^meepworks\/.*/, (target, originalRequire) => {
+  target = target.replace(/^meepworks/, path.resolve(__dirname, '../../build'));
+  return originalRequire(target);
+
 });
 requireFilter.filter('.css!');
-//console.timeEnd('setFilter');
 
-//console.time('koa-mount');
-const server = new koa();
+const server = new Koa();
 
 server.use(favicon());
 
+function * capture(next) {
+  this.status = 404;
+}
 
 server.use(mount('/jspm_packages', serve(path.resolve(__dirname, '../../jspm_packages'), {
 })));
+server.use(mount('/jspm_packages', capture));
 server.use(mount('/build', serve(path.resolve(__dirname, '../../build'), {
 })));
-server.use(mount('/test-server', serve(__dirname, {
+server.use(mount('/build', capture));
+server.use(mount('/test-server/build', serve(__dirname, {
 })));
-//console.timeEnd('koa-mount');
-
+server.use(mount('/test-server/build', capture));
 
 server.use(function * (next) {
   console.log('req start: ', this.req.url);
-  //console.time('req');
+  console.time('req');
+  this.initialData = {test: 'test-data'};
   yield next;
-  //console.timeEnd('req');
+  console.timeEnd('req');
+
 });
 
-//console.time('mountApp');
-//const app = new AppDriver({
-//  appPath: 'app/app',
-//  jspm: {
-//    path: 'jspm_packages',
-//    config: 'jspm_packages/config.js'
-//  },
-//  dirname: __dirname,
-//  root: path.resolve(__dirname, '../..'),
-//  localtest: true,
-//  buildPath: 'test-server/build',
-//  buildURL: 'test-server',
-//  abortPath: '/my-app/sub',
-//  baseURL: 'my-app'
-//});
-//server.use(mount('/my-app', app.router));
-//console.timeEnd('mountApp');
+const app = new Router({
+  appPath: path.resolve(__dirname, './app/app'),
+  //publicPath points to the public source folder that contains code for client side
+  publicPath: __dirname,
+  //publicUrl is the url path where the public folder is mounted
+  publicUrl: 'test-server/build',
 
-const app = new AppDriver({
-  appPath: 'app/app',
-  jspm: {
-    path: 'jspm_packages',
-    config: 'jspm_packages/config.js'
-  },
-  dirname: __dirname,
-  root: path.resolve(__dirname, '../..'),
-  localtest: true,
-  buildPath: 'test-server/build',
-  buildURL: 'test-server',
-  abortPath: '/',
-  baseURL: ''
+  jspmConfig: 'jspm_packages/config.js',
+  //dirname: __dirname,
+  root: path.resolve(__dirname, '../../'),
+  //buildPath: 'test-server/build',
+  //fileURL: 'test-server/build/server',
+  //version,
+  clientRender: true,
+  /*
+   *loadingComponent: path.resolve(__dirname, './loader/loader')
+   */
 });
-server.use(app.router);
+
+app.on('error', (err) => {
+  console.log(err);
+  console.log(err.stack);
+});
+
+server.use(app.routes);
 
 server.listen(18881);
-console.log('listening to 18881');
-
-
+console.log('listening to 18881...');

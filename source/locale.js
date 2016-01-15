@@ -1,7 +1,6 @@
 import IntlPolyfill from 'intl';
 import Tmpl from './tmpl';
-import { APPROOT } from './app-root';
-import { LocaleLoadFailed } from './errors';
+import { LocaleLoadError } from './errors';
 
 
 //const Intl = global.Intl || IntlPolyfill;
@@ -9,25 +8,24 @@ const Intl = IntlPolyfill;
 const Cache = new Map();
 const NumberFormatters = new Map();
 const DateFormatters = new Map();
-const DefaultLocale = 'en-US';
 
-const CTX = Symbol();
-const PATH = Symbol();
+const _Ctx = Symbol();
+const _Path = Symbol();
 
-export const LOCALE = Symbol();
-export const ACCEPTLANG = Symbol();
-export const LOCALEMAPPING = Symbol();
+let localeDataLoaded = false;
+const isClient = typeof window !== 'undefined';
+
 
 export default class Locale {
   constructor(ctx, setting) {
     //load files and create mappings
     let self = (key, params) => {
-      let p = self[PATH];
+      let p = self[_Path];
       if(!p) {
         return key;
       }
-      let m = self[CTX][LOCALEMAPPING][p];
-      let res = Cache.get(self[PATH]).preload[m][key];
+      let m = self[_Ctx].localeMapping[p];
+      let res = Cache.get(self[_Path]).preload[m][key];
       if(typeof res === 'undefined') {
         return key;
       }
@@ -38,11 +36,11 @@ export default class Locale {
       return res;
     };
 
-    self[CTX] = ctx;
+    self[_Ctx] = ctx;
 
     if(typeof setting !== 'undefined') {
 
-      self[PATH] = setting.path;
+      self[_Path] = setting.path;
       if(!setting.preload) {
         setting.preload = {};
       } else {
@@ -78,16 +76,20 @@ export default class Locale {
 
   async loadLocales() {
 
-    let mapping = this[CTX][LOCALEMAPPING];
-    let locale = this[CTX][LOCALE];
-    let acceptedLanguages = this[CTX][ACCEPTLANG];
+    if(isClient && !localeDataLoaded) {
+      await System.import('intl/locale-data/complete');
+    }
+
+    let mapping = this[_Ctx].localeMapping;
+    let locale = this[_Ctx].locale;
+    let acceptLanguage = this[_Ctx].acceptLanguage;
     //check if path exists in Cache
     for(let [p, c] of Cache) {
       let match = findMatch(locale, c.locales);
 
       //find a match from accepted languages current locale isn't available
       if(!match) {
-        if(acceptedLanguages.every((l) => {
+        if(acceptLanguage.every((l) => {
           match = findMatch(l, c.locales);
           return !match;
         })) {
@@ -106,28 +108,26 @@ export default class Locale {
   }
 
   get locale() {
-    return this[CTX][LOCALE];
+    return this[_Ctx].locale;
   }
 
   async setLocale(l) {
-    let previousLocale = this[CTX][LOCALE];
-    this[CTX][LOCALE] = l;
+    let previousLocale = this[_Ctx].locale;
+    this[_Ctx].locale = l;
     try {
       await this.loadLocales();
-      this[CTX].emit('locale-change', l);
-      if(typeof this[CTX][APPROOT] === 'function') {
-        this[CTX][APPROOT](l);
-      }
+      this[_Ctx].emit('locale-change');
     } catch (err) {
-      this[CTX][LOCALE] = previousLocale;
+      this[_Ctx].locale = previousLocale;
       await this.loadLocales();
-      this[CTX].emit('error', new LocaleLoadFailed(err));
+      this[_Ctx].emit('error', new LocaleLoadError(err));
     }
 
   }
 
 
   static formatNumber(locale, value, opts) {
+    locale = locale.replace('_', '-');
     let key = `${locale}:${JSON.stringify(opts)}`;
     if(!NumberFormatters.has(key)) {
       NumberFormatters.set(key, Intl.NumberFormat(locale, opts));
@@ -136,12 +136,13 @@ export default class Locale {
     return f.format(value);
   }
   formatNumber(...args) {
-    let locale = this[CTX][LOCALE];
-    return Locale.formatNumber(Locale, ...args);
+    let locale = this[_Ctx].locale;
+    return Locale.formatNumber(locale, ...args);
   }
 
 
   static formatDateTime(locale, t, opts) {
+    locale = locale.replace('_', '-');
     let key = `${locale}:${JSON.stringify(opts)}`;
     if(!DateFormatters.has(key)) {
       DateFormatters.set(key, Intl.DateTimeFormat(locale, opts));
@@ -150,7 +151,7 @@ export default class Locale {
     return f.format(t);
   }
   formatDateTime(...args) {
-    let locale = this[CTX][LOCALE];
+    let locale = this[_Ctx].locale;
     return Locale.formatDateTime(locale, ...args);
   }
 
@@ -168,7 +169,7 @@ export default class Locale {
     return this.formatNumber(locale, value, opts);
   }
   formatCurrency(...args) {
-    let locale = this[CTX][LOCALE];
+    let locale = this[_Ctx].locale;
     return Locale.formatCurrency(locale, ...args);
   }
 }

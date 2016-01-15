@@ -1,24 +1,20 @@
 import React, { PropTypes } from 'react';
+import { PropTypes as RouterPropTypes} from 'react-router';
+
 
 export default class Component extends React.Component {
   static get contextTypes() {
     return {
-      router: PropTypes.func,
-      appCtx: PropTypes.object,
-      baseURL: PropTypes.string,
-      appURL: PropTypes.string,
-      currentPath: PropTypes.string,
-      locale: PropTypes.func
+      history: RouterPropTypes.history,
+      ctx: PropTypes.object,
+      locale: PropTypes.func,
     };
   }
-  static get localeSetting() {
-    return void 0;
-  }
   runAction(action) {
-    return this.context.appCtx.runAction(action);
+    return this.context.ctx.runAction(action);
   }
   getStore(Store) {
-    return Store.getInstance(this.context.appCtx);
+    return Store.getInstance(this.context.ctx);
   }
   get locale() {
     return this.context.locale.locale;
