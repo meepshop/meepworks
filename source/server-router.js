@@ -22,10 +22,10 @@ const CssCache = new Map();
 export default class ServerRouter {
   constructor({
     appPath,
-    publicPath,
-    publicUrl,
+    publicPath = '/',
+    publicUrl = '',
     jspmPath = 'jspm_packages',
-    jspmConfig = 'jspm_config.js',
+    jspmConfig = 'jspm_packages/config.js',
     version,
     preloadCss = true,
     root,
@@ -98,10 +98,11 @@ function *clientRenderer(router, App) {
     initialData: ctx.initialData,
   };
 
-  let Loader;
+  let loader;
   let styles = [];
   if(router.loadingComponent) {
-    Loader = require(router.loadingComponent);
+    let Loader = require(router.loadingComponent);
+    loader = <Loader />;
 
     if(!CssCache.has(router.loadingComponent)) {
       yield router::traceCss(router.loadingComponent);
@@ -120,7 +121,7 @@ function *clientRenderer(router, App) {
       ]}
       styles={styles}
       >
-      <Loader />
+      {loader}
     </HtmlPage>
   );
 }
