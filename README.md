@@ -10,6 +10,7 @@ Meepworks Framework
 
 # DONE
 - [x] migrate new meepwork source code
+- [x] pass all eslint test by airbnb rule
 
 # TODO - LIST
 - [ ] 將 gulp 及 jspm 汰除
