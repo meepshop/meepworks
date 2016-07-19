@@ -1,6 +1,14 @@
 Change Log
 ===
 
+#v0.12.0
+**2016 July 19**
+
+1. Migrate old source code
+2. Fix child component error log
+3. remove gulp file
+4. remove jspm file
+
 #v0.11.43
 **2015 Dec 08**
 
@@ -249,7 +257,7 @@ Breaking Changes:
 3. Cache buster is built into app-loader's initial scripts
 
 
-#v0.3.19 
+#v0.3.19
 
 *2015 Mar. 06*
 
