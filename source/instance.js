@@ -1,11 +1,11 @@
-const _cache = new WeakMap();
+const _cache = new WeakMap()
 /**
  * Use weak maps for instances so that instances can easily be gc'ed
  * if the key is the request object itself.
  *
  */
 
-const _Ctx = Symbol();
+const _Ctx = Symbol()
 /**
  * @class Instance
  *  simple implementation of instanced objects
@@ -24,31 +24,31 @@ export default class Instance {
    * reference.
    */
   static getInstance(key) {
-    if(!_cache.has(this)) {
-      _cache.set(this, new WeakMap());
+    if (!_cache.has(this)) {
+      _cache.set(this, new WeakMap())
     }
-    let cache = _cache.get(this);
+    const cache = _cache.get(this)
 
-    if(key) {
-      if(!cache.has(key)) {
-        let inst = new this();
+    if (key) {
+      if (!cache.has(key)) {
+        const inst = new this()
 
-        cache.set(key, inst);
-        //keep a reference to the key for destroy
-        inst[_Ctx] = key;
+        cache.set(key, inst)
+        // keep a reference to the key for destroy
+        inst[_Ctx] = key
       }
-      return cache.get(key);
+      return cache.get(key)
     } else {
-      if(!cache.has(this)) {
-        let inst  = new this();
-        cache.set(this, inst);
+      if (!cache.has(this)) {
+        const inst = new this()
+        cache.set(this, inst)
       }
-      return cache.get(this);
+      return cache.get(this)
     }
   }
 
   get ctx() {
-    return this[_Ctx];
+    return this[_Ctx]
   }
 
   /**
@@ -57,15 +57,15 @@ export default class Instance {
    * Remove the singleton from the internal cache.
    */
   destroy() {
-    let cache = _cache.get(this.constructor);
-    if(this[_Ctx]) {
-      //use key to clear _cache
-      if(cache.has( this[_Ctx] )) {
-        cache.delete( this[_Ctx] );
+    const cache = _cache.get(this.constructor)
+    if (this[_Ctx]) {
+      // use key to clear _cache
+      if (cache.has(this[_Ctx])) {
+        cache.delete(this[_Ctx])
       }
     } else {
-      if(cache.has( this.constructor )) {
-        cache.delete( this.constructor );
+      if (cache.has(this.constructor)) {
+        cache.delete(this.constructor)
       }
     }
   }

@@ -26,8 +26,8 @@ export function isObject(obj) {
  * @returns void 0
  */
 export function isArray(arr) {
-  var toString = {}.toString
-  return Array.isArray(arr) || toString.call(arr) == '[object Array]'
+  const toString = {}.toString
+  return Array.isArray(arr) || toString.call(arr) === '[object Array]'
 }
 
 /**

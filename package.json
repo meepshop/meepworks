@@ -17,8 +17,15 @@
   "homepage": "https://github.com/meepshop/meepworks",
   "devDependencies": {
     "babel": "^5.8.23",
+    "babel-eslint": "^6.1.2",
     "babel-runtime": "^5.8.25",
     "chalk": "^1.1.1",
+    "eslint": "^2.11.1",
+    "eslint-config-airbnb": "^9.0.1",
+    "eslint-import-resolver-webpack": "^0.2.5",
+    "eslint-plugin-import": "^1.8.1",
+    "eslint-plugin-jsx-a11y": "^1.2.2",
+    "eslint-plugin-react": "^5.1.1",
     "fs-promise": "^0.3.1",
     "gulp": "^3.9.0",
     "gulp-babel": "^5.2.1",
@@ -49,8 +56,8 @@
     "uuid": "^2.0.1"
   },
   "peerDependencies": {
-    "react": "^0.14.0",
-    "react-dom": "^0.14.0"
+    "react": "0.14.8",
+    "react-dom": "0.14.8"
   },
   "jspm": {
     "configFile": "jspm_packages/config.js",

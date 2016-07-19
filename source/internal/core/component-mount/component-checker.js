@@ -14,7 +14,6 @@ import {
  * @returns void 0
  */
 export default function component_checker(component, callback) {
-
   if (!isFunction(component) & component !== undefined) {
     warning(`component support only function, but got the ${typeof component}, please checkout your component type`)
     return void 0
@@ -25,4 +24,6 @@ export default function component_checker(component, callback) {
   } catch (err) {
     warning(err)
   }
+
+  return void 0
 }
