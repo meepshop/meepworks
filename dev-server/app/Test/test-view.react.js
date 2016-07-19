@@ -1,5 +1,6 @@
 import React from 'react'
 import Component from '../../../source/component'
+import Link from '../../../source/internal/component/link'
 
 export default class TestView extends Component {
   componentDidMount() {
@@ -9,7 +10,12 @@ export default class TestView extends Component {
   render() {
     return (
       <div>
-        This is TestViewer
+        <Link to='/'>Meepshop Meepworks Framework</Link>
+        <div>
+          This is TestViewer
+          <Link to='admin'>Link to Admin</Link>
+        </div>
+        { this.props.children }
       </div>
     )
   }
