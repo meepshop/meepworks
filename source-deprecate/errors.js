@@ -1,3 +1,5 @@
+
+
 export class GenericError extends Error {
   constructor(err) {
     super();
@@ -10,6 +12,7 @@ export class GenericError extends Error {
     return this.name;
   }
 }
+
 
 export class AppLoadError extends GenericError {
   constructor(err) {
@@ -31,3 +34,4 @@ export class ActionError extends GenericError {
     this.msg = this.message = 'Failed to run action';
   }
 }
+

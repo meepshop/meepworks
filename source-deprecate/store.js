@@ -1,9 +1,8 @@
 import Instance from './instance';
 import Emitter from 'component-emitter';
-import Dispatcher from './dispatcher';
 
-import { isFunction } from './internal/utils/type-checker'
-import { warning } from './internal/warning/type-error-log'
+
+import Dispatcher from './dispatcher';
 
 const _ActionHandler = Symbol();
 const _Emitter = Symbol();
@@ -46,7 +45,7 @@ export default class Store extends Instance {
     let self = super.getInstance(ctx);
 
     if(!self[_Registered]) {
-      if(!ctx.init && ctx.storeData) {
+      if(!ctx.init) {
         //rehydrate data if ctx has not been initialized
         self.rehydrate(ctx.storeData);
       }
@@ -76,14 +75,13 @@ export default class Store extends Instance {
     this[_Emitter].emit('change');
   }
   on(fn) {
-    if (!isFunction(fn)) warning(`error on ${fn}, listener must be [Function] type.`)
     this[_Emitter].on('change', fn);
   }
   off(fn) {
-    if (!isFunction(fn)) warning(`error on ${fn}, listener must be [Function] type.`)
     this[_Emitter].off('change', fn);
   }
   get ctx() {
     return this[_Ctx];
   }
 }
+
