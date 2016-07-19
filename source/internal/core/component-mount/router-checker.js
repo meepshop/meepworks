@@ -14,7 +14,6 @@ import {
  * @returns void 0
  */
 export default function router_checker(router, callback) {
-
   if (!isArray(router) & router !== undefined) {
     warning(`router support only array, but got the ${typeof router}, please checkout your router type`)
     return void 0
@@ -25,4 +24,5 @@ export default function router_checker(router, callback) {
   } catch (err) {
     warning(err)
   }
+  return void 0
 }

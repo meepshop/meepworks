@@ -1,4 +1,4 @@
-import { Link } from 'react-router';
-export default Link;
+import { Link } from 'react-router'
+export default Link
 
-//re-export Link Component from react-router;
+// re-export Link Component from react-router;

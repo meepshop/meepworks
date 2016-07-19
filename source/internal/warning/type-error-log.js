@@ -1,3 +1,5 @@
+/* eslint no-console: 0 */
+
 /**
  * meepworks-warning
  *
@@ -13,5 +15,5 @@ export function warning(message, callback) {
   }
   try {
     throw new Error(message)
-  } catch (err) {}
+  } catch (err) { throw new Error(err) }
 }

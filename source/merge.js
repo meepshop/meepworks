@@ -1,4 +1,4 @@
-import extend from './extend';
+import extend from './extend'
 /**
  * @exports merge
  * @function
@@ -7,6 +7,5 @@ import extend from './extend';
  * Merges all the style definitions in the arguments to one resulting object.
  */
 export default function merge(...args) {
-  return extend({}, ...args);
+  return extend({}, ...args)
 }
-

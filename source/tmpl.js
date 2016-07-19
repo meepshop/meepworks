@@ -1,4 +1,4 @@
-import escapeRegExp from 'greasebox/escape-reg-exp';
+import escapeRegExp from 'greasebox/escape-reg-exp'
 
 /**
  * @exports default
@@ -10,7 +10,7 @@ export default class Tmpl {
    * @param {String} tmpl - the template string
    */
   constructor(tmpl) {
-    this.tmpl = tmpl;
+    this.tmpl = tmpl
   }
 
   /**
@@ -22,17 +22,19 @@ export default class Tmpl {
    *                  - return empty string if tmpl is not a string.
    */
   static format(tmpl, params) {
-    if(typeof tmpl !== 'string') {
-      return '';
+    if (typeof tmpl !== 'string') {
+      return ''
     }
-    let res = tmpl;
-    if(params) {
-      for(let p in params) {
-        let reg = new RegExp(`\\$\\{${escapeRegExp(p)}\\}`, 'g');
-        res = res.replace(reg, params[p]);
+    let res = tmpl
+    if (params) {
+      for (const p in params) { /* eslint no-restricted-syntax: 0 */
+        if ({}.hasOwnProperty.call(params, p)) {
+          const reg = new RegExp(`\\$\\{${escapeRegExp(p)}\\}`, 'g')
+          res = res.replace(reg, params[p])
+        }
       }
     }
-    return res;
+    return res
   }
   /**
    * @function
@@ -40,6 +42,6 @@ export default class Tmpl {
    * @return {String} - return the result of Tmpl.format using this.tmpl and params.
    */
   format(params) {
-    return Tmpl.format(this.tmpl, params);
+    return Tmpl.format(this.tmpl, params)
   }
 }
