@@ -3,25 +3,17 @@ import Emitter from 'component-emitter';
 import { ActionError } from './errors';
 import Im from 'immutable';
 
-import {
-  isObject
-} from './internal/utils/type-checker'
+const _Dispatcher = Symbol();
+const _Init = Symbol();
+const _Stores = Symbol();
+const _Title = Symbol();
+const _Locale = Symbol();
+const _AcceptLanguage = Symbol();
+const _LocaleMapping = Symbol();
+const _StoreData = Symbol();
+const _Files = Symbol();
+const _InitialData = Symbol();
 
-import {
-  warning
-} from './internal/warning/type-error-log'
-
-const _Dispatcher = Symbol('Dispatcher');
-const _Init = Symbol('Init');
-const _Stores = Symbol('Stores');
-const _Title = Symbol('Title');
-const _Locale = Symbol('Locale');
-const _StoreId = Symbol('StoreId');
-const _AcceptLanguage = Symbol('AcceptLanguage');
-const _LocaleMapping = Symbol('LocaleMapping');
-const _StoreData = Symbol('StoreData');
-const _Files = Symbol('Files');
-const _InitialData = Symbol('InitialData');
 
 export default class ApplicationContext {
   constructor({
@@ -29,15 +21,13 @@ export default class ApplicationContext {
     locale = 'en_US',
     acceptLanguage = [],
     localeMapping = {},
-    storeData = [],
-    storeId
+    storeData = []
   }) {
     this[_Dispatcher] = Dispatcher.getInstance(this);
     this[_Title] = [];
     this[_Stores] = new Set();
     this[_Init] = false;
     this[_Locale] = locale;
-    this[_StoreId] = storeId;
     this[_AcceptLanguage] = acceptLanguage;
     this[_LocaleMapping] = localeMapping;
     this[_StoreData] = storeData.reverse();
@@ -45,12 +35,6 @@ export default class ApplicationContext {
     this[_InitialData] = initialData;
   }
   async runAction(action) {
-
-    if (!isObject(action)) {
-      warning(`got the action [${action}] - type of [${typeof action}] ,the action must be object, please checkout your action type.`)
-      return
-    }
-
     action.ctx = this;
     try {
       this[_Dispatcher].dispatch({
@@ -58,8 +42,9 @@ export default class ApplicationContext {
         payload: await action.action(action.payload)
       });
     } catch(err) {
-      err = new ActionError(err)
-      warning(err)
+      err = new ActionError(err);
+      this.emit('error', err);
+      throw err;
     }
   }
   getStore(Store) {
@@ -77,11 +62,9 @@ export default class ApplicationContext {
   get stores() {
     return this[_Stores];
   }
+
   get locale() {
     return this[_Locale];
-  }
-  get storeId() {
-    return this[_StoreId];
   }
   set locale(locale) {
     this[_Locale] = locale;
@@ -118,3 +101,35 @@ export default class ApplicationContext {
 }
 
 Emitter(ApplicationContext.prototype);
+
+
+
+
+
+//    export default class AppContext {
+//      constructor() {
+//        this[ACCEPTLANG] = [];
+//        this[_LocaleMAPPING] = {};
+//
+//      }
+//      get files() {
+//        return this[FILES];
+//      }
+//    }
+//
+//    Emitter(AppContext.prototype);
+//
+//    Object.defineProperty(AppContext.prototype, STATE, {
+//      get() {
+//        return {
+//          locale: this[_Locale],
+//          acceptLanguage: this[ACCEPTLANG],
+//          mapping: this[_LocaleMAPPING]
+//        };
+//      },
+//      set(val) {
+//        this[_Locale] = val.locale;
+//        this[ACCEPTLANG] = val.acceptLanguage;
+//        this[_LocaleMAPPING] = val.mapping;
+//      }
+//    });

@@ -8,28 +8,43 @@ import asyncMap from 'greasebox/async-map';
 import Locale from './locale';
 import { LocaleLoadError } from './errors';
 
-const isClient = typeof window !== 'undefined';
+import component_checker from './internal/core/component-mount/component-checker'
+import router_checker from './internal/core/component-mount/router-checker'
 
-const _ChildRoutes = Symbol();
-const _Component = Symbol();
-const _LoadingComponent = Symbol();
-const _ComponentPath = Symbol();
-const _Locale = Symbol();
-const _Ctx = Symbol();
-const _CtxObject = Symbol();
-const _Routes = Symbol();
-const _LoadingRoutes = Symbol();
-const _RouteObject = Symbol();
+import routes_initializer from './internal/core/initializer/routes_initializer'
+
+import {
+  isFunction,
+  isArray,
+  isClient
+} from './internal/utils/type-checker'
+
+import {
+  warning
+} from './internal/warning/type-error-log'
+
+import ApplicationHOC from './internal/core/higher-level-container/application-hoc.react'
+
+const _ChildRoutes = Symbol('_ChildRoutes');
+const _Component = Symbol('_Component');
+const _LoadingComponent = Symbol('_LoadingComponent');
+const _ComponentPath = Symbol('_ComponentPath');
+const _Locale = Symbol('_Locale');
+const _Ctx = Symbol('_Ctx');
+const _CtxObject = Symbol('_CtxObject');
+const _Routes = Symbol('_Routes');
+const _LoadingRoutes = Symbol('_LoadingRoutes');
+const _RouteObject = Symbol('_RouteObject');
+const _IsLoaded = Symbol('_IsLoaded')
 
 
 export default class Application {
   constructor(ctx) {
     this[_Ctx] = ctx;
-    //this[_ChildRoutes] = this.childRoutes.map(r => path.resolve(normalizeDirname(this.dirname), r));
-    this[_ChildRoutes] = this.childRoutes.map(r => normalizedResolver(this.dirname, r));
-    //this[_ComponentPath] = path.resolve(normalizeDirname(this.dirname), this.component);
-    this[_ComponentPath] = normalizedResolver(this.dirname, this.component);
-    this[_Locale] = new Locale(ctx, this::processLocaleSetting());
+    this[_ChildRoutes] = this.childRoutes;
+    this[_ComponentPath] = this.component;
+    this[_Locale] = new Locale(ctx, this.locale);
+    this[_IsLoaded] = false
     this[_CtxObject] = {
       context: {
         ctx,
@@ -77,19 +92,15 @@ export default class Application {
   get locale() {
     return void 0;
   }
-
   get stores() {
     return [];
   }
-
   title() {
     return void 0;
   }
-
   async onEnter() {
     //overload this function to define onEnter hook handlers
   }
-
   onLeave() {
     //overload this function to define onLeave hook handlers
   }
@@ -99,207 +110,182 @@ export default class Application {
   }
   get routes() {
     if(!this[_RouteObject]) {
+      const own = this
       this[_RouteObject] = {
-        path: this.path,
+        path: own.path,
         getChildRoutes: (location, cb) => {
           if(this[_Routes]) {
-            cb(null, this[_Routes]);
+            router_checker(this[_Routes], cb)
           } else if(this[_LoadingRoutes]) {
+
             (async () => {
               await this[_LoadingRoutes];
-              cb(null, this[_Routes]);
+              router_checker(this[_Routes], cb)
             })();
           } else {
             this[_LoadingRoutes] = (async () => {
               let childRoutes = [];
-              if(isClient) {
-                childRoutes = await asyncMap(this[_ChildRoutes], async r => {
-                  try {
-                    let ChildApp = await System.import(r);
-                    let child = new ChildApp(this[_Ctx]);
-                    return child.routes;
-                  } catch (err) {
-                    this[_Ctx].emit('error', err);
-                  }
-                });
-              } else {
-                childRoutes = this[_ChildRoutes].map(r => {
-                  try {
-                    let ChildApp = require(r);
-                    let child = new ChildApp(this[_Ctx]);
-                    this[_Ctx].files.add(r);
-                    return child.routes;
-                  } catch(err) {
-                    this[_Ctx].emit('error', err);
-                  }
-                });
-              }
+              childRoutes = await asyncMap(this[_ChildRoutes], r => {
+                try {
+                  let child = new r(this[_Ctx]);
+                  return child.routes;
+                } catch (err) {
+                  warning(err)
+                }
+              });
               this[_Routes] = childRoutes.filter(r => !!r);
-              cb(null, this[_Routes]);
+              router_checker(this[_Routes], cb)
             })();
           }
         },
-        onEnter: async (nextState, replaceState, cb) => {
-          try {
-            await this[_Locale].loadLocales();
-          } catch (err) {
-            if(!(err instanceof LocaleLoadError)) {
-              err = new LocaleLoadError(err);
-            }
-            this[_Ctx].emit('error', err);
-          }
-
-          //stores
-          this.stores.forEach(s => {
-            let store = s.getInstance(this[_Ctx]);
-            return store;
-          });
-
-
-          //title
-          if(this.title !== Application.prototype.title) {
-            try {
-              let title = this[_CtxObject]::this.title();
-              if(title) {
-                this[_Ctx].pushTitle(title);
-              }
-            } catch(err) {
-              this[_Ctx].emit('error', err);
-            }
-          }
-          if(this[_Ctx].init &&
-             this.onEnter !== Application.prototype.onEnter &&
-               typeof this.onEnter === 'function') {
-            try {
-              await this[_CtxObject]::this.onEnter(nextState, replaceState);
-              cb();
-            } catch(err) {
-              cb(err);
-            }
-          } else {
-            cb();
-          }
+        onEnter: (nextState, replaceState, cb) => {
+          _onEnter_initializer(nextState, replaceState, cb, own)
         },
         onLeave: () => {
-          //title
-          if(this.title !== Application.prototype.title) {
-            try {
-              let title = this[_CtxObject]::this.title();
-              if(title) {
-                this[_Ctx].popTitle();
-              }
-            } catch(err) {
-              this[_Ctx].emit('error', err);
-            }
-          }
-          if(this.onLeave !== Application.prototype.onLeave &&
-             typeof this.onLeave === 'function') {
-            this[_CtxObject]::this.onLeave();
-          }
+          _onLeave_initializer(own)
         },
         getComponent: (location, cb) => {
-          let self = this;
-          if(this[_Component]) {
-            cb(null, this[_Component]);
-          } else if(this[_LoadingComponent]) {
-            (async () => {
-              await this[_LoadingComponent];
-              cb(null, this[_Component]);
-            })();
-          } else {
-            this[_LoadingComponent] = (async () => {
-              let Comp;
-              if(isClient) {
-                try {
-                  Comp = await System.import(this[_ComponentPath]);
-                } catch(err) {
-                  this[_Ctx].emit('error', err);
-                  cb(err);
-                }
-
-              } else {
-                this[_Ctx].files.add(this[_ComponentPath]);
-                try {
-                  Comp = require(this[_ComponentPath]);
-                } catch(err) {
-                  this[_Ctx].emit('error', err);
-                  cb(err);
-                }
-              }
-
-              //extends the Comp with contexts
-              this[_Component] = class K extends Component {
-                static get contextTypes() {
-                  return {
-                    ctx: PropTypes.object,
-                    locale: PropTypes.func,
-                    history: RouterPropTypes.history,
-                    route: RouterPropTypes.route
-                  };
-                }
-                static get childContextTypes () {
-                  return {
-                    ctx: PropTypes.object,
-                    locale: PropTypes.func
-                  }
-                }
-                componentDidMount() {
-                  if(this.routerWillLeave !== Application.prototype.routerWillLeave &&
-                     typeof self.routerWillLeave === 'function') {
-                    this._unlistenBeforeLeavingRoute = this.context.history.listenBefore(
-                      this::self.routerWillLeave
-                    );
-                  }
-                }
-                componentWillUnmount() {
-                  if(this._unlistenBeforeLeavingRoute) {
-                    this._unlistenBeforeLeavingRoute();
-                  }
-                }
-                getChildContext() {
-                  return self[_CtxObject].context;
-                }
-                render() {
-                  return (<Comp {...this.props}/>)
-                }
-
-              };
-              cb(null, this[_Component]);
-
-            })();
-          }
+          _mainly_component_initializer(location, Application, cb, own)
         }
-
       };
     }
     return this[_RouteObject];
   }
 }
 
-function processLocaleSetting() {
-  let settings = this.locale;
-  if(settings) {
-    //settings.path = path.resolve(normalizeDirname(this.dirname), settings.path);
-    settings.path = normalizedResolver(this.dirname, settings.path);
+/**
+ * meepworks-initialize-class-application-mainly-component
+ *
+ * @param {object} location
+ * @param {object} applicationInstance - application class instance
+ * @param {fn} cb - this function is instead component method
+ * @param {own} own - High Level Context Container by (route)
+ */
+function _mainly_component_initializer(location, applicationInstance, cb, own) {
+  if(own[_Component]) {
+    component_checker(own[_Component], cb)
+  } else if(own[_LoadingComponent]) {
+    (async () => {
+      await own[_LoadingComponent];
+      component_checker(own[_Component], cb)
+    })();
+  } else {
+    own[_LoadingComponent] = (async () => {
+      let Comp;
+      try {
+        Comp = own[_ComponentPath];
+      } catch(err) {
+        warning(err, cb)
+      }
+      own[_Component] = ApplicationHOC(Comp, applicationInstance, own[_CtxObject], own)
+      component_checker(own[_Component], cb)
+    })();
   }
-  return settings;
 }
 
-const httpCheck = /^http/;
-const httpReplace = /^(http:\/\/.*?)(\/)/;
-
-
-function normalizedResolver(dirname, p) {
-  if(httpCheck.test(dirname)) {
-    let match = dirname.match(httpReplace);
-    dirname = dirname.replace(httpReplace, '/');
-    return match[1] + path.resolve(dirname, p);
+/**
+ * meepworks-initialize-class-application-onLeave
+ *
+ * @param {object} own - High Level Context Container by (route)
+ */
+function _onLeave_initializer(own) {
+  if(own.onLeave !== Application.prototype.onLeave &&
+      isFunction(own.onLeave)
+    ) {
+    own.onLeave.bind(own[_CtxObject])
   }
-  return path.resolve(dirname, p);
 }
-function normalizeDirname(dirname) {
-  if(httpCheck.test(dirname)) {
-    return dirname.replace(httpReplace, '');
+
+/**
+ * meepworks-initialize-class-application-getChildRoutes
+ * initialize getChildRoutes
+ *
+ * @param {object} location - react-router location object
+ * @param {Function} cb
+ * @param {object} own - High Level Context Container by (route)
+ */
+function _getChildRoutes_initializer(location, cb, own) {
+  if(own[_Routes]) {
+    router_checker(own[_Routes], cb)
+  } else if(own[_LoadingRoutes]) {
+
+    (async () => {
+      await own[_LoadingRoutes];
+      router_checker(own[_Routes], cb)
+    })();
+  } else {
+    own[_LoadingRoutes] = (async () => {
+      let childRoutes = [];
+      childRoutes = await asyncMap(own[_ChildRoutes], r => {
+        try {
+          let child = new r(own[_Ctx]);
+          return child.routes;
+        } catch (err) {
+          warning(err)
+        }
+      });
+      own[_Routes] = childRoutes.filter(r => !!r);
+      router_checker(own[_Routes], cb)
+    })();
   }
-  return dirname;
 }
+
+/**
+ * meepworks-initialize-class-application-onEnter
+ * initialize onEnter
+ *
+ * @param {object} nextState - High Level Container state
+ * @param {Function} replaceState
+ * @param {Function} cb
+ * @param {object} own - High Level Context Container by (route)
+ */
+function _onEnter_initializer(nextState, replaceState, cb, own) {
+  (async () => {
+    try {
+      await own[_Locale].loadLocales();
+    } catch (err) {
+      if(!(err instanceof LocaleLoadError)) {
+        err = new LocaleLoadError(err);
+      }
+      warning(err)
+    }
+
+    /*
+     * avoid store instance run second time
+     * setting isLoaded to condition store loader
+     */
+    if (!own[_IsLoaded]) {
+      _store_mapper(own.stores, own[_Ctx])
+    }
+
+    if(own.path &&
+        own.onEnter !== Application.prototype.onEnter &&
+        isFunction(own.onEnter)
+      ){
+      try {
+        await own.onEnter.call(own[_CtxObject], nextState, replaceState);
+        cb();
+      } catch(err) {
+        warning(err)
+      }
+    } else {
+      cb();
+    }
+    own[_IsLoaded] = true
+  })();
+}
+
+/**
+ * meepworks-store-mapper
+ * private method,
+ * set context instance for store,
+ * help you to get the store when you get the store data from children router
+ * @param {Array} stores
+ * @param {Object} global context
+ * @returns {Array} new store extends with context
+ */
+ function _store_mapper(stores, context) {
+   return stores.forEach(function(s) {
+     s.getInstance(context)
+   })
+ }
