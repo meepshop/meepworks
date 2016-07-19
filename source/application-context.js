@@ -24,7 +24,7 @@ const _InitialData = Symbol('InitialData')
 
 export default class ApplicationContext {
   constructor({
-    initialData,
+    initialData = {},
     locale = 'en_US',
     acceptLanguage = [],
     localeMapping = {},

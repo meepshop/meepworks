@@ -18,7 +18,6 @@ export default function component_checker(component, callback) {
     warning(`component support only function, but got the ${typeof component}, please checkout your component type`)
     return void 0
   }
-
   try {
     callback(null, component)
   } catch (err) {
