@@ -6,8 +6,7 @@ Change Log
 
 1. Migrate old source code
 2. Fix child component error log
-3. remove gulp file
-4. remove jspm file
+3. remove gulp file, remove jspm file
 
 #v0.11.43
 **2015 Dec 08**
