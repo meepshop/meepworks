@@ -24,7 +24,7 @@ source -
          | - component（額外用輔助元件）
          | - utils（工具包）
          | - warning (計畫納入 utils)
-       - meepworks.js (api exposed file)
+       - index.js (api exposed file)
        - application-context.js (export ApplicationContext.js) -
        - application.js (export Application.js)                |
        - component (export Component.js)                       |
