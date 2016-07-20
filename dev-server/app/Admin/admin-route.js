@@ -24,14 +24,6 @@ export default class Admin extends Application {
     ]
   }
 
-  get locale() {
-    return {}
-  }
-
-  get dirname() {
-    return __dirname
-  }
-
   title() {
     return 'meepworks-next'
   }
