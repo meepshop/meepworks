@@ -1,6 +1,7 @@
 import Application from '../../../source/application'
 
 import TestComponent from './test-view.react'
+import AdminComponent from '../Admin/admin-route'
 
 export default class Test extends Application {
   get component() {
@@ -12,7 +13,9 @@ export default class Test extends Application {
   }
 
   get childRoutes() {
-    return []
+    return [
+      AdminComponent
+    ]
   }
 
   get stores() {
