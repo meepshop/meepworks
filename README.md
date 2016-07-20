@@ -38,9 +38,9 @@ source -
 1. 首先 fork 專案到自己的 github repo 下
 2. 到 terminal 中輸入 git clone [剛剛 fork 的專案位置(自己的)]
 3. npm i (安裝 node_module 依賴檔案)
-4. npm i webpack-dev-server --g
-5. npm start 啟動 webpack-dev-server
-6. 網址輸入 http://localhost:18881
+4. npm run watch (會用 webpack build 專案)
+5. npm start (啟動koa server)
+6. 網址輸入 http://localhost:18882
 
 # 如何幫助改進 (PULL REQUEST)
 
