@@ -3,7 +3,7 @@
 
 import { data } from './admin-mock'
 
-import { Store } from '../../../source/meepworks'
+import { Store } from '../../../source'
 import { fromJS } from 'immutable'
 
 // import dispatch action

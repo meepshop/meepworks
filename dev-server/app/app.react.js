@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { Router, browserHistory } from 'react-router'
 
-import { ApplicationContext } from '../../source/meepworks'
+import { ApplicationContext } from '../../source/'
 
 import Test from './Test/test-route'
 

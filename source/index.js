@@ -1,6 +1,7 @@
 import Application from './internal/core/class/Application'
 import ApplicationContext from './internal/core/class/ApplicationContext'
 import Component from './internal/core/class/Component'
+import Instance from './internal/core/class/Instance'
 import Action from './internal/core/class/Action'
 import Store from './internal/core/class/Store'
 
@@ -14,6 +15,7 @@ export {
   Application,
   ApplicationContext,
   Component,
+  Instance,
   Action,
   Store,
 

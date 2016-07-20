@@ -1,5 +1,5 @@
 import React from 'react'
-import Component from '../../../source/component'
+import { Component } from '../../../source'
 
 import {
   FetchUser,

@@ -1,4 +1,4 @@
-import { Application } from '../../../source/meepworks'
+import { Application } from '../../../source'
 
 import AdminComponent from './admin-view.react'
 
