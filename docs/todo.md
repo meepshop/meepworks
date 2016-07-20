@@ -3,7 +3,7 @@ Todo List
 
 Priority
 * [x] 由 koa server 啟動
-* [ ] 更新 react router
+* [x] 更新 react router
 
 Other
 * [x] 將 gulp 及 jspm 汰除
