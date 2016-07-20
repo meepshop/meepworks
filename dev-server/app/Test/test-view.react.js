@@ -1,5 +1,5 @@
 import React from 'react'
-import Component from '../../../source/component'
+import { Component } from '../../../source/meepworks'
 import Link from '../../../source/internal/component/link'
 
 export default class TestView extends Component {

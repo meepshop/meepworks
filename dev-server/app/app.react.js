@@ -4,7 +4,7 @@ import Router from 'react-router'
 
 import createBrowserHistory from 'history/lib/createBrowserHistory'
 
-import ApplicationContext from '../../source/application-context'
+import { ApplicationContext } from '../../source/meepworks'
 
 import Test from './Test/test-route'
 
