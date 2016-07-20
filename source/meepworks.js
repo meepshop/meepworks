@@ -4,10 +4,22 @@ import Component from './internal/core/class/Component'
 import Action from './internal/core/class/Action'
 import Store from './internal/core/class/Store'
 
+import Styles from './internal/core/class/Styles'
+import Tmpl from './internal/core/class/Tmpl'
+
+import merge from './merge'
+import tmpl from './tmpl'
+
 export {
   Application,
   ApplicationContext,
   Component,
   Action,
-  Store
+  Store,
+
+  Styles,
+  Tmpl,
+
+  merge,
+  tmpl
 }
