@@ -24,13 +24,14 @@ source -
          | - component（額外用輔助元件）
          | - utils（工具包）
          | - warning (計畫納入 utils)
-       - application-context.js (export ApplicationContext.js)
-       - application.js (export Application.js)
-       - component (export Component.js)
-       - action.js (export Action.js)
-       - store.js (export Store.js)
-       - styles.js (js-css 類別)
-       - tmpl (format 類別)
+       - meepworks.js (api exposed file)
+       - application-context.js (export ApplicationContext.js) -
+       - application.js (export Application.js)                |
+       - component (export Component.js)                       |
+       - action.js (export Action.js)                          | - Deprecate file (but not now)
+       - store.js (export Store.js)                            |
+       - styles.js (js-css 類別)                               |
+       - tmpl (format 類別) -----------------------------------
        --- 等待移動 ---
        - error.js (等待移動至 utils)
        - extend.js (等待移動至 utils)
