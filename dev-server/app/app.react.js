@@ -1,10 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Router from 'react-router'
+import { Router, browserHistory } from 'react-router'
 
-import createBrowserHistory from 'history/lib/createBrowserHistory'
-
-import ApplicationContext from '../../source/application-context'
+import { ApplicationContext } from '../../source/'
 
 import Test from './Test/test-route'
 
@@ -20,7 +18,7 @@ const _onUpdate = () => {
 
 ReactDOM.render(
   <Router
-    history={ createBrowserHistory() }
+    history={ browserHistory }
     onError={ _onError }
     routes={ routes }
     onUpdate={ _onUpdate } />

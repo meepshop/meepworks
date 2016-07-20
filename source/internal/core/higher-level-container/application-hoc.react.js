@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react'
-import { PropTypes as RouterPropTypes } from 'react-router'
+import { routerShape } from 'react-router'
 import Component from '../../../component'
 
 const ApplicationHOC = (WrapperComponent, applicationInstance, contextObject, child) => (
@@ -8,8 +8,7 @@ const ApplicationHOC = (WrapperComponent, applicationInstance, contextObject, ch
       return {
         ctx: PropTypes.object,
         locale: PropTypes.func,
-        history: RouterPropTypes.history,
-        route: RouterPropTypes.route
+        router: routerShape.isRequired
       }
     }
     static get childContextTypes() {
@@ -21,7 +20,7 @@ const ApplicationHOC = (WrapperComponent, applicationInstance, contextObject, ch
     componentDidMount() {
       if (this.routerWillLeave !== applicationInstance.prototype.routerWillLeave &&
          typeof child.routerWillLeave === 'function') {
-        this._unlistenBeforeLeavingRoute = this.context.history.listenBefore(
+        this._unlistenBeforeLeavingRoute = this.context.router.listenBefore(
           child.routerWillLeave.bind(this)
         )
       }

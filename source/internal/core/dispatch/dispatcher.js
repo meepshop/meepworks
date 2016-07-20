@@ -1,5 +1,5 @@
 import Flux from 'flux'
-import Instance from './instance'
+import Instance from '../../core/class/Instance'
 
 const _DispatchToken = Symbol()
 const _Dispatcher = Symbol()

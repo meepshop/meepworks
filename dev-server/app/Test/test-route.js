@@ -1,4 +1,4 @@
-import Application from '../../../source/application'
+import { Application } from '../../../source'
 
 import TestComponent from './test-view.react'
 import AdminComponent from '../Admin/admin-route'
