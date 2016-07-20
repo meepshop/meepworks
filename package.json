@@ -5,6 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm run server",
+    "watch": "webpack --config webpack.dev.config.js --watch",
     "server": "./node_modules/babel-cli/bin/babel-node.js dev-server dev-server"
   },
   "repository": {
