@@ -1,8 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Router from 'react-router'
-
-import createBrowserHistory from 'history/lib/createBrowserHistory'
+import { Router, browserHistory } from 'react-router'
 
 import { ApplicationContext } from '../../source/meepworks'
 
@@ -20,7 +18,7 @@ const _onUpdate = () => {
 
 ReactDOM.render(
   <Router
-    history={ createBrowserHistory() }
+    history={ browserHistory }
     onError={ _onError }
     routes={ routes }
     onUpdate={ _onUpdate } />

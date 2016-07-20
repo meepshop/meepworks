@@ -67,7 +67,7 @@
     "html-escape": "^1.0.2",
     "immutable": "^3.7.5",
     "intl": "^1.0.0",
-    "react-router": "^1.0.0-rc3",
+    "react-router": "^2.6.0",
     "systemjs-builder": "^0.14.6",
     "transit-immutable-js": "^0.4.0",
     "transit-js": "^0.8.837",

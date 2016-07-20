@@ -3,6 +3,7 @@ import { Component } from '../../../source/meepworks'
 import Link from '../../../source/internal/component/link'
 
 export default class TestView extends Component {
+
   componentDidMount() {
     console.log('component mounted !')
   }
