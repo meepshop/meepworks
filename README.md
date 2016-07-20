@@ -8,24 +8,30 @@ Meepworks Framework
 #### 改進 -> 測試 -> 發布合併請求 -> 檢視 -> 測試 -> 簽名（簽章）-> 版本 -> 上線
 #### IMPROVEMENT -> TEST -> PULLREQUEST -> REVIEW CODE -> TEST -> SIGNATURE -> VERSION -> PRODUCTION
 
-# 主要專案結構 (改善中)
+# 主要專案結構
 
 ```
 source -
        | - internal (內部檔案)
          | - core (核心檔案)
+           | - class
+             | - Application.js (設定router相關的類別)
+             | - ApplicationContext.js (全域使用的參數與方法)
+             | - Component.js (子元件類別)
+             | - Action.js (產生 flux 的 action 類別)
+             | - Store.js （產生 flux 的 store 類別）
+             | - Instance.js
          | - component（額外用輔助元件）
          | - utils（工具包）
          | - warning (計畫納入 utils)
-       - application-context.js (全域使用的參數與方法)
-       - application.js (設定router相關的類別)
-       - component (子元件類別)
-       - instance.js (產生實體類別)
-       - dispatcher.js （flux 的 dispatcher）
-       - action.js (產生 flux 的 action 類別)
-       - store.js （產生 flux 的 store 類別）
-       - styles.js (js-css 類別)
-       - tmpl (format 類別)
+       - meepworks.js (api exposed file)
+       - application-context.js (export ApplicationContext.js) -
+       - application.js (export Application.js)                |
+       - component (export Component.js)                       |
+       - action.js (export Action.js)                          | - Deprecate file (but not now)
+       - store.js (export Store.js)                            |
+       - styles.js (js-css 類別)                               |
+       - tmpl (format 類別) -----------------------------------
        --- 等待移動 ---
        - error.js (等待移動至 utils)
        - extend.js (等待移動至 utils)
@@ -38,9 +44,9 @@ source -
 1. 首先 fork 專案到自己的 github repo 下
 2. 到 terminal 中輸入 git clone [剛剛 fork 的專案位置(自己的)]
 3. npm i (安裝 node_module 依賴檔案)
-4. npm i webpack-dev-server --g
-5. npm start 啟動 webpack-dev-server
-6. 網址輸入 http://localhost:18881
+4. npm run watch (會用 webpack build 專案)
+5. npm start (啟動koa server)
+6. 網址輸入 http://localhost:18882
 
 # 如何幫助改進 (PULL REQUEST)
 
