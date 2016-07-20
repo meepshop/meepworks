@@ -1,6 +1,6 @@
 {
   "name": "meepworks",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "description": "Isomorphic Framework based on ReactJS & Flux",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
