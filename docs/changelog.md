@@ -1,6 +1,15 @@
 Change Log
 ===
 
+#v0.14.0 **2016 July 20**
+
+Now react-router was upgrade to version 2.6.0
+
+1. Remove `this.props.history`
+2. Use `this.context.router` instead `this.props.history`
+3. Use `this.props.router.push` instead pushState and `this.props.history.replace`
+4. Exposed all api in meepworks/index.js
+
 #v0.13.0
 **2016 July 19**
 
